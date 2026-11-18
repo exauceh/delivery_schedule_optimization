@@ -1,0 +1,11 @@
+etape,lignes,commentaire
+Chargement,5728,Fichier brut
+Dernière version du programme,5728,
+Filtre quantité > 0,4769,Lignes sans besoin écartées
+Imputation du poids,4769,139 lignes imputées
+Imputation du volume,4769,119 lignes imputées
+Ajout des distances,4769,5 lignes à distance imputée
+Calendrier,4769,379 lignes dans le cumul de fin d'horizon
+Signalement des anomalies,4769,42 poids unitaires atypiques
+Agrégation couple x jour,1731,Livraisons actuelles
+Synthèse par couple,181,Couples avec au moins un besoin

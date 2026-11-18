@@ -1,0 +1,29 @@
+id,source,controle,n_concernes,pct,gravite,detail,regle_de_traitement
+S01,schedule,"Doublons sur la clé (date, fournisseur, material, usine, quai)",0,0.0,OK,,
+S02,schedule,Lignes sans besoin (quantité = 0),959,16.74,INFO,,Écartées : rien à livrer (filtre quantité > 0)
+S03,schedule,"Valeurs négatives (quantité, poids, volume)",0,0.0,OK,,
+S04,schedule,Poids manquant sur une ligne avec besoin,139,2.91,ATTENTION,,"Imputation : poids unitaire médian du material x quantité, sinon poids médian d'une ligne du couple, sinon médiane globale ; tracé dans `weight_source`"
+S05,schedule,Volume manquant sur une ligne avec besoin,119,2.5,ATTENTION,,"Imputation : volume du material (constant par material), sinon médiane du couple, sinon médiane globale ; tracé dans `volume_source`"
+S06,schedule,Quantité > 0 mais poids = 0,0,0.0,OK,,
+S07,schedule,Quantité = 0 mais volume > 0,931,16.25,INFO,Le volume est renseigné même sans besoin,Sans effet (lignes écartées) ; indique que `volume` est un attribut du material
+S08,schedule,Volume identique quelle que soit la quantité (materials à quantité variable),397,85.38,ATTENTION,"Valeurs typiques d'emballage (1,2 m³ = palette) : le volume semble être celui d'une unité de manutention",Hypothèse à valider : `volume` utilisé tel quel comme volume de la ligne (convention du cahier des charges)
+S09,schedule,Besoin un samedi ou un dimanche,0,0.0,OK,,
+S10,schedule,Besoin un jour férié,487,10.21,INFO,"01/01/2027, 11/11/2026",Conservé et signalé (`is_holiday`) ; le moteur évitera de livrer ces jours-là
+S11,schedule,Dernière date = cumul de fin d'horizon,379,7.95,ATTENTION,01/01/2027 : 7.2x le poids d'un jour médian,Conservé et signalé (`is_horizon_bucket`) ; exclu par défaut de la consolidation hebdomadaire
+S12,schedule,"Ligne seule plus lourde qu'un camion (24,5 t)",2,0.04,ATTENTION,,Conservée ; nécessitera plusieurs camions (`line_exceeds_truck`)
+S13,schedule,Couple x jour plus lourd qu'un camion,8,0.46,INFO,,Normal : plusieurs camions ce jour-là
+S14,schedule,Poids unitaire à plus de 10x la médiane du material,41,0.86,INFO,15 materials concernés,"Signalé (`unit_weight_outlier`), non corrigé : le poids est brut, emballage compris"
+S15,schedule,Plusieurs versions du programme,0,0.0,OK,,
+S16,schedule,Date de transmission postérieure à la version,0,0.0,OK,,
+S17,schedule,Besoin daté avant ou le jour de la version du programme,0,0.0,OK,,
+S18,schedule,Quai rattaché à plusieurs usines,0,0.0,OK,,
+S19,schedule,Couple fournisseur x usine sans aucun besoin,4,2.16,INFO,"SUP_00003/PLT_004, SUP_00018/PLT_004, SUP_00095/PLT_004, SUP_00046/PLT_001",Exclu de la consolidation (rien à livrer)
+D01,distances,Fournisseur en double,0,0.0,OK,,
+D02,distances,Distance manquante (tous fournisseurs),11,7.05,INFO,,Sans effet si absent du planning
+D03,distances,Fournisseur du planning sans distance,2,2.13,ATTENTION,"SUP_00047, SUP_00130",Imputation par la median des distances des fournisseurs du planning (`distance_source`)
+D04,distances,Distance nulle ou au-delà de la dernière tranche fermée (650 km),0,0.0,OK,,
+R01,rate_sheet,Cellules vides dans la grille,0,0.0,OK,14 tranches km x 15 tranches kg,
+R02,rate_sheet,Tarif non croissant avec la distance ou le poids,0,0.0,OK,,
+R03,rate_sheet,"Exemple du PDF (300 km, 1 000 kg = 335,34 EUR) non retrouvé",0,0.0,OK,Recalculé : 335.34 EUR,
+R04,rate_sheet,Tarif non valide à la première date du planning,0,0.0,OK,Valide depuis 2026-08-01,
+R05,rate_sheet,Envoi > 4 000 kg : tarif forfaitaire de la tranche ouverte,90,4.64,INFO,Couple x jour dépassant 4 000 kg dans le planning actuel,Hypothèse à confirmer : tarif « >4000 » appliqué par envoi (par camion)
