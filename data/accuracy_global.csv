@@ -2,5 +2,6 @@
 rows,4389.0
 rows_modified,138.0
 rows_accuracy,0.9685577580314423
-weight_accuracy,0.9670400449359317
+weight_accuracy,0.3260749607203006
+volume_accuracy,0.18018130257845147
 rows_removed,1339.0

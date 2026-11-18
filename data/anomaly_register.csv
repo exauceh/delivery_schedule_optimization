@@ -1,27 +1,13 @@
 rule,source,severity,rows,action
-DQ01,schedule,none,0,trimmed / upper-cased
-DQ01,schedule,none,0,dropped (invalid identifier)
-DQ02,schedule,none,0,dropped (exact duplicate)
-DQ02,schedule,none,0,"flagged only (same key, different values)"
-DQ03,schedule,info,959,"dropped (quantity = 0, no need)"
-DQ03,schedule,none,0,dropped (negative quantity)
-DQ03,schedule,none,0,dropped (missing quantity)
-DQ04,schedule,none,0,flagged and kept (outside horizon)
-DQ04,schedule,none,0,"flagged and kept (no delivery on weekends, handled by the optimization)"
-DQ04,schedule,none,0,"flagged and kept (no delivery on German public holidays, handled by the optimization)"
-DQ05,schedule,info,379,"dropped (date >= 2027-01-01, needs accumulated after the horizon)"
-DQ06,schedule,none,0,weight imputed with the same material x dock value
-DQ06,schedule,warning,108,weight imputed with the couple median
-DQ06,schedule,warning,26,weight imputed with the plant median
-DQ06,schedule,none,0,weight not imputable
-DQ06,schedule,none,0,volume imputed with the same material x dock value
-DQ06,schedule,warning,90,volume imputed with the couple median
-DQ06,schedule,warning,26,volume imputed with the plant median
-DQ06,schedule,none,0,volume not imputable
-DQ07,schedule,warning,1,"dropped (weight > 24500 kg, heavier than one truck)"
-DQ08,distances,none,0,kept first value
-DQ09,distances,warning,1,1 supplier(s) imputed with the median 60.5 km
-DQ10,rate_sheet,none,0,missing price
-DQ10,rate_sheet,none,0,price decreases with distance
-DQ10,rate_sheet,none,0,price decreases with weight
-DQ10,rate_sheet,none,0,rate_sheet.csv differs from rate_sheet.pdf
+DQ01,schedule,info,959,"dropped (quantity = 0, no need)"
+DQ01,schedule,none,0,dropped (negative quantity)
+DQ01,schedule,none,0,dropped (missing quantity)
+DQ02,schedule,none,0,flagged and kept (outside horizon)
+DQ02,schedule,none,0,"flagged and kept (no delivery on weekends, handled by the optimization)"
+DQ02,schedule,none,0,"flagged and kept (no delivery on German public holidays, handled by the optimization)"
+DQ03,schedule,info,379,"dropped (date >= 2027-01-01, needs accumulated after the horizon)"
+DQ04,schedule,warning,134,"weight imputed (truck_max, impute_quantile=None)"
+DQ04,schedule,warning,116,"volume imputed (truck_max, impute_quantile=None)"
+DQ05,schedule,warning,1,"dropped (weight > 24500 kg, heavier than one truck)"
+DQ06,distances,none,0,kept first value
+DQ07,distances,warning,1,1 supplier(s) imputed with the median 60.5 km
