@@ -10,9 +10,11 @@ DQ04,schedule,none,0,flagged and kept (outside horizon)
 DQ04,schedule,none,0,"flagged and kept (no delivery on weekends, handled by the optimization)"
 DQ04,schedule,none,0,"flagged and kept (no delivery on German public holidays, handled by the optimization)"
 DQ05,schedule,info,379,"dropped (date >= 2027-01-01, needs accumulated after the horizon)"
+DQ06,schedule,none,0,weight imputed with the same material x dock value
 DQ06,schedule,warning,108,weight imputed with the couple median
 DQ06,schedule,warning,26,weight imputed with the plant median
 DQ06,schedule,none,0,weight not imputable
+DQ06,schedule,none,0,volume imputed with the same material x dock value
 DQ06,schedule,warning,90,volume imputed with the couple median
 DQ06,schedule,warning,26,volume imputed with the plant median
 DQ06,schedule,none,0,volume not imputable
@@ -22,3 +24,4 @@ DQ09,distances,warning,1,1 supplier(s) imputed with the median 60.5 km
 DQ10,rate_sheet,none,0,missing price
 DQ10,rate_sheet,none,0,price decreases with distance
 DQ10,rate_sheet,none,0,price decreases with weight
+DQ10,rate_sheet,none,0,rate_sheet.csv differs from rate_sheet.pdf
