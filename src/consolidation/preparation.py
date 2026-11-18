@@ -19,7 +19,7 @@ import pandas as pd
 
 from . import config
 from .loaders import RateSheet
-from .quality import unit_weight_ratio
+from .quality import is_missing, unit_weight_ratio
 
 WEEKDAY_NAMES = ["Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi", "Dimanche"]
 
@@ -60,10 +60,12 @@ def _fill_by_hierarchy(target: pd.Series, candidates: list[tuple[str, pd.Series]
 
 
 def impute_volume(lines: pd.DataFrame, reference: pd.DataFrame) -> pd.DataFrame:
-    """Volume manquant -> volume du material (constant par material, toutes lignes du
+    """Volume manquant ou nul -> volume du material (constant par material, toutes lignes du
     planning, y compris quantité 0) -> médiane du couple -> médiane globale."""
     out = lines.copy()
-    mat_vol = reference.dropna(subset=["volume"]).groupby("material")["volume"].agg(lambda x: x.mode().iat[0])
+    out.loc[is_missing(out["volume"]), "volume"] = np.nan
+    ref = reference[~is_missing(reference["volume"])]
+    mat_vol = ref.groupby("material")["volume"].agg(lambda x: x.mode().iat[0])
     couple_med = out.groupby(config.COUPLE_KEY)["volume"].transform("median")
     out["volume"], out["volume_source"] = _fill_by_hierarchy(out["volume"], [
         ("material", out["material"].map(mat_vol)),
@@ -77,7 +79,7 @@ def impute_weight(lines: pd.DataFrame) -> pd.DataFrame:
     """Poids manquant ou nul -> poids unitaire médian du material x quantité
     -> poids médian d'une ligne du couple -> poids médian global d'une ligne."""
     out = lines.copy()
-    out.loc[out["weight"] <= 0, "weight"] = np.nan
+    out.loc[is_missing(out["weight"]), "weight"] = np.nan
     unit = (out["weight"] / out["schedule_quantity"]).groupby(out["material"]).median()
     couple_med = out.groupby(config.COUPLE_KEY)["weight"].transform("median")
     out["weight"], out["weight_source"] = _fill_by_hierarchy(out["weight"], [

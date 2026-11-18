@@ -2,9 +2,8 @@ id,source,controle,n_concernes,pct,gravite,detail,regle_de_traitement
 S01,schedule,"Doublons sur la clé (date, fournisseur, material, usine, quai)",0,0.0,OK,,
 S02,schedule,Lignes sans besoin (quantité = 0),959,16.74,INFO,,Écartées : rien à livrer (filtre quantité > 0)
 S03,schedule,"Valeurs négatives (quantité, poids, volume)",0,0.0,OK,,
-S04,schedule,Poids manquant sur une ligne avec besoin,139,2.91,ATTENTION,,"Imputation : poids unitaire médian du material x quantité, sinon poids médian d'une ligne du couple, sinon médiane globale ; tracé dans `weight_source`"
-S05,schedule,Volume manquant sur une ligne avec besoin,119,2.5,ATTENTION,,"Imputation : volume du material (constant par material), sinon médiane du couple, sinon médiane globale ; tracé dans `volume_source`"
-S06,schedule,Quantité > 0 mais poids = 0,0,0.0,OK,,
+S04,schedule,Poids manquant ou nul sur une ligne avec besoin,139,2.91,ATTENTION,"139 vides, 0 nuls","Imputation : poids unitaire médian du material x quantité, sinon poids médian d'une ligne du couple, sinon médiane globale ; tracé dans `weight_source`"
+S05,schedule,Volume manquant ou nul sur une ligne avec besoin,119,2.5,ATTENTION,"119 vides, 0 nuls","Imputation : volume du material (constant par material), sinon médiane du couple, sinon médiane globale ; tracé dans `volume_source`"
 S07,schedule,Quantité = 0 mais volume > 0,931,16.25,INFO,Le volume est renseigné même sans besoin,Sans effet (lignes écartées) ; indique que `volume` est un attribut du material
 S08,schedule,Volume identique quelle que soit la quantité (materials à quantité variable),397,85.38,ATTENTION,"Valeurs typiques d'emballage (1,2 m³ = palette) : le volume semble être celui d'une unité de manutention",Hypothèse à valider : `volume` utilisé tel quel comme volume de la ligne (convention du cahier des charges)
 S09,schedule,Besoin un samedi ou un dimanche,0,0.0,OK,,

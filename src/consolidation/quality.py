@@ -30,6 +30,15 @@ def _row(check_id, source, check, n, total, severity, rule, detail=""):
     }
 
 
+def is_missing(values: pd.Series) -> pd.Series:
+    """Poids ou volume inexploitable : vide OU nul (<= 0).
+
+    Règle métier : un 0 et une valeur absente ont le même impact (on ne connaît pas la
+    charge réelle de la ligne), ils sont donc détectés et traités de la même manière.
+    """
+    return values.isna() | (values <= 0)
+
+
 def unit_weight_ratio(needs: pd.DataFrame) -> pd.Series:
     """Poids unitaire de chaque ligne rapporté à la médiane de son material."""
     wu = needs["weight"] / needs["schedule_quantity"]
@@ -50,16 +59,17 @@ def schedule_checks(s: pd.DataFrame) -> list[dict]:
     rows.append(_row("S03", "schedule", "Valeurs négatives (quantité, poids, volume)",
                      (s[["schedule_quantity", "weight", "volume"]] < 0).any(axis=1).sum(), n, CRIT,
                      "Ligne rejetée"))
-    rows.append(_row("S04", "schedule", "Poids manquant sur une ligne avec besoin",
-                     needs["weight"].isna().sum(), m, WARN,
-                     "Imputation : poids unitaire médian du material x quantité, "
-                     "sinon poids médian d'une ligne du couple, sinon médiane globale ; tracé dans `weight_source`"))
-    rows.append(_row("S05", "schedule", "Volume manquant sur une ligne avec besoin",
-                     needs["volume"].isna().sum(), m, WARN,
-                     "Imputation : volume du material (constant par material), "
-                     "sinon médiane du couple, sinon médiane globale ; tracé dans `volume_source`"))
-    rows.append(_row("S06", "schedule", "Quantité > 0 mais poids = 0",
-                     (needs["weight"] == 0).sum(), m, CRIT, "Traité comme poids manquant"))
+    # S04 / S05 : vide et nul sont un seul et même cas (ancien contrôle S06 « poids = 0 » fusionné dans S04)
+    for check_id, col, label, rule in [
+        ("S04", "weight", "Poids manquant ou nul sur une ligne avec besoin",
+         "Imputation : poids unitaire médian du material x quantité, "
+         "sinon poids médian d'une ligne du couple, sinon médiane globale ; tracé dans `weight_source`"),
+        ("S05", "volume", "Volume manquant ou nul sur une ligne avec besoin",
+         "Imputation : volume du material (constant par material), "
+         "sinon médiane du couple, sinon médiane globale ; tracé dans `volume_source`"),
+    ]:
+        rows.append(_row(check_id, "schedule", label, is_missing(needs[col]).sum(), m, WARN, rule,
+                         f"{needs[col].isna().sum()} vides, {(needs[col] <= 0).sum()} nuls"))
     rows.append(_row("S07", "schedule", "Quantité = 0 mais volume > 0",
                      ((s["schedule_quantity"] == 0) & (s["volume"] > 0)).sum(), n, INFO,
                      "Sans effet (lignes écartées) ; indique que `volume` est un attribut du material",
@@ -232,7 +242,10 @@ def referential_integrity(schedule: pd.DataFrame, distances: pd.DataFrame, rates
     return out
 
 
-def missing_values(df: pd.DataFrame) -> pd.DataFrame:
-    """Valeurs manquantes par colonne."""
-    na = df.isna().sum()
-    return pd.DataFrame({"manquants": na, "pct": (100 * na / len(df)).round(2)}).query("manquants > 0")
+def missing_values(df: pd.DataFrame, zero_as_missing=("weight", "volume")) -> pd.DataFrame:
+    """Valeurs manquantes par colonne ; pour `zero_as_missing`, un 0 compte comme manquant."""
+    out = pd.DataFrame({"vides": df.isna().sum()})
+    out["nuls"] = [int((df[c] <= 0).sum()) if c in zero_as_missing else 0 for c in df.columns]
+    out["manquants_ou_nuls"] = out["vides"] + out["nuls"]
+    out["pct"] = (100 * out["manquants_ou_nuls"] / len(df)).round(2)
+    return out.query("manquants_ou_nuls > 0")
