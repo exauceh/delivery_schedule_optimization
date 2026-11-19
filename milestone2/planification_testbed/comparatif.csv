@@ -1,0 +1,4 @@
+scenario,lines,trucks,cost_eur,peak_trucks_per_day,max_advance_days,saving_eur
+A,4251,1603,142964.05,109,0,0.0
+B,4251,558,74970.67,50,7,67993.38
+C,4251,338,56405.38,36,7,86558.67
