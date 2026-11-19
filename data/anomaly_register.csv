@@ -10,4 +10,4 @@ DQ04,schedule,warning,134,"weight imputed (truck_max, impute_quantile=None)"
 DQ04,schedule,warning,116,"volume imputed (truck_max, impute_quantile=None)"
 DQ05,schedule,warning,1,"dropped (weight > 24500 kg, heavier than one truck)"
 DQ06,distances,none,0,kept first value
-DQ07,distances,warning,1,1 supplier(s) imputed with the median 60.5 km
+DQ07,distances,warning,1,1 supplier(s) imputed with the maximum of the planning distances (149.0 km)
