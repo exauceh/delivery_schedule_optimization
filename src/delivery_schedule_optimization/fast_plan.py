@@ -201,13 +201,13 @@ def serialize(plans, source: list[Line], holidays: set[date], scenario: str) -> 
     return shipment_rows, allocations, stats
 
 
-def run(root: Path, output: Path) -> dict:
+def run(root: Path, output: Path, *, include_imputed: bool = False) -> dict:
     start = perf_counter()
     cutoff = start + 70
     prepared = load_prepared_lines(root / "data" / "schedule_clean.csv")
     grid = load_rate_grid(root / "docs" / "rate_sheet.csv")
     # Use the same measured and priced scope as the previous testbed comparison.
-    eligible = prepared.loc[~prepared["any_imputed"]]
+    eligible = prepared if include_imputed else prepared.loc[~prepared["any_imputed"]]
     lines = [Line(r.prepared_line_id, r.supplier_id, r.plant, r.unloading_point, r.material,
                   r.date.date(), r.schedule_quantity, r.weight, r.volume, r.distance)
              for r in eligible.itertuples(index=False)]
@@ -268,7 +268,7 @@ def run(root: Path, output: Path) -> dict:
         pd.DataFrame(shipments).to_csv(output / f"camions_{scenario}.csv", index=False)
         pd.DataFrame(allocations).to_csv(output / f"affectations_{scenario}.csv", index=False)
         summaries.append(stats)
-    prepared.loc[prepared["any_imputed"], [
+    prepared.loc[~prepared.index.isin(eligible.index), [
         "prepared_line_id", "weight_imputed", "volume_imputed", "distance_imputed"
     ]].to_csv(output / "exclusions_preparees.csv", index=False)
     for stats in summaries:
