@@ -1,7 +1,9 @@
 """Delivery consolidation engine (milestone 3).
 
-One MILP per couple supplier x plant and per profile N (at most N delivery weekdays per week).
+First pass: one MILP per couple supplier x plant and per profile N (at most N delivery weekdays per week).
 The couples are independent, so every (couple, N) problem is solved in parallel in its own process.
+Second pass (smoothing, RG09): every weekday set of each couple's profile is priced, then one small MILP
+per plant picks a weekday set per couple to lower the daily truck peak within a cost budget.
 The mathematical model is documented in milestone3/milestone3.ipynb.
 """
 
@@ -10,9 +12,10 @@ from __future__ import annotations
 import logging
 import os
 import time
-from collections.abc import Iterable, Sequence
+from collections.abc import Iterable, Mapping, Sequence
 from concurrent.futures import ProcessPoolExecutor, as_completed
 from dataclasses import dataclass, replace
+from itertools import combinations
 
 import numpy as np
 import numpy.typing as npt
@@ -78,6 +81,7 @@ def solve_couple(
     settings: SolverSettings,
     window_days: int | None = None,
     profile_reached: bool = True,
+    weekdays: Sequence[int] | None = None,
 ) -> CoupleSolution:
     """Build and solve the MILP of one couple for the profile n_max.
 
@@ -86,6 +90,7 @@ def solve_couple(
     profile_reached: constraint (8), every allowed weekday is delivered in at least one same week, so the
         number of allowed weekdays equals the highest weekly frequency (no weekday kept only to float).
         Disabled to replay the current situation, which does not follow a profile.
+    weekdays: allowed weekdays imposed (0 = Monday), used by the smoothing to price every weekday set.
     """
     window = settings.max_anticipation_days if window_days is None else window_days
     days = calendar.astype("datetime64[D]")
@@ -134,6 +139,9 @@ def solve_couple(
         prob += x[dj] <= pulp.lpSum(var for _, var in assigned)  # (6) no empty delivery
         prob += x[dj] <= s[int(day_weekday[dj])]  # (7) delivery only on an allowed weekday
     prob += pulp.lpSum(s.values()) <= n_max  # (7) at most n_max allowed weekdays
+    if weekdays is not None:  # smoothing: the weekday set is imposed
+        for d, var in s.items():
+            prob += var == (1 if d in weekdays else 0)
 
     if profile_reached:  # (8) one week h delivers every allowed weekday (holidays excepted)
         day_number = days.astype(np.int64)
@@ -296,6 +304,21 @@ def best_per_profile(solved: Sequence[CoupleSolution], frequencies: Iterable[int
     return plans
 
 
+RETRY_TIME_FACTOR = 6  # a solve with no plan at all within the time limit is retried once with 6x the limit
+
+
+def _solve_task(inst: CoupleInstance, n_max: int, calendar: npt.NDArray[np.datetime64],
+                settings: SolverSettings) -> CoupleSolution:
+    """solve_couple, retried once with a longer time limit when the solver found no plan in time."""
+    try:
+        return solve_couple(inst, n_max, calendar, settings)
+    except RuntimeError:
+        longer = replace(settings, time_limit_s=settings.time_limit_s * RETRY_TIME_FACTOR)
+        logger.warning("%s x %s N=%d: no plan in %.0f s, retrying with %.0f s", inst.supplier_id, inst.plant,
+                       n_max, settings.time_limit_s, longer.time_limit_s)
+        return solve_couple(inst, n_max, calendar, longer)
+
+
 def solve_all(
     instances: Sequence[CoupleInstance],
     frequencies: Sequence[int],
@@ -310,10 +333,162 @@ def solve_all(
     solved: dict[tuple[str, str], list[CoupleSolution]] = {inst.key: [] for inst in instances}
     start = time.perf_counter()
     with ProcessPoolExecutor(max_workers=workers) as pool:
-        futures = {pool.submit(solve_couple, inst, n, calendar, settings): inst.key for inst, n in tasks}
+        futures = {pool.submit(_solve_task, inst, n, calendar, settings): inst.key for inst, n in tasks}
         for done, future in enumerate(as_completed(futures), start=1):
             solved[futures[future]].append(future.result())
             if done % 150 == 0 or done == len(futures):
                 logger.info("%d / %d solves done (%.0f s, %d workers)", done, len(futures),
                             time.perf_counter() - start, workers)
     return {key: best_per_profile(sols, frequencies) for key, sols in solved.items()}
+
+
+# --------------------------------------------------------------------------- smoothing (second pass, RG09)
+
+
+@dataclass(frozen=True)
+class CoupleOption:
+    """One weekday set of a couple's profile, with its plan loaded truck by truck."""
+
+    weekdays: tuple[int, ...]
+    plan: CoupleSolution
+    cost: float  # EUR, sum of the truck costs after loading
+    days: npt.NDArray[np.datetime64]  # delivery days of the plan
+    trucks: npt.NDArray[np.int64]  # trucks on each delivery day (same order as days)
+
+
+@dataclass(frozen=True)
+class PlantSmoothing:
+    """Result of the smoothing of one plant."""
+
+    plant: str
+    chosen: dict[tuple[str, str], CoupleOption]
+    peak_before: int  # highest number of trucks received on one day, before smoothing
+    peak_after: int
+    cost_before: float  # EUR, loaded cost of the plant before smoothing
+    cost_after: float
+    status: str
+
+
+def evaluate_plan(inst: CoupleInstance, plan: CoupleSolution, settings: SolverSettings) -> CoupleOption:
+    """Load every delivery of a couple's plan and count its trucks per day."""
+    days = np.unique(plan.delivery_days)
+    trucks = np.zeros(len(days), dtype=np.int64)
+    cost = 0.0
+    for i, day in enumerate(days):
+        on_day = plan.delivery_days == day
+        load = load_delivery(inst.weights[on_day], inst.volumes[on_day], inst.prices, inst.bracket_upper, settings)
+        trucks[i] = load.n_trucks
+        cost += float(load.truck_costs.sum())
+    return CoupleOption(weekdays=plan.weekdays, plan=plan, cost=cost, days=days, trucks=trucks)
+
+
+def _solve_option(
+    inst: CoupleInstance, weekdays: tuple[int, ...], calendar: npt.NDArray[np.datetime64], settings: SolverSettings
+) -> CoupleOption | None:
+    """Plan of a couple with an imposed weekday set; None when the solver finds no plan for it."""
+    try:
+        plan = solve_couple(inst, len(weekdays), calendar, settings, weekdays=weekdays)
+    except RuntimeError:
+        logger.debug("%s x %s: no plan with weekdays %s", inst.supplier_id, inst.plant, weekdays)
+        return None
+    return evaluate_plan(inst, plan, settings)
+
+
+def build_options(
+    instances: Sequence[CoupleInstance],
+    chosen: Mapping[tuple[str, str], CoupleSolution],
+    calendar: npt.NDArray[np.datetime64],
+    settings: SolverSettings,
+    workers: int | None = None,
+) -> dict[tuple[str, str], list[CoupleOption]]:
+    """Every weekday set of each couple's profile N, priced and loaded (first option = plan of the first pass).
+
+    The profile N of a couple is the number of weekdays of its first-pass plan: the smoothing only moves the
+    delivery weekdays, it never changes the frequency.
+    """
+    workers = workers or os.cpu_count() or 1
+    options = {inst.key: [evaluate_plan(inst, chosen[inst.key], settings)] for inst in instances}
+    tasks = [
+        (inst, combo)
+        for inst in instances
+        for combo in combinations(range(N_WEEKDAYS), len(chosen[inst.key].weekdays))
+        if combo != chosen[inst.key].weekdays
+    ]
+    tasks.sort(key=lambda t: -len(t[0].line_ids))  # largest first
+    start = time.perf_counter()
+    with ProcessPoolExecutor(max_workers=workers) as pool:
+        futures = {pool.submit(_solve_option, inst, combo, calendar, settings): inst.key for inst, combo in tasks}
+        for done, future in enumerate(as_completed(futures), start=1):
+            option = future.result()
+            if option is not None:
+                options[futures[future]].append(option)
+            if done % 250 == 0 or done == len(futures):
+                logger.info("%d / %d weekday sets priced (%.0f s, %d workers)", done, len(futures),
+                            time.perf_counter() - start, workers)
+    return options
+
+
+def smooth_plant(
+    plant: str,
+    options: Mapping[tuple[str, str], Sequence[CoupleOption]],
+    tolerance: float,
+    time_limit_s: float = 30.0,
+) -> PlantSmoothing:
+    """Choose one weekday set per couple of a plant: lowest daily truck peak, then lowest cost.
+
+    The cost may rise by at most `tolerance` x the cost of the first pass (option 0 of every couple).
+    Stage 1 minimises the peak P; stage 2 keeps the peak at P and minimises the cost.
+    """
+    couples = list(options)
+    days = sorted({day for key in couples for opt in options[key] for day in opt.days.tolist()})
+    cost_before = sum(options[key][0].cost for key in couples)
+    budget = (1 + tolerance) * cost_before + 1e-6
+
+    def daily(choice: Mapping[tuple[str, str], CoupleOption]) -> dict[object, int]:
+        load: dict[object, int] = dict.fromkeys(days, 0)
+        for opt in choice.values():
+            for day, n in zip(opt.days.tolist(), opt.trucks.tolist(), strict=True):
+                load[day] += n
+        return load
+
+    def solve(peak_cap: float | None) -> tuple[dict[tuple[str, str], CoupleOption], str]:
+        prob = pulp.LpProblem(f"smoothing_{plant}", pulp.LpMinimize)
+        u = {(c, o): pulp.LpVariable(f"u_{c}_{o}", cat=pulp.LpBinary)
+             for c in range(len(couples)) for o in range(len(options[couples[c]]))}
+        peak = pulp.LpVariable("peak", lowBound=0)
+        cost = pulp.lpSum(options[couples[c]][o].cost * var for (c, o), var in u.items())
+        prob += peak if peak_cap is None else cost
+        for c in range(len(couples)):  # one weekday set per couple
+            prob += pulp.lpSum(u[c, o] for o in range(len(options[couples[c]]))) == 1
+        load: dict[object, list[pulp.LpAffineExpression]] = {day: [] for day in days}
+        for (c, o), var in u.items():
+            opt = options[couples[c]][o]
+            for day, n in zip(opt.days.tolist(), opt.trucks.tolist(), strict=True):
+                load[day].append(n * var)
+        for terms in load.values():  # trucks received by the plant on each day
+            prob += pulp.lpSum(terms) <= (peak if peak_cap is None else peak_cap + 1e-6)
+        prob += cost <= budget  # cost budget
+        prob.solve(pulp.HiGHS(msg=False, timeLimit=time_limit_s, gapRel=0.0, threads=1))
+        choice = {couples[c]: options[couples[c]][o] for (c, o), var in u.items() if (var.value() or 0.0) > 0.5}
+        if len(choice) != len(couples):
+            raise RuntimeError(f"{plant}: smoothing found no solution ({pulp.LpStatus[prob.status]})")
+        return choice, pulp.LpSolution[prob.sol_status]
+
+    before = {key: options[key][0] for key in couples}
+    stage1, _ = solve(None)
+    peak_after = max(daily(stage1).values())
+    chosen, status = solve(float(peak_after))
+    result = PlantSmoothing(
+        plant=plant,
+        chosen=chosen,
+        peak_before=max(daily(before).values()),
+        peak_after=max(daily(chosen).values()),
+        cost_before=cost_before,
+        cost_after=sum(opt.cost for opt in chosen.values()),
+        status=status,
+    )
+    logger.info("Smoothing %s: peak %d -> %d trucks/day, cost %.0f -> %.0f EUR (%+.2f %%), %d couples moved",
+                plant, result.peak_before, result.peak_after, result.cost_before, result.cost_after,
+                100 * (result.cost_after / result.cost_before - 1),
+                sum(chosen[key].weekdays != before[key].weekdays for key in couples))
+    return result
