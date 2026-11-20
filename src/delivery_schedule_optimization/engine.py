@@ -77,11 +77,15 @@ def solve_couple(
     calendar: npt.NDArray[np.datetime64],
     settings: SolverSettings,
     window_days: int | None = None,
+    profile_reached: bool = True,
 ) -> CoupleSolution:
     """Build and solve the MILP of one couple for the profile n_max.
 
     calendar: sorted possible delivery days (working days, datetime64[D]).
     window_days: anticipation window; defaults to settings.max_anticipation_days.
+    profile_reached: constraint (8), every allowed weekday is delivered in at least one same week, so the
+        number of allowed weekdays equals the highest weekly frequency (no weekday kept only to float).
+        Disabled to replay the current situation, which does not follow a profile.
     """
     window = settings.max_anticipation_days if window_days is None else window_days
     days = calendar.astype("datetime64[D]")
@@ -127,8 +131,29 @@ def solve_couple(
         )  # (4) volume
         prob += pulp.lpSum(y[dj, k] for k in brackets) == x[dj]  # (5) one last truck per delivery
         prob += full[dj] <= len(assigned) * x[dj]  # (6) no truck without delivery
-        prob += x[dj] <= s[int(day_weekday[dj])]  # (7) fixed weekdays
-    prob += pulp.lpSum(s.values()) <= n_max  # (7) at most n_max weekdays
+        prob += x[dj] <= pulp.lpSum(var for _, var in assigned)  # (6) no empty delivery
+        prob += x[dj] <= s[int(day_weekday[dj])]  # (7) delivery only on an allowed weekday
+    prob += pulp.lpSum(s.values()) <= n_max  # (7) at most n_max allowed weekdays
+
+    if profile_reached:  # (8) one week h delivers every allowed weekday (holidays excepted)
+        day_number = days.astype(np.int64)
+        week_of_day = (day_number + 3) // 7  # Monday-based week number
+        weeks: dict[int, list[int]] = {}
+        for dj, wk in enumerate(week_of_day.tolist()):
+            monday = int(wk) * 7 - 3
+            if monday >= day_number[0] and monday + 4 <= day_number[-1]:  # whole weeks of the horizon only
+                weeks.setdefault(int(wk), []).append(dj)
+        if not weeks:
+            raise ValueError("profile_reached needs at least one whole week in the calendar")
+        h = {wk: pulp.LpVariable(f"h_{wk}", cat=pulp.LpBinary) for wk in weeks}
+        for wk, day_indices in weeks.items():
+            for dj in day_indices:
+                allowed = s[int(day_weekday[dj])]
+                if dj in x:
+                    prob += x[dj] >= allowed + h[wk] - 1
+                else:  # no line can arrive that day: the week cannot be the reference week for this weekday
+                    prob += allowed + h[wk] <= 1
+        prob += pulp.lpSum(h.values()) >= 1
 
     start = time.perf_counter()
     prob.solve(pulp.HiGHS(msg=False, timeLimit=settings.time_limit_s, gapRel=settings.mip_gap, threads=1))
