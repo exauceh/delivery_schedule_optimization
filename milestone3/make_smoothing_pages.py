@@ -1,7 +1,7 @@
 """Add the smoothing model (RG09) to the algorithm presentation, in the style of its existing pages.
 
-Three pages are inserted after page 15 ("Lisser : comment le plan d'un couple est choisi"):
-the integer programme of one plant, the cost / smoothing frontier, and the budget shared between the plants.
+Two pages are inserted after page 15 ("Lisser : comment le plan d'un couple est choisi"):
+the integer programme of one plant and the cost / smoothing frontier.
 The page numbers printed on the following pages are updated.
 
 Usage (from the project root):
@@ -75,21 +75,6 @@ def frontiers() -> tuple[list[PlantFrontier], float]:
         out.append(PlantFrontier(plant, len(opts), sum(len(v) for v in opts.values()), points))
         log.info("%s: %d points, indicator %d -> %d", plant, len(points), points[0][0], points[-1][0])
     return out, cost0
-
-
-def share_budget(fronts: list[PlantFrontier], budget: float) -> list[tuple[int, float]]:
-    """Point chosen on each frontier when the budget is shared (same rule as `planner.smooth`)."""
-    combos: list[tuple[int, float, list[tuple[int, float]]]] = [(0, 0.0, [])]
-    for f in fronts:
-        merged = [(i + fi, c + fc, pts + [(fi, fc)]) for i, c, pts in combos for fi, fc in f.points]
-        merged.sort(key=lambda x: (x[1], x[0]))
-        combos, best = [], float("inf")
-        for point in merged:
-            if point[0] < best:
-                combos.append(point)
-                best = point[0]
-    limit = sum(f.points[0][1] for f in fronts) + budget + 1e-6
-    return min((c for c in combos if c[1] <= limit), key=lambda c: (c[0], c[1]))[2]
 
 
 # --------------------------------------------------------------------------- drawing helpers
@@ -223,56 +208,6 @@ def p_frontier(pdf: PdfPages, number: int, fronts: list[PlantFrontier]) -> None:
     pdf.savefig(fig); plt.close(fig)
 
 
-def p_budget(pdf: PdfPages, number: int, fronts: list[PlantFrontier], cost0: float) -> None:
-    budget = SMALL_BUDGET * cost0
-    chosen = share_budget(fronts, budget)
-    free = share_budget(fronts, 0.0)
-    fig = page("Lisser : partager le budget entre les usines",
-               "Le budget est commun aux 4 usines : il va là où un cran de lissage coûte le moins cher", number)
-    for k, f in enumerate(fronts):
-        bx = fig.add_axes([0.06 + (k % 2) * 0.3, 0.45 - (k // 2) * 0.3, 0.25, 0.22])
-        base_c = f.points[0][1]
-        bx.step([i for i, _ in f.points], [c - base_c for _, c in f.points], where="post", color=PLANT_COLORS[f.plant], lw=1.8)
-        for (i, c), color, label in ((free[k], BLUE, "budget 0"), (chosen[k], GREEN, "budget 0,5 %")):
-            bx.scatter([i], [c - base_c], s=55, color=color, zorder=4, label=label)
-        bx.invert_xaxis()
-        bx.set_title(f"{f.plant} · {f.couples} couples", fontsize=10.5, color=INK, loc="left")
-        bx.tick_params(labelsize=8)
-        bx.grid(axis="y", color="#eeeeee")
-        if k == 0:
-            bx.legend(frameon=False, fontsize=8.5, loc="upper left")
-        if k >= 2:
-            bx.set_xlabel("indicateur de lissage", fontsize=8.5)
-        if k % 2 == 0:
-            bx.set_ylabel("surcoût (€)", fontsize=8.5)
-    ax = fig.add_axes([0.66, 0.1, 0.3, 0.68]); ax.set_xlim(0, 1); ax.set_ylim(0, 1); ax.axis("off")
-    card(ax, 0.0, 0.0, 1.0, 1.0)
-    badge(ax, 0.1, 0.93, 1, GREEN, "Comment il partage")
-    ax.text(0.06, 0.84,
-            "On combine les frontières des 4 usines\n"
-            "et on garde les combinaisons non\n"
-            "dominées (aucune autre n'est à la\nfois moins chère et mieux lissée).\n\n"
-            "On prend celle dont l'indicateur total\n"
-            "est le plus bas sans dépasser\n"
-            "le budget ; à égalité, la moins chère.",
-            fontsize=10.5, color=INK, va="top", linespacing=1.5)
-    rows = [("", "budget 0", "budget 0,5 %")]
-    rows += [("indicateur total", f"{sum(i for i, _ in free)}", f"{sum(i for i, _ in chosen)}")]
-    rows += [("surcoût", eur(sum(c for _, c in free) - sum(f.points[0][1] for f in fronts)),
-              eur(sum(c for _, c in chosen) - sum(f.points[0][1] for f in fronts)))]
-    for r, (a, b, c) in enumerate(rows):
-        y = 0.36 - r * 0.075
-        weight = "bold" if r == 0 else "normal"
-        ax.text(0.06, y, a, fontsize=10, color=BODY, fontweight=weight)
-        ax.text(0.6, y, b, fontsize=10, color=BLUE if r else INK, fontweight="bold", ha="center")
-        ax.text(0.86, y, c, fontsize=10, color=GREEN if r else INK, fontweight="bold", ha="center")
-    ax.text(0.06, 0.1, f"Plan retenu du notebook : budget 0.\nBudget 0,5 % = {eur(budget)} sur 6 semaines.", fontsize=9.5, color=BODY, va="top",
-            linespacing=1.4)
-    fig.text(0.35, 0.06, "Un point bleu et un point vert confondus : l'usine ne reçoit rien du budget, un cran y coûte trop cher.",
-             ha="center", fontsize=9.5, color=BODY)
-    pdf.savefig(fig); plt.close(fig)
-
-
 def number_overlay(number: int, width: float, height: float) -> PdfReader:
     """A transparent page that hides the old page number and prints the new one."""
     fig = plt.figure(figsize=(width / 72, height / 72))
@@ -288,12 +223,11 @@ def number_overlay(number: int, width: float, height: float) -> PdfReader:
 
 if __name__ == "__main__":
     base, out = Path(sys.argv[1]), Path(sys.argv[2])
-    fronts, cost0 = frontiers()
+    fronts, _ = frontiers()
     new = io.BytesIO()
     with PdfPages(new) as pdf:
         p_model(pdf, INSERT_AFTER + 1, fronts)
         p_frontier(pdf, INSERT_AFTER + 2, fronts)
-        p_budget(pdf, INSERT_AFTER + 3, fronts, cost0)
     new.seek(0)
     reader, added = PdfReader(base), PdfReader(new)
     writer = PdfWriter()
