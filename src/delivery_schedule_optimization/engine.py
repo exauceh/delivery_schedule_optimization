@@ -24,6 +24,8 @@ import pulp
 logger = logging.getLogger(__name__)
 
 N_WEEKDAYS = 5  # Monday .. Friday
+EXTRA_TRUCK_SLOTS = 4  # loading: up to 4 trucks more than the capacity minimum may be tried to lower the price
+TRUCK_TIE_BREAK_EUR = 1e-3  # loading: at equal price, fewer trucks
 
 
 @dataclass(frozen=True)
@@ -225,9 +227,10 @@ def _pack(
     a = {(i, b): pulp.LpVariable(f"a_{i}_{b}", cat=pulp.LpBinary) for i in lines for b in trucks}
     used = {b: pulp.LpVariable(f"t_{b}", cat=pulp.LpBinary) for b in trucks}
     y = {(b, k): pulp.LpVariable(f"y_{b}_{k}", cat=pulp.LpBinary) for b in trucks for k in brackets}
-    # A truck costs more than any price difference: first the fewest trucks, then the cheapest brackets
-    truck_penalty = slots * float(prices.max()) + 1.0
-    prob += truck_penalty * pulp.lpSum(used.values()) + pulp.lpSum(float(prices[k]) * var for (_, k), var in y.items())
+    # Price only; the tiny term per truck only breaks ties towards fewer trucks
+    prob += pulp.lpSum(float(prices[k]) * var for (_, k), var in y.items()) + TRUCK_TIE_BREAK_EUR * pulp.lpSum(
+        used.values()
+    )
     for i in lines:  # a line is never split: exactly one truck
         prob += pulp.lpSum(a[i, b] for b in trucks) == 1
     for b in trucks:
@@ -264,24 +267,30 @@ def load_delivery(
     bracket_upper: npt.NDArray[np.float64],
     settings: SolverSettings,
 ) -> DeliveryLoad:
-    """Load the whole lines of one delivery into trucks (2D bin packing on weight and volume).
+    """Load the whole lines of one delivery into trucks at the lowest price (2D bin packing on weight and volume).
 
-    The fewest trucks first, then the cheapest loading: the rate sheet is not subadditive at the bracket
-    edges, so a pure cost minimum could send extra trucks just to land in cheaper brackets.
+    Only the price is minimised. The rate sheet is not subadditive at the bracket edges (1,050 kg in one truck
+    may cost more than 1,000 kg + 50 kg in two), so a delivery that fits in one truck may be split when this is
+    cheaper. A single truck is kept without solving when it is provably the cheapest: any loading with two
+    trucks or more costs at least the price of the truck holding the heaviest line plus the cheapest price.
     """
     if (weights > settings.truck_kg).any() or (volumes > settings.truck_m3).any():
         raise ValueError("a single line does not fit in a truck")
-    if weights.sum() <= settings.truck_kg and volumes.sum() <= settings.truck_m3:
-        total = float(weights.sum())
-        return DeliveryLoad(
-            truck_of_line=np.ones(len(weights), dtype=np.int64),
-            truck_weights=np.array([total]),
-            truck_volumes=np.array([float(volumes.sum())]),
-            truck_costs=np.array([truck_cost(total, prices, bracket_upper)]),
-            status="single truck",
-        )
-    lower = int(np.ceil(max(weights.sum() / settings.truck_kg, volumes.sum() / settings.truck_m3)))
-    for slots in range(min(len(weights), lower + 1), len(weights) + 1):
+    total = float(weights.sum())
+    fits_one = total <= settings.truck_kg and float(volumes.sum()) <= settings.truck_m3
+    if fits_one:
+        one_truck = truck_cost(total, prices, bracket_upper)
+        split_floor = truck_cost(float(weights.max()), prices, bracket_upper) + float(prices.min())
+        if len(weights) == 1 or one_truck <= split_floor + 1e-9:
+            return DeliveryLoad(
+                truck_of_line=np.ones(len(weights), dtype=np.int64),
+                truck_weights=np.array([total]),
+                truck_volumes=np.array([float(volumes.sum())]),
+                truck_costs=np.array([one_truck]),
+                status="single truck",
+            )
+    lower = max(1, int(np.ceil(max(total / settings.truck_kg, float(volumes.sum()) / settings.truck_m3))))
+    for slots in range(min(len(weights), lower + EXTRA_TRUCK_SLOTS), len(weights) + 1):
         load = _pack(weights, volumes, prices, bracket_upper, settings, slots)
         if load is not None:
             return load
