@@ -835,6 +835,39 @@ def load_baseline(path: Path, lines: pd.DataFrame) -> pd.DataFrame:
     return baseline
 
 
+def current_situation(lines: pd.DataFrame, baseline: pd.DataFrame, tariff: Tariff,
+                      config: PlannerConfig) -> tuple[pd.DataFrame, pd.DataFrame]:
+    """Reference A loaded truck by truck, like the plan (same reference as the `main` branch).
+
+    The current deliveries are those of Milestone 2 (one per couple and need day, RG12), but their lines are
+    loaded whole with `pack` and each truck is priced on its own weight, exactly like the optimised plan:
+    both sides of the saving are measured the same way. (The Milestone 2 estimator splits the load
+    continuously and rounds the number of trucks up, which counts 3 trucks too many when a delivery is
+    exactly 3 full trucks, because of floating-point sums.)
+
+    Returns the deliveries (Milestone 2 columns, `trucks`, `fill` and `cost` recomputed, the Milestone 2
+    figures kept in `estimator_trucks` and `estimator_cost`) and one row per truck.
+    """
+    rows, trucks = [], []
+    for (supplier, plant, day), group in lines.groupby(["supplier_id", "plant", "date"], sort=True):
+        weight, volume = group["weight"].to_numpy(float), group["volume"].to_numpy(float)
+        packed = pack(weight, volume, config)
+        kg = np.array([weight[t].sum() for t in packed])
+        m3 = np.array([volume[t].sum() for t in packed])
+        distance = float(group["distance"].iloc[0])
+        prices = tariff(np.full(len(packed), distance), kg)
+        rows.append({"supplier_id": supplier, "plant": plant, "date": day, "trucks": len(packed), "cost": float(prices.sum())})
+        trucks += [{"supplier_id": supplier, "plant": plant, "date": day, "distance": distance, "weight": w, "volume": v,
+                    "fill": max(w / config.truck_kg, v / config.truck_m3), "cost": float(c)}
+                   for w, v, c in zip(kg, m3, prices)]
+    loaded = pd.DataFrame(rows)
+    out = baseline.rename(columns={"trucks": "estimator_trucks", "cost": "estimator_cost"}).merge(
+        loaded, on=["supplier_id", "plant", "date"], how="outer", validate="1:1", indicator=True)
+    if not (out.pop("_merge") == "both").all():
+        raise ValueError("the Milestone 2 deliveries and the dataset lines do not match")
+    return out, pd.DataFrame(trucks)
+
+
 def reference_plan(lines: pd.DataFrame, holidays: set[date], tariff: Tariff, config: PlannerConfig) -> dict:
     """Scenario A rebuilt with the planner's packing (used to compare with `prime`, whose reference packs whole lines)."""
     plans = {}
