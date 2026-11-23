@@ -1,4 +1,29 @@
-# Testbed de planification fournisseur → hub
+# Testbed de planification des livraisons
+
+## Dossier final fournisseur × usine
+
+[Document explicatif, cartes de chaleur et exports finaux](ENSEMBLE_FINAL.md)
+
+Le calcul combine trois sources de calendriers sur les 4 389 lignes préparées de `main` au commit `c069c90`. Il reprend le plan de `main`, le plan publié de Wissam au commit `64e34b9` et notre heuristique, qu’il recalcule à partir des mêmes besoins. Le graphe de Wissam fournit d’autres calendriers. Le moteur essaie les combinaisons de jours déjà observées et explore les 31 combinaisons sur les 40 couples les plus coûteux du plan publié de `main`.
+
+Chaque candidat est rechargé avec le même chargeur et la même grille. Pour RG06 stricte, chaque besoin doit partir au dernier départ admissible du couple à sa date ou avant. Le contrôle RG05 du jalon 3 demande en plus qu’au moins une semaine utilise tous les jours du profil. Le pic global est le premier critère de choix sous le plafond de coût de `main`. À pic égal, le moteur choisit le coût le plus faible. Les plafonds par usine font l’objet d’un scénario distinct.
+
+Depuis la racine du testbed, avec Python, pandas, NumPy, SciPy et holidays, et un dépôt Git contenant les deux commits distants :
+
+```powershell
+$env:PYTHONPATH = 'src'
+python milestone2/planification_testbed/ensemble_calendriers.py --repo ../delivery_schedule_optimization --output results/ensemble-final
+python milestone2/planification_testbed/heatmaps.py --ensemble results/ensemble-final/calendrier.csv
+```
+
+L'exécution régénère les candidats heuristiques puis produit le comparatif, les camions, les affectations, les profils et les économies par couple et par usine. Les plans publiés de `main` et de Wissam fournissent les calendriers de départ du comparatif. Le chronomètre ne comprend pas leur résolution d'origine.
+
+| Variante | Coût calculé | Camions | Pic global | Couples sans semaine complète du profil |
+|---|---:|---:|---:|---:|
+| RG06 stricte, sous le coût de `main` | 110 314,80 € | 733 | 32 | 56 |
+| RG05 et RG06, au coût le plus bas dans le vivier élargi | 111 708,13 € | 759 | 53 | 0 |
+
+Les deux variantes couvrent les mêmes lignes et respectent RG06. Le vivier testé ne permet pas de satisfaire également RG05 sous le plafond de 110 329,59 €. La seconde variante dépasse ce plafond de 1 378,54 €. Elle reste sous 800 camions et présente 65 016,48 € d’économies calculées par rapport à la référence reconstruite. Aucun contrôle de la préférence de fréquence RG07 n’est déduit de ces résultats.
 
 ## Plan mixte fournisseur × usine
 

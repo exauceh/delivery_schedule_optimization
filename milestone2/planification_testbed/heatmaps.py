@@ -7,9 +7,9 @@ from pathlib import Path
 from xml.sax.saxutils import escape
 
 
-def render(root: Path, smoothing_calendar: Path | None = None) -> Path:
+def render(root: Path, smoothing_calendar: Path | None = None, final_calendar: Path | None = None) -> Path:
     panels = []
-    if smoothing_calendar is None:
+    if smoothing_calendar is None and final_calendar is None:
         exports = root / "results" / "fast_plan"
         for key, label in (("A", "Référence reconstruite"), ("B", "Fournisseur × usine"), ("C", "Fournisseur → hub")):
             with (exports / f"camions_{key}.csv").open(newline="", encoding="utf-8") as file:
@@ -18,15 +18,24 @@ def render(root: Path, smoothing_calendar: Path | None = None) -> Path:
         subtitle = "Même périmètre mesuré et tarifable"
         filename = "heatmap-camions.svg"
     else:
-        with smoothing_calendar.open(newline="", encoding="utf-8") as file:
+        calendar_path = final_calendar or smoothing_calendar
+        with calendar_path.open(newline="", encoding="utf-8") as file:
             calendar = list(csv.DictReader(file))
-        for key, label, scenario in (("A", "Moteur main", "main"), ("B", "Heuristique seule", "heuristique"),
-                                     ("C", "Plan mixte sans surcoût", "budget_0")):
+        if final_calendar is not None:
+            full_rule = ("principal_rg05_rg06" if any(r["scenario"] == "principal_rg05_rg06" for r in calendar)
+                         else "rg05_rg06_moins_cher")
+            specs = (("A", "Moteur main", "main"), ("B", "RG06 sous budget", "strict_budget_main_pic_global"),
+                     ("C", "RG05 et RG06", full_rule))
+            filename = "heatmap-ensemble-final.svg"
+        else:
+            specs = (("A", "Moteur main", "main"), ("B", "Heuristique seule", "heuristique"),
+                     ("C", "Plan mixte sans surcoût", "budget_0"))
+            filename = "heatmap-lissage.svg"
+        for key, label, scenario in specs:
             counts = Counter({date.fromisoformat(row["date"]): int(row["trucks"])
                               for row in calendar if row["scenario"] == scenario})
             panels.append((key, label, counts))
         subtitle = "Fournisseur × usine · mêmes 4 389 lignes préparées"
-        filename = "heatmap-lissage.svg"
     days = sorted({day for _, _, counts in panels for day in counts})
     if any(day.weekday() > 4 for day in days):
         raise ValueError("A truck is scheduled on a weekend")
@@ -80,6 +89,8 @@ def render(root: Path, smoothing_calendar: Path | None = None) -> Path:
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--lissage", type=Path, metavar="CALENDRIER_CSV")
+    mode = parser.add_mutually_exclusive_group()
+    mode.add_argument("--lissage", type=Path, metavar="CALENDRIER_CSV")
+    mode.add_argument("--ensemble", type=Path, metavar="CALENDRIER_CSV")
     args = parser.parse_args()
-    print(render(Path(__file__).resolve().parents[2], args.lissage))
+    print(render(Path(__file__).resolve().parents[2], args.lissage, args.ensemble))

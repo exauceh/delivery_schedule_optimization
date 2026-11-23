@@ -1,0 +1,181 @@
+supplier_id,plant,source,profile,weekdays,peak_week_days,departures,trucks,baseline_eur,plan_eur,saving_eur
+SUP_00003,PLT_001,wissam,2,"mardi, mercredi",2,4,4,340.85,242.44,98.41
+SUP_00008,PLT_002,main,1,jeudi,1,3,3,234.37,234.37,0.00
+SUP_00009,PLT_004,graphe,1,mercredi,1,1,1,34.68,34.68,0.00
+SUP_00010,PLT_001,main,1,jeudi,1,3,3,112.14,84.11,28.04
+SUP_00010,PLT_002,graphe,2,"mardi, vendredi",2,4,4,336.15,228.01,108.13
+SUP_00010,PLT_004,wissam,2,"mercredi, vendredi",2,5,5,863.56,544.96,318.60
+SUP_00011,PLT_002,wissam,2,"lundi, mardi",2,4,4,569.27,352.51,216.75
+SUP_00014,PLT_001,graphe,2,"lundi, jeudi",2,5,5,795.42,375.36,420.05
+SUP_00014,PLT_004,graphe,1,mardi,1,5,5,962.54,650.29,312.24
+SUP_00015,PLT_004,graphe,1,jeudi,1,2,2,142.69,142.69,0.00
+SUP_00016,PLT_001,graphe,1,mercredi,1,2,2,142.61,83.22,59.39
+SUP_00016,PLT_002,graphe,1,mercredi,1,1,1,41.61,41.61,0.00
+SUP_00016,PLT_003,graphe,1,mercredi,1,2,2,134.30,134.30,0.00
+SUP_00018,PLT_002,graphe,1,jeudi,1,2,3,515.58,515.58,0.00
+SUP_00019,PLT_001,graphe,1,jeudi,1,1,1,87.83,58.14,29.70
+SUP_00019,PLT_002,wissam,2,"mercredi, vendredi",2,4,5,1047.50,897.39,150.11
+SUP_00019,PLT_004,graphe,3,"lundi, mercredi, vendredi",3,6,6,697.66,452.50,245.15
+SUP_00020,PLT_002,graphe,1,vendredi,1,1,1,119.19,52.95,66.24
+SUP_00022,PLT_004,graphe,1,lundi,1,5,5,1009.49,623.96,385.53
+SUP_00024,PLT_002,graphe,1,jeudi,1,2,2,409.84,245.03,164.81
+SUP_00024,PLT_003,graphe,1,mardi,1,3,3,1277.49,773.25,504.24
+SUP_00026,PLT_001,graphe,1,vendredi,1,3,3,589.56,430.91,158.65
+SUP_00028,PLT_002,graphe,1,vendredi,1,1,1,319.82,191.75,128.07
+SUP_00032,PLT_004,wissam,2,"mercredi, vendredi",2,5,5,620.64,422.64,197.99
+SUP_00033,PLT_002,graphe,1,vendredi,1,1,1,96.50,52.95,43.55
+SUP_00033,PLT_004,graphe,2,"lundi, vendredi",2,5,5,704.18,419.93,284.25
+SUP_00035,PLT_001,graphe,2,"mardi, vendredi",2,4,4,816.89,474.66,342.22
+SUP_00035,PLT_002,graphe,3,"lundi, mardi, vendredi",3,5,5,942.77,528.35,414.42
+SUP_00037,PLT_001,wissam,2,"mardi, vendredi",2,4,4,595.40,434.72,160.68
+SUP_00038,PLT_001,wissam,2,"lundi, vendredi",2,6,6,798.86,284.61,514.25
+SUP_00038,PLT_002,graphe,2,"lundi, vendredi",2,5,5,1233.25,590.58,642.68
+SUP_00038,PLT_003,graphe,1,mardi,1,3,3,522.19,362.60,159.59
+SUP_00038,PLT_004,graphe,1,mercredi,1,4,4,319.41,236.04,83.38
+SUP_00039,PLT_002,graphe,1,vendredi,1,1,1,89.09,41.61,47.48
+SUP_00041,PLT_004,graphe,2,"mardi, vendredi",2,6,6,1569.36,764.10,805.26
+SUP_00043,PLT_004,graphe,2,"lundi, vendredi",2,6,6,1410.38,766.69,643.69
+SUP_00045,PLT_002,graphe,2,"lundi, vendredi",2,4,4,639.80,460.32,179.48
+SUP_00051,PLT_001,heuristique,1,mercredi,1,5,5,1730.08,810.57,919.51
+SUP_00052,PLT_001,graphe,2,"lundi, mercredi",2,6,6,978.50,471.83,506.67
+SUP_00052,PLT_002,graphe,1,mardi,1,1,1,33.46,33.46,0.00
+SUP_00053,PLT_001,graphe,3,"mardi, jeudi, vendredi",3,7,7,899.29,483.94,415.35
+SUP_00053,PLT_002,graphe,1,mercredi,1,2,2,96.22,38.49,57.73
+SUP_00054,PLT_002,wissam,2,"mardi, jeudi",2,2,2,427.83,427.83,0.00
+SUP_00055,PLT_003,main,1,jeudi,1,3,3,164.69,164.69,0.00
+SUP_00057,PLT_001,wissam,2,"mardi, jeudi",2,5,5,951.36,632.47,318.89
+SUP_00058,PLT_001,graphe,2,"lundi, jeudi",2,4,4,621.49,435.81,185.68
+SUP_00058,PLT_002,main,1,lundi,1,4,4,308.68,233.12,75.56
+SUP_00060,PLT_002,wissam,2,"lundi, vendredi",2,3,3,793.80,397.08,396.72
+SUP_00060,PLT_003,main,1,vendredi,1,3,3,159.71,159.71,0.00
+SUP_00060,PLT_004,graphe,2,"lundi, jeudi",2,4,4,212.94,212.94,0.00
+SUP_00061,PLT_004,heuristique,1,lundi,1,1,1,117.57,117.57,0.00
+SUP_00062,PLT_001,graphe,1,mardi,1,2,2,561.16,561.16,0.00
+SUP_00066,PLT_001,main,1,mardi,1,3,3,237.29,168.30,69.00
+SUP_00066,PLT_002,graphe,1,vendredi,1,1,1,104.04,52.91,51.13
+SUP_00068,PLT_002,wissam,1,mardi,1,1,1,69.36,52.91,16.45
+SUP_00071,PLT_002,graphe,1,lundi,1,1,1,293.44,207.43,86.01
+SUP_00073,PLT_001,graphe,2,"lundi, mercredi",2,5,5,1479.30,798.54,680.76
+SUP_00073,PLT_002,main,1,vendredi,1,2,2,627.77,404.49,223.27
+SUP_00074,PLT_003,wissam,2,"mardi, jeudi",2,5,6,3199.17,1939.74,1259.43
+SUP_00077,PLT_002,main,1,mercredi,1,2,3,515.58,515.58,0.00
+SUP_00079,PLT_001,wissam,1,jeudi,1,3,3,165.10,139.86,25.24
+SUP_00079,PLT_002,graphe,1,mercredi,1,4,4,267.84,193.54,74.30
+SUP_00080,PLT_001,wissam,2,"mardi, jeudi",2,5,5,634.94,390.68,244.26
+SUP_00080,PLT_002,graphe,3,"lundi, mardi, vendredi",3,5,6,2389.17,1020.84,1368.33
+SUP_00080,PLT_003,main,1,vendredi,1,4,4,177.37,153.95,23.42
+SUP_00081,PLT_001,main,1,vendredi,1,2,2,234.74,214.44,20.30
+SUP_00081,PLT_002,wissam,2,"mercredi, vendredi",2,4,4,489.78,348.34,141.44
+SUP_00083,PLT_002,graphe,2,"lundi, vendredi",2,4,4,1120.91,623.80,497.11
+SUP_00085,PLT_003,graphe,1,mardi,1,3,4,896.54,750.53,146.01
+SUP_00086,PLT_001,graphe,2,"mardi, mercredi",2,3,3,107.48,107.48,0.00
+SUP_00086,PLT_002,graphe,1,vendredi,1,1,1,216.79,125.39,91.40
+SUP_00087,PLT_001,wissam,1,mardi,1,3,3,184.26,159.18,25.08
+SUP_00087,PLT_003,graphe,1,mercredi,1,4,4,283.48,283.48,0.00
+SUP_00090,PLT_001,graphe,1,mardi,1,1,1,70.29,70.29,0.00
+SUP_00090,PLT_002,graphe,3,"lundi, mardi, vendredi",3,5,5,453.15,327.52,125.63
+SUP_00091,PLT_001,wissam,2,"lundi, mercredi",2,5,6,1066.33,647.98,418.35
+SUP_00091,PLT_002,graphe,2,"lundi, mardi",2,4,4,794.20,365.24,428.96
+SUP_00091,PLT_004,graphe,2,"mardi, vendredi",2,6,6,1137.36,565.01,572.34
+SUP_00092,PLT_001,main,1,mardi,1,3,3,84.11,84.11,0.00
+SUP_00092,PLT_002,graphe,2,"mardi, vendredi",2,4,4,439.38,262.69,176.68
+SUP_00092,PLT_003,graphe,1,vendredi,1,1,1,53.24,53.24,0.00
+SUP_00094,PLT_001,graphe,1,vendredi,1,1,1,52.95,52.95,0.00
+SUP_00094,PLT_002,graphe,1,mercredi,1,1,1,43.51,43.51,0.00
+SUP_00094,PLT_003,wissam,1,jeudi,1,3,3,857.08,601.64,255.44
+SUP_00095,PLT_001,main,1,mardi,1,5,5,425.89,330.47,95.41
+SUP_00096,PLT_002,main,1,mercredi,1,4,4,331.12,291.30,39.83
+SUP_00096,PLT_004,graphe,2,"mardi, jeudi",2,4,4,480.74,359.12,121.62
+SUP_00097,PLT_002,graphe,1,vendredi,1,3,4,1437.69,809.31,628.38
+SUP_00099,PLT_003,graphe,1,jeudi,1,1,1,52.95,52.95,0.00
+SUP_00100,PLT_004,main,1,mercredi,1,2,2,227.33,227.33,0.00
+SUP_00102,PLT_001,graphe,2,"lundi, vendredi",2,6,6,1112.60,424.10,688.50
+SUP_00102,PLT_002,wissam,2,"lundi, mercredi",2,4,4,1495.62,759.84,735.78
+SUP_00107,PLT_001,graphe,1,jeudi,1,6,6,1468.88,730.84,738.05
+SUP_00107,PLT_002,graphe,3,"lundi, mercredi, vendredi",3,5,10,1229.08,1034.65,194.43
+SUP_00107,PLT_003,wissam,2,"mardi, jeudi",2,5,5,986.16,598.15,388.00
+SUP_00108,PLT_001,graphe,1,vendredi,1,2,2,427.83,427.83,0.00
+SUP_00109,PLT_002,main,1,mardi,1,3,4,441.69,412.72,28.97
+SUP_00112,PLT_004,main,2,"mardi, jeudi",2,5,6,1872.41,1389.27,483.13
+SUP_00113,PLT_001,wissam,2,"lundi, jeudi",2,5,5,816.16,568.78,247.38
+SUP_00113,PLT_002,graphe,1,lundi,1,1,1,96.50,43.51,52.99
+SUP_00116,PLT_002,graphe,1,lundi,1,1,1,57.73,19.24,38.49
+SUP_00117,PLT_001,graphe,1,lundi,1,1,1,43.47,43.47,0.00
+SUP_00118,PLT_002,main,1,mardi,1,4,4,314.92,199.49,115.43
+SUP_00118,PLT_003,graphe,1,jeudi,1,1,1,29.70,29.70,0.00
+SUP_00118,PLT_004,graphe,2,"lundi, vendredi",2,5,5,1450.98,862.14,588.83
+SUP_00121,PLT_004,wissam,2,"mardi, jeudi",2,6,6,532.36,365.60,166.76
+SUP_00122,PLT_002,graphe,1,vendredi,1,1,1,84.11,28.04,56.07
+SUP_00124,PLT_001,heuristique,1,lundi,1,1,1,74.67,74.67,0.00
+SUP_00124,PLT_002,graphe,1,lundi,1,4,4,522.67,378.04,144.64
+SUP_00124,PLT_004,graphe,2,"lundi, mardi",2,4,4,448.01,351.58,96.42
+SUP_00126,PLT_003,graphe,1,mercredi,1,1,1,101.97,101.97,0.00
+SUP_00126,PLT_004,graphe,1,jeudi,1,2,2,204.11,155.90,48.21
+SUP_00127,PLT_002,main,1,mercredi,1,2,2,343.72,343.72,0.00
+SUP_00128,PLT_002,graphe,2,"jeudi, vendredi",2,4,4,362.56,231.86,130.70
+SUP_00128,PLT_003,graphe,1,mercredi,1,1,1,53.24,53.24,0.00
+SUP_00128,PLT_004,wissam,2,"lundi, vendredi",2,4,4,299.72,209.90,89.82
+SUP_00129,PLT_003,graphe,2,"lundi, mercredi",2,6,30,10143.87,8516.42,1627.46
+SUP_00130,PLT_001,graphe,1,mardi,1,1,1,47.93,47.93,0.00
+SUP_00130,PLT_002,graphe,1,vendredi,1,1,1,207.11,113.80,93.30
+SUP_00132,PLT_002,graphe,1,vendredi,1,1,1,26.98,26.98,0.00
+SUP_00133,PLT_002,main,1,lundi,1,3,3,781.28,781.28,0.00
+SUP_00136,PLT_001,graphe,1,mercredi,1,4,4,1516.61,870.21,646.40
+SUP_00136,PLT_002,graphe,2,"lundi, mardi",2,4,4,1238.93,559.14,679.79
+SUP_00136,PLT_003,graphe,1,jeudi,1,4,4,491.88,368.15,123.73
+SUP_00136,PLT_004,main,1,mercredi,1,5,5,616.02,512.06,103.96
+SUP_00143,PLT_001,graphe,1,mercredi,1,3,3,231.70,170.81,60.89
+SUP_00143,PLT_002,graphe,1,vendredi,1,1,1,104.04,52.91,51.13
+SUP_00143,PLT_003,graphe,1,jeudi,1,3,3,254.23,215.74,38.49
+SUP_00144,PLT_001,wissam,2,"lundi, mercredi",2,6,7,3454.61,1368.41,2086.20
+SUP_00144,PLT_002,graphe,2,"lundi, vendredi",2,3,3,238.39,149.62,88.77
+SUP_00145,PLT_001,graphe,2,"jeudi, vendredi",2,3,3,112.14,84.11,28.04
+SUP_00145,PLT_002,wissam,3,"lundi, mardi, vendredi",3,6,11,3104.24,2144.66,959.58
+SUP_00145,PLT_004,graphe,3,"lundi, mardi, vendredi",3,7,7,3033.99,1438.13,1595.86
+SUP_00146,PLT_001,main,1,mardi,1,3,3,252.32,204.11,48.21
+SUP_00146,PLT_002,graphe,2,"lundi, mardi",2,5,5,4651.48,1164.14,3487.34
+SUP_00148,PLT_002,graphe,1,vendredi,1,2,2,278.29,200.99,77.30
+SUP_00148,PLT_003,wissam,2,"mardi, jeudi",2,5,5,2327.58,1116.37,1211.21
+SUP_00149,PLT_001,main,1,mardi,1,2,2,139.86,115.38,24.47
+SUP_00149,PLT_002,graphe,1,mardi,1,1,1,34.68,34.68,0.00
+SUP_00149,PLT_003,heuristique,1,lundi,1,2,2,69.36,69.36,0.00
+SUP_00150,PLT_002,graphe,1,vendredi,1,1,1,155.90,101.97,53.92
+SUP_00150,PLT_003,graphe,1,mardi,1,1,1,31.48,31.48,0.00
+SUP_00151,PLT_001,main,1,jeudi,1,5,5,237.58,148.48,89.09
+SUP_00151,PLT_002,main,1,vendredi,1,2,2,263.50,112.35,151.16
+SUP_00152,PLT_001,graphe,2,"jeudi, vendredi",2,4,4,453.48,328.89,124.58
+SUP_00152,PLT_002,graphe,2,"lundi, mardi",2,5,5,646.20,367.34,278.86
+SUP_00152,PLT_004,main,1,mercredi,1,4,4,337.32,307.42,29.90
+SUP_00154,PLT_001,wissam,1,jeudi,1,3,3,277.20,243.73,33.46
+SUP_00154,PLT_002,graphe,1,lundi,1,4,4,747.77,603.70,144.07
+SUP_00154,PLT_003,graphe,1,jeudi,1,3,3,181.79,143.79,38.00
+SUP_00154,PLT_004,wissam,1,vendredi,1,3,3,830.74,657.10,173.64
+SUP_00156,PLT_003,graphe,1,jeudi,1,3,3,448.09,396.11,51.98
+SUP_00001,PLT_004,graphe_elargi,3,"mardi, mercredi, vendredi",3,10,18,3592.48,3592.48,0.00
+SUP_00005,PLT_001,graphe_elargi,1,mercredi,1,4,6,1118.23,1118.23,0.00
+SUP_00011,PLT_004,graphe_elargi,1,vendredi,1,6,6,2861.52,1320.68,1540.84
+SUP_00024,PLT_001,graphe_elargi,2,"lundi, jeudi",2,6,6,2408.90,1226.24,1182.65
+SUP_00024,PLT_004,graphe_elargi,3,"lundi, mardi, vendredi",3,7,7,2872.38,1377.00,1495.38
+SUP_00032,PLT_002,graphe_elargi,1,mardi,1,2,5,1031.17,859.31,171.86
+SUP_00037,PLT_002,graphe_elargi,1,jeudi,1,5,7,2656.68,1754.31,902.37
+SUP_00045,PLT_001,graphe_elargi,2,"mardi, jeudi",2,6,6,2482.47,1319.91,1162.56
+SUP_00046,PLT_002,graphe_elargi,1,vendredi,1,2,8,2094.79,1979.04,115.75
+SUP_00046,PLT_004,graphe_elargi,1,mercredi,1,5,8,2881.09,2367.33,513.76
+SUP_00055,PLT_001,graphe_elargi,2,"lundi, jeudi",2,5,5,1370.96,815.35,555.61
+SUP_00059,PLT_003,graphe_elargi,1,mercredi,1,5,5,3874.58,1657.03,2217.55
+SUP_00060,PLT_001,graphe_elargi,2,"lundi, vendredi",2,6,6,1893.23,860.85,1032.38
+SUP_00080,PLT_004,graphe_elargi,2,"lundi, vendredi",2,6,6,2989.46,1179.94,1809.53
+SUP_00085,PLT_004,graphe_elargi,1,lundi,1,6,6,7429.18,1988.44,5440.74
+SUP_00087,PLT_002,graphe_elargi,1,vendredi,1,2,5,1146.72,1059.16,87.55
+SUP_00087,PLT_004,graphe_elargi,2,"lundi, vendredi",2,6,6,2995.95,1402.08,1593.87
+SUP_00094,PLT_004,graphe_elargi,2,"lundi, vendredi",2,6,6,1711.93,820.13,891.80
+SUP_00102,PLT_003,graphe_elargi,2,"lundi, jeudi",2,5,7,1159.68,862.87,296.81
+SUP_00117,PLT_002,graphe_elargi,3,"lundi, jeudi, vendredi",3,7,15,2799.21,2433.33,365.88
+SUP_00117,PLT_004,graphe_elargi,3,"lundi, jeudi, vendredi",3,7,9,2386.13,1546.75,839.37
+SUP_00118,PLT_001,graphe_elargi,2,"lundi, vendredi",2,6,6,3210.51,1453.93,1756.58
+SUP_00129,PLT_001,graphe_elargi,2,"mercredi, vendredi",2,8,21,5937.56,5759.50,178.06
+SUP_00135,PLT_004,graphe_elargi,1,lundi,1,3,5,1315.50,1115.84,199.65
+SUP_00144,PLT_004,graphe_elargi,2,"mardi, vendredi",2,6,6,1643.82,962.09,681.73
+SUP_00148,PLT_001,graphe_elargi,2,"mardi, vendredi",2,5,5,1347.67,861.54,486.13
+SUP_00149,PLT_004,graphe_elargi,2,"lundi, vendredi",2,6,6,2516.99,947.06,1569.93
+SUP_00153,PLT_004,graphe_elargi,2,"mardi, jeudi",2,3,11,3255.08,3255.08,0.00
