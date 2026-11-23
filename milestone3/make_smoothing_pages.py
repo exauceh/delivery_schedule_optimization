@@ -1,6 +1,6 @@
 """Add the smoothing model (RG09) to the algorithm presentation, in the style of its existing pages.
 
-Two pages are inserted after page 15 ("Lisser : comment le plan d'un couple est choisi"):
+Page 15 ("Lisser : comment le plan d'un couple est choisi") is replaced by two pages:
 the integer programme of one plant and the cost / smoothing frontier.
 The page numbers printed on the following pages are updated.
 
@@ -28,7 +28,7 @@ logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(mess
 log = logging.getLogger("smoothing_pages")
 
 ROOT = Path(__file__).resolve().parent.parent
-INSERT_AFTER = 15  # pages of the base presentation kept before the new ones
+REPLACED_PAGE = 15  # page of the base presentation (1-based) replaced by the new pages
 SMALL_BUDGET = 0.005  # "petit lissage" scenario of the notebook (0.5 % of the cost)
 
 BLUE, ORANGE, GREEN, YELLOW = "#2a78d6", "#eb6834", "#1baf7a", "#eda100"
@@ -119,7 +119,7 @@ def p_model(pdf: PdfPages, number: int, fronts: list[PlantFrontier]) -> None:
     arrow(ax, 0.313, 0.5, 0.342); arrow(ax, 0.658, 0.5, 0.687)
     total = sum(f.plans for f in fronts)
     ax.text(0.025, 0.82,
-            "Les plans candidats de chaque couple\n(page précédente : un plan par ensemble\nde jours, calculé par le graphe)\n\n"
+            "Les plans candidats de chaque couple\n(un plan par ensemble de jours, calculé\npar le graphe : environ 12 par couple)\n\n"
             "Pour chaque plan p :\n"
             "  • son coût  $c_p$\n"
             "  • ses camions reçus chaque jour  $n_{p,d}$\n\n"
@@ -226,19 +226,20 @@ if __name__ == "__main__":
     fronts, _ = frontiers()
     new = io.BytesIO()
     with PdfPages(new) as pdf:
-        p_model(pdf, INSERT_AFTER + 1, fronts)
-        p_frontier(pdf, INSERT_AFTER + 2, fronts)
+        p_model(pdf, REPLACED_PAGE, fronts)
+        p_frontier(pdf, REPLACED_PAGE + 1, fronts)
     new.seek(0)
     reader, added = PdfReader(base), PdfReader(new)
     writer = PdfWriter()
-    for k, pg in enumerate(reader.pages):
-        if k == INSERT_AFTER:
+    for k, pg in enumerate(reader.pages, start=1):
+        if k == REPLACED_PAGE:
             for extra in added.pages:
                 writer.add_page(extra)
+            continue
         kept = writer.add_page(pg)
-        if k >= INSERT_AFTER:
+        if k > REPLACED_PAGE:
             box = kept.mediabox
-            kept.merge_page(number_overlay(k + 1 + len(added.pages), float(box.width), float(box.height)).pages[0])
+            kept.merge_page(number_overlay(len(writer.pages), float(box.width), float(box.height)).pages[0])
     writer.add_metadata(reader.metadata or {})
     with out.open("wb") as fh:
         writer.write(fh)
