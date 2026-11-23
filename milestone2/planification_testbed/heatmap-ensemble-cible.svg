@@ -1,0 +1,251 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1130" height="548" viewBox="0 0 1130 548" role="img" aria-labelledby="title desc">
+<title id="title">Camions planifiés par jour</title>
+<desc id="desc">Les trois cartes utilisent un calendrier commun et une échelle commune, avec un compte par jour ouvré.</desc>
+<defs><linearGradient id="scale"><stop stop-color="#eef4f8"/><stop offset="1" stop-color="#103d72"/></linearGradient></defs>
+<rect width="1130" height="548" fill="#fff"/>
+<text x="26" y="44" font-family="Segoe UI, Arial, sans-serif" font-size="28" fill="#142c44" font-weight="700" text-anchor="start">Camions planifiés par jour</text>
+<text x="26" y="70" font-family="Segoe UI, Arial, sans-serif" font-size="15" fill="#405a70" font-weight="400" text-anchor="start">Fournisseur × usine · mêmes 4 389 lignes préparées · semaines commençant le lundi · 2026</text>
+<text x="109" y="110" font-family="Segoe UI, Arial, sans-serif" font-size="18" fill="#142c44" font-weight="700" text-anchor="start">A · Moteur main</text>
+<text x="109" y="136" font-family="Segoe UI, Arial, sans-serif" font-size="14" fill="#405a70" font-weight="400" text-anchor="start">761 camions · pic 41/jour</text>
+<text x="137" y="166" font-family="Segoe UI, Arial, sans-serif" font-size="14" fill="#142c44" font-weight="400" text-anchor="middle">Lun.</text>
+<text x="198" y="166" font-family="Segoe UI, Arial, sans-serif" font-size="14" fill="#142c44" font-weight="400" text-anchor="middle">Mar.</text>
+<text x="259" y="166" font-family="Segoe UI, Arial, sans-serif" font-size="14" fill="#142c44" font-weight="400" text-anchor="middle">Mer.</text>
+<text x="320" y="166" font-family="Segoe UI, Arial, sans-serif" font-size="14" fill="#142c44" font-weight="400" text-anchor="middle">Jeu.</text>
+<text x="381" y="166" font-family="Segoe UI, Arial, sans-serif" font-size="14" fill="#142c44" font-weight="400" text-anchor="middle">Ven.</text>
+<text x="26" y="201" font-family="Segoe UI, Arial, sans-serif" font-size="14" fill="#142c44" font-weight="400" text-anchor="start">02/11</text>
+<rect x="109" y="177" width="56" height="37" rx="5" fill="#e9f0f5"><title>02/11/2026 · 1 camion(s) · scénario A</title></rect>
+<text x="137" y="201" font-family="Segoe UI, Arial, sans-serif" font-size="14" fill="#142c44" font-weight="600" text-anchor="middle">1</text>
+<rect x="170" y="177" width="56" height="37" rx="5" fill="#c5d2df"><title>03/11/2026 · 9 camion(s) · scénario A</title></rect>
+<text x="198" y="201" font-family="Segoe UI, Arial, sans-serif" font-size="14" fill="#142c44" font-weight="600" text-anchor="middle">9</text>
+<rect x="231" y="177" width="56" height="37" rx="5" fill="#afc0d2"><title>04/11/2026 · 14 camion(s) · scénario A</title></rect>
+<text x="259" y="201" font-family="Segoe UI, Arial, sans-serif" font-size="14" fill="#142c44" font-weight="600" text-anchor="middle">14</text>
+<rect x="292" y="177" width="56" height="37" rx="5" fill="#9cb1c7"><title>05/11/2026 · 18 camion(s) · scénario A</title></rect>
+<text x="320" y="201" font-family="Segoe UI, Arial, sans-serif" font-size="14" fill="#142c44" font-weight="600" text-anchor="middle">18</text>
+<rect x="353" y="177" width="56" height="37" rx="5" fill="#869eb9"><title>06/11/2026 · 23 camion(s) · scénario A</title></rect>
+<text x="381" y="201" font-family="Segoe UI, Arial, sans-serif" font-size="14" fill="#142c44" font-weight="600" text-anchor="middle">23</text>
+<text x="26" y="244" font-family="Segoe UI, Arial, sans-serif" font-size="14" fill="#142c44" font-weight="400" text-anchor="start">09/11</text>
+<rect x="109" y="220" width="56" height="37" rx="5" fill="#345b88" stroke="#172f49" stroke-width="2"><title>09/11/2026 · 41 camion(s) · scénario A</title></rect>
+<text x="137" y="244" font-family="Segoe UI, Arial, sans-serif" font-size="14" fill="#fff" font-weight="600" text-anchor="middle">41</text>
+<rect x="170" y="220" width="56" height="37" rx="5" fill="#748fae"><title>10/11/2026 · 27 camion(s) · scénario A</title></rect>
+<text x="198" y="244" font-family="Segoe UI, Arial, sans-serif" font-size="14" fill="#142c44" font-weight="600" text-anchor="middle">27</text>
+<rect x="231" y="220" width="56" height="37" rx="5" fill="#819ab6"><title>11/11/2026 · 24 camion(s) · scénario A</title></rect>
+<text x="259" y="244" font-family="Segoe UI, Arial, sans-serif" font-size="14" fill="#142c44" font-weight="600" text-anchor="middle">24</text>
+<rect x="292" y="220" width="56" height="37" rx="5" fill="#6f8bab"><title>12/11/2026 · 28 camion(s) · scénario A</title></rect>
+<text x="320" y="244" font-family="Segoe UI, Arial, sans-serif" font-size="14" fill="#142c44" font-weight="600" text-anchor="middle">28</text>
+<rect x="353" y="220" width="56" height="37" rx="5" fill="#6f8bab"><title>13/11/2026 · 28 camion(s) · scénario A</title></rect>
+<text x="381" y="244" font-family="Segoe UI, Arial, sans-serif" font-size="14" fill="#142c44" font-weight="600" text-anchor="middle">28</text>
+<text x="26" y="287" font-family="Segoe UI, Arial, sans-serif" font-size="14" fill="#142c44" font-weight="400" text-anchor="start">16/11</text>
+<rect x="109" y="263" width="56" height="37" rx="5" fill="#748fae"><title>16/11/2026 · 27 camion(s) · scénario A</title></rect>
+<text x="137" y="287" font-family="Segoe UI, Arial, sans-serif" font-size="14" fill="#142c44" font-weight="600" text-anchor="middle">27</text>
+<rect x="170" y="263" width="56" height="37" rx="5" fill="#8fa6bf"><title>17/11/2026 · 21 camion(s) · scénario A</title></rect>
+<text x="198" y="287" font-family="Segoe UI, Arial, sans-serif" font-size="14" fill="#142c44" font-weight="600" text-anchor="middle">21</text>
+<rect x="231" y="263" width="56" height="37" rx="5" fill="#93a9c1"><title>18/11/2026 · 20 camion(s) · scénario A</title></rect>
+<text x="259" y="287" font-family="Segoe UI, Arial, sans-serif" font-size="14" fill="#142c44" font-weight="600" text-anchor="middle">20</text>
+<rect x="292" y="263" width="56" height="37" rx="5" fill="#54759b"><title>19/11/2026 · 34 camion(s) · scénario A</title></rect>
+<text x="320" y="287" font-family="Segoe UI, Arial, sans-serif" font-size="14" fill="#fff" font-weight="600" text-anchor="middle">34</text>
+<rect x="353" y="263" width="56" height="37" rx="5" fill="#3d628d"><title>20/11/2026 · 39 camion(s) · scénario A</title></rect>
+<text x="381" y="287" font-family="Segoe UI, Arial, sans-serif" font-size="14" fill="#fff" font-weight="600" text-anchor="middle">39</text>
+<text x="26" y="330" font-family="Segoe UI, Arial, sans-serif" font-size="14" fill="#142c44" font-weight="400" text-anchor="start">23/11</text>
+<rect x="109" y="306" width="56" height="37" rx="5" fill="#5d7ca0"><title>23/11/2026 · 32 camion(s) · scénario A</title></rect>
+<text x="137" y="330" font-family="Segoe UI, Arial, sans-serif" font-size="14" fill="#fff" font-weight="600" text-anchor="middle">32</text>
+<rect x="170" y="306" width="56" height="37" rx="5" fill="#748fae"><title>24/11/2026 · 27 camion(s) · scénario A</title></rect>
+<text x="198" y="330" font-family="Segoe UI, Arial, sans-serif" font-size="14" fill="#142c44" font-weight="600" text-anchor="middle">27</text>
+<rect x="231" y="306" width="56" height="37" rx="5" fill="#6f8bab"><title>25/11/2026 · 28 camion(s) · scénario A</title></rect>
+<text x="259" y="330" font-family="Segoe UI, Arial, sans-serif" font-size="14" fill="#142c44" font-weight="600" text-anchor="middle">28</text>
+<rect x="292" y="306" width="56" height="37" rx="5" fill="#345b88" stroke="#172f49" stroke-width="2"><title>26/11/2026 · 41 camion(s) · scénario A</title></rect>
+<text x="320" y="330" font-family="Segoe UI, Arial, sans-serif" font-size="14" fill="#fff" font-weight="600" text-anchor="middle">41</text>
+<rect x="353" y="306" width="56" height="37" rx="5" fill="#869eb9"><title>27/11/2026 · 23 camion(s) · scénario A</title></rect>
+<text x="381" y="330" font-family="Segoe UI, Arial, sans-serif" font-size="14" fill="#142c44" font-weight="600" text-anchor="middle">23</text>
+<text x="26" y="373" font-family="Segoe UI, Arial, sans-serif" font-size="14" fill="#142c44" font-weight="400" text-anchor="start">30/11</text>
+<rect x="109" y="349" width="56" height="37" rx="5" fill="#7893b1"><title>30/11/2026 · 26 camion(s) · scénario A</title></rect>
+<text x="137" y="373" font-family="Segoe UI, Arial, sans-serif" font-size="14" fill="#142c44" font-weight="600" text-anchor="middle">26</text>
+<rect x="170" y="349" width="56" height="37" rx="5" fill="#6f8bab"><title>01/12/2026 · 28 camion(s) · scénario A</title></rect>
+<text x="198" y="373" font-family="Segoe UI, Arial, sans-serif" font-size="14" fill="#142c44" font-weight="600" text-anchor="middle">28</text>
+<rect x="231" y="349" width="56" height="37" rx="5" fill="#748fae"><title>02/12/2026 · 27 camion(s) · scénario A</title></rect>
+<text x="259" y="373" font-family="Segoe UI, Arial, sans-serif" font-size="14" fill="#142c44" font-weight="600" text-anchor="middle">27</text>
+<rect x="292" y="349" width="56" height="37" rx="5" fill="#6684a6"><title>03/12/2026 · 30 camion(s) · scénario A</title></rect>
+<text x="320" y="373" font-family="Segoe UI, Arial, sans-serif" font-size="14" fill="#142c44" font-weight="600" text-anchor="middle">30</text>
+<rect x="353" y="349" width="56" height="37" rx="5" fill="#819ab6"><title>04/12/2026 · 24 camion(s) · scénario A</title></rect>
+<text x="381" y="373" font-family="Segoe UI, Arial, sans-serif" font-size="14" fill="#142c44" font-weight="600" text-anchor="middle">24</text>
+<text x="26" y="416" font-family="Segoe UI, Arial, sans-serif" font-size="14" fill="#142c44" font-weight="400" text-anchor="start">07/12</text>
+<rect x="109" y="392" width="56" height="37" rx="5" fill="#98adc4"><title>07/12/2026 · 19 camion(s) · scénario A</title></rect>
+<text x="137" y="416" font-family="Segoe UI, Arial, sans-serif" font-size="14" fill="#142c44" font-weight="600" text-anchor="middle">19</text>
+<rect x="170" y="392" width="56" height="37" rx="5" fill="#93a9c1"><title>08/12/2026 · 20 camion(s) · scénario A</title></rect>
+<text x="198" y="416" font-family="Segoe UI, Arial, sans-serif" font-size="14" fill="#142c44" font-weight="600" text-anchor="middle">20</text>
+<rect x="231" y="392" width="56" height="37" rx="5" fill="#9cb1c7"><title>09/12/2026 · 18 camion(s) · scénario A</title></rect>
+<text x="259" y="416" font-family="Segoe UI, Arial, sans-serif" font-size="14" fill="#142c44" font-weight="600" text-anchor="middle">18</text>
+<rect x="292" y="392" width="56" height="37" rx="5" fill="#8aa2bc"><title>10/12/2026 · 22 camion(s) · scénario A</title></rect>
+<text x="320" y="416" font-family="Segoe UI, Arial, sans-serif" font-size="14" fill="#142c44" font-weight="600" text-anchor="middle">22</text>
+<rect x="353" y="392" width="56" height="37" rx="5" fill="#a1b5ca"><title>11/12/2026 · 17 camion(s) · scénario A</title></rect>
+<text x="381" y="416" font-family="Segoe UI, Arial, sans-serif" font-size="14" fill="#142c44" font-weight="600" text-anchor="middle">17</text>
+<text x="26" y="459" font-family="Segoe UI, Arial, sans-serif" font-size="14" fill="#142c44" font-weight="400" text-anchor="start">14/12</text>
+<rect x="109" y="435" width="56" height="37" rx="5" fill="#b8c7d7"><title>14/12/2026 · 12 camion(s) · scénario A</title></rect>
+<text x="137" y="459" font-family="Segoe UI, Arial, sans-serif" font-size="14" fill="#142c44" font-weight="600" text-anchor="middle">12</text>
+<rect x="170" y="435" width="56" height="37" rx="5" fill="#cedae5"><title>15/12/2026 · 7 camion(s) · scénario A</title></rect>
+<text x="198" y="459" font-family="Segoe UI, Arial, sans-serif" font-size="14" fill="#142c44" font-weight="600" text-anchor="middle">7</text>
+<rect x="231" y="435" width="56" height="37" rx="5" fill="#e0e9f0"><title>16/12/2026 · 3 camion(s) · scénario A</title></rect>
+<text x="259" y="459" font-family="Segoe UI, Arial, sans-serif" font-size="14" fill="#142c44" font-weight="600" text-anchor="middle">3</text>
+<rect x="292" y="435" width="56" height="37" rx="5" fill="#e0e9f0"><title>17/12/2026 · 3 camion(s) · scénario A</title></rect>
+<text x="320" y="459" font-family="Segoe UI, Arial, sans-serif" font-size="14" fill="#142c44" font-weight="600" text-anchor="middle">3</text>
+<rect x="353" y="435" width="56" height="37" rx="5" fill="#eef4f8"><title>18/12/2026 · 0 camion(s) · scénario A</title></rect>
+<text x="381" y="459" font-family="Segoe UI, Arial, sans-serif" font-size="14" fill="#142c44" font-weight="600" text-anchor="middle">0</text>
+<text x="441" y="110" font-family="Segoe UI, Arial, sans-serif" font-size="18" fill="#142c44" font-weight="700" text-anchor="start">B · RG06 sous budget</text>
+<text x="441" y="136" font-family="Segoe UI, Arial, sans-serif" font-size="14" fill="#405a70" font-weight="400" text-anchor="start">733 camions · pic 32/jour</text>
+<text x="469" y="166" font-family="Segoe UI, Arial, sans-serif" font-size="14" fill="#142c44" font-weight="400" text-anchor="middle">Lun.</text>
+<text x="530" y="166" font-family="Segoe UI, Arial, sans-serif" font-size="14" fill="#142c44" font-weight="400" text-anchor="middle">Mar.</text>
+<text x="591" y="166" font-family="Segoe UI, Arial, sans-serif" font-size="14" fill="#142c44" font-weight="400" text-anchor="middle">Mer.</text>
+<text x="652" y="166" font-family="Segoe UI, Arial, sans-serif" font-size="14" fill="#142c44" font-weight="400" text-anchor="middle">Jeu.</text>
+<text x="713" y="166" font-family="Segoe UI, Arial, sans-serif" font-size="14" fill="#142c44" font-weight="400" text-anchor="middle">Ven.</text>
+<rect x="441" y="177" width="56" height="37" rx="5" fill="#eef4f8"><title>02/11/2026 · 0 camion(s) · scénario B</title></rect>
+<text x="469" y="201" font-family="Segoe UI, Arial, sans-serif" font-size="14" fill="#142c44" font-weight="600" text-anchor="middle">0</text>
+<rect x="502" y="177" width="56" height="37" rx="5" fill="#cedae5"><title>03/11/2026 · 7 camion(s) · scénario B</title></rect>
+<text x="530" y="201" font-family="Segoe UI, Arial, sans-serif" font-size="14" fill="#142c44" font-weight="600" text-anchor="middle">7</text>
+<rect x="563" y="177" width="56" height="37" rx="5" fill="#bccbda"><title>04/11/2026 · 11 camion(s) · scénario B</title></rect>
+<text x="591" y="201" font-family="Segoe UI, Arial, sans-serif" font-size="14" fill="#142c44" font-weight="600" text-anchor="middle">11</text>
+<rect x="624" y="177" width="56" height="37" rx="5" fill="#b3c3d4"><title>05/11/2026 · 13 camion(s) · scénario B</title></rect>
+<text x="652" y="201" font-family="Segoe UI, Arial, sans-serif" font-size="14" fill="#142c44" font-weight="600" text-anchor="middle">13</text>
+<rect x="685" y="177" width="56" height="37" rx="5" fill="#a6b8cc"><title>06/11/2026 · 16 camion(s) · scénario B</title></rect>
+<text x="713" y="201" font-family="Segoe UI, Arial, sans-serif" font-size="14" fill="#142c44" font-weight="600" text-anchor="middle">16</text>
+<rect x="441" y="220" width="56" height="37" rx="5" fill="#5d7ca0" stroke="#172f49" stroke-width="2"><title>09/11/2026 · 32 camion(s) · scénario B</title></rect>
+<text x="469" y="244" font-family="Segoe UI, Arial, sans-serif" font-size="14" fill="#fff" font-weight="600" text-anchor="middle">32</text>
+<rect x="502" y="220" width="56" height="37" rx="5" fill="#5d7ca0" stroke="#172f49" stroke-width="2"><title>10/11/2026 · 32 camion(s) · scénario B</title></rect>
+<text x="530" y="244" font-family="Segoe UI, Arial, sans-serif" font-size="14" fill="#fff" font-weight="600" text-anchor="middle">32</text>
+<rect x="563" y="220" width="56" height="37" rx="5" fill="#6280a3"><title>11/11/2026 · 31 camion(s) · scénario B</title></rect>
+<text x="591" y="244" font-family="Segoe UI, Arial, sans-serif" font-size="14" fill="#fff" font-weight="600" text-anchor="middle">31</text>
+<rect x="624" y="220" width="56" height="37" rx="5" fill="#6b88a9"><title>12/11/2026 · 29 camion(s) · scénario B</title></rect>
+<text x="652" y="244" font-family="Segoe UI, Arial, sans-serif" font-size="14" fill="#142c44" font-weight="600" text-anchor="middle">29</text>
+<rect x="685" y="220" width="56" height="37" rx="5" fill="#748fae"><title>13/11/2026 · 27 camion(s) · scénario B</title></rect>
+<text x="713" y="244" font-family="Segoe UI, Arial, sans-serif" font-size="14" fill="#142c44" font-weight="600" text-anchor="middle">27</text>
+<rect x="441" y="263" width="56" height="37" rx="5" fill="#a1b5ca"><title>16/11/2026 · 17 camion(s) · scénario B</title></rect>
+<text x="469" y="287" font-family="Segoe UI, Arial, sans-serif" font-size="14" fill="#142c44" font-weight="600" text-anchor="middle">17</text>
+<rect x="502" y="263" width="56" height="37" rx="5" fill="#6f8bab"><title>17/11/2026 · 28 camion(s) · scénario B</title></rect>
+<text x="530" y="287" font-family="Segoe UI, Arial, sans-serif" font-size="14" fill="#142c44" font-weight="600" text-anchor="middle">28</text>
+<rect x="563" y="263" width="56" height="37" rx="5" fill="#5d7ca0" stroke="#172f49" stroke-width="2"><title>18/11/2026 · 32 camion(s) · scénario B</title></rect>
+<text x="591" y="287" font-family="Segoe UI, Arial, sans-serif" font-size="14" fill="#fff" font-weight="600" text-anchor="middle">32</text>
+<rect x="624" y="263" width="56" height="37" rx="5" fill="#6f8bab"><title>19/11/2026 · 28 camion(s) · scénario B</title></rect>
+<text x="652" y="287" font-family="Segoe UI, Arial, sans-serif" font-size="14" fill="#142c44" font-weight="600" text-anchor="middle">28</text>
+<rect x="685" y="263" width="56" height="37" rx="5" fill="#5d7ca0" stroke="#172f49" stroke-width="2"><title>20/11/2026 · 32 camion(s) · scénario B</title></rect>
+<text x="713" y="287" font-family="Segoe UI, Arial, sans-serif" font-size="14" fill="#fff" font-weight="600" text-anchor="middle">32</text>
+<rect x="441" y="306" width="56" height="37" rx="5" fill="#5d7ca0" stroke="#172f49" stroke-width="2"><title>23/11/2026 · 32 camion(s) · scénario B</title></rect>
+<text x="469" y="330" font-family="Segoe UI, Arial, sans-serif" font-size="14" fill="#fff" font-weight="600" text-anchor="middle">32</text>
+<rect x="502" y="306" width="56" height="37" rx="5" fill="#869eb9"><title>24/11/2026 · 23 camion(s) · scénario B</title></rect>
+<text x="530" y="330" font-family="Segoe UI, Arial, sans-serif" font-size="14" fill="#142c44" font-weight="600" text-anchor="middle">23</text>
+<rect x="563" y="306" width="56" height="37" rx="5" fill="#5d7ca0" stroke="#172f49" stroke-width="2"><title>25/11/2026 · 32 camion(s) · scénario B</title></rect>
+<text x="591" y="330" font-family="Segoe UI, Arial, sans-serif" font-size="14" fill="#fff" font-weight="600" text-anchor="middle">32</text>
+<rect x="624" y="306" width="56" height="37" rx="5" fill="#5d7ca0" stroke="#172f49" stroke-width="2"><title>26/11/2026 · 32 camion(s) · scénario B</title></rect>
+<text x="652" y="330" font-family="Segoe UI, Arial, sans-serif" font-size="14" fill="#fff" font-weight="600" text-anchor="middle">32</text>
+<rect x="685" y="306" width="56" height="37" rx="5" fill="#a6b8cc"><title>27/11/2026 · 16 camion(s) · scénario B</title></rect>
+<text x="713" y="330" font-family="Segoe UI, Arial, sans-serif" font-size="14" fill="#142c44" font-weight="600" text-anchor="middle">16</text>
+<rect x="441" y="349" width="56" height="37" rx="5" fill="#98adc4"><title>30/11/2026 · 19 camion(s) · scénario B</title></rect>
+<text x="469" y="373" font-family="Segoe UI, Arial, sans-serif" font-size="14" fill="#142c44" font-weight="600" text-anchor="middle">19</text>
+<rect x="502" y="349" width="56" height="37" rx="5" fill="#5d7ca0" stroke="#172f49" stroke-width="2"><title>01/12/2026 · 32 camion(s) · scénario B</title></rect>
+<text x="530" y="373" font-family="Segoe UI, Arial, sans-serif" font-size="14" fill="#fff" font-weight="600" text-anchor="middle">32</text>
+<rect x="563" y="349" width="56" height="37" rx="5" fill="#5d7ca0" stroke="#172f49" stroke-width="2"><title>02/12/2026 · 32 camion(s) · scénario B</title></rect>
+<text x="591" y="373" font-family="Segoe UI, Arial, sans-serif" font-size="14" fill="#fff" font-weight="600" text-anchor="middle">32</text>
+<rect x="624" y="349" width="56" height="37" rx="5" fill="#748fae"><title>03/12/2026 · 27 camion(s) · scénario B</title></rect>
+<text x="652" y="373" font-family="Segoe UI, Arial, sans-serif" font-size="14" fill="#142c44" font-weight="600" text-anchor="middle">27</text>
+<rect x="685" y="349" width="56" height="37" rx="5" fill="#93a9c1"><title>04/12/2026 · 20 camion(s) · scénario B</title></rect>
+<text x="713" y="373" font-family="Segoe UI, Arial, sans-serif" font-size="14" fill="#142c44" font-weight="600" text-anchor="middle">20</text>
+<rect x="441" y="392" width="56" height="37" rx="5" fill="#a6b8cc"><title>07/12/2026 · 16 camion(s) · scénario B</title></rect>
+<text x="469" y="416" font-family="Segoe UI, Arial, sans-serif" font-size="14" fill="#142c44" font-weight="600" text-anchor="middle">16</text>
+<rect x="502" y="392" width="56" height="37" rx="5" fill="#93a9c1"><title>08/12/2026 · 20 camion(s) · scénario B</title></rect>
+<text x="530" y="416" font-family="Segoe UI, Arial, sans-serif" font-size="14" fill="#142c44" font-weight="600" text-anchor="middle">20</text>
+<rect x="563" y="392" width="56" height="37" rx="5" fill="#869eb9"><title>09/12/2026 · 23 camion(s) · scénario B</title></rect>
+<text x="591" y="416" font-family="Segoe UI, Arial, sans-serif" font-size="14" fill="#142c44" font-weight="600" text-anchor="middle">23</text>
+<rect x="624" y="392" width="56" height="37" rx="5" fill="#93a9c1"><title>10/12/2026 · 20 camion(s) · scénario B</title></rect>
+<text x="652" y="416" font-family="Segoe UI, Arial, sans-serif" font-size="14" fill="#142c44" font-weight="600" text-anchor="middle">20</text>
+<rect x="685" y="392" width="56" height="37" rx="5" fill="#9cb1c7"><title>11/12/2026 · 18 camion(s) · scénario B</title></rect>
+<text x="713" y="416" font-family="Segoe UI, Arial, sans-serif" font-size="14" fill="#142c44" font-weight="600" text-anchor="middle">18</text>
+<rect x="441" y="435" width="56" height="37" rx="5" fill="#b8c7d7"><title>14/12/2026 · 12 camion(s) · scénario B</title></rect>
+<text x="469" y="459" font-family="Segoe UI, Arial, sans-serif" font-size="14" fill="#142c44" font-weight="600" text-anchor="middle">12</text>
+<rect x="502" y="435" width="56" height="37" rx="5" fill="#c1cfdd"><title>15/12/2026 · 10 camion(s) · scénario B</title></rect>
+<text x="530" y="459" font-family="Segoe UI, Arial, sans-serif" font-size="14" fill="#142c44" font-weight="600" text-anchor="middle">10</text>
+<rect x="563" y="435" width="56" height="37" rx="5" fill="#c1cfdd"><title>16/12/2026 · 10 camion(s) · scénario B</title></rect>
+<text x="591" y="459" font-family="Segoe UI, Arial, sans-serif" font-size="14" fill="#142c44" font-weight="600" text-anchor="middle">10</text>
+<rect x="624" y="435" width="56" height="37" rx="5" fill="#e5edf3"><title>17/12/2026 · 2 camion(s) · scénario B</title></rect>
+<text x="652" y="459" font-family="Segoe UI, Arial, sans-serif" font-size="14" fill="#142c44" font-weight="600" text-anchor="middle">2</text>
+<rect x="685" y="435" width="56" height="37" rx="5" fill="#e5edf3"><title>18/12/2026 · 2 camion(s) · scénario B</title></rect>
+<text x="713" y="459" font-family="Segoe UI, Arial, sans-serif" font-size="14" fill="#142c44" font-weight="600" text-anchor="middle">2</text>
+<text x="773" y="110" font-family="Segoe UI, Arial, sans-serif" font-size="18" fill="#142c44" font-weight="700" text-anchor="start">C · RG05 et RG06</text>
+<text x="773" y="136" font-family="Segoe UI, Arial, sans-serif" font-size="14" fill="#405a70" font-weight="400" text-anchor="start">759 camions · pic 49/jour</text>
+<text x="801" y="166" font-family="Segoe UI, Arial, sans-serif" font-size="14" fill="#142c44" font-weight="400" text-anchor="middle">Lun.</text>
+<text x="862" y="166" font-family="Segoe UI, Arial, sans-serif" font-size="14" fill="#142c44" font-weight="400" text-anchor="middle">Mar.</text>
+<text x="923" y="166" font-family="Segoe UI, Arial, sans-serif" font-size="14" fill="#142c44" font-weight="400" text-anchor="middle">Mer.</text>
+<text x="984" y="166" font-family="Segoe UI, Arial, sans-serif" font-size="14" fill="#142c44" font-weight="400" text-anchor="middle">Jeu.</text>
+<text x="1045" y="166" font-family="Segoe UI, Arial, sans-serif" font-size="14" fill="#142c44" font-weight="400" text-anchor="middle">Ven.</text>
+<rect x="773" y="177" width="56" height="37" rx="5" fill="#eef4f8"><title>02/11/2026 · 0 camion(s) · scénario C</title></rect>
+<text x="801" y="201" font-family="Segoe UI, Arial, sans-serif" font-size="14" fill="#142c44" font-weight="600" text-anchor="middle">0</text>
+<rect x="834" y="177" width="56" height="37" rx="5" fill="#d3dee8"><title>03/11/2026 · 6 camion(s) · scénario C</title></rect>
+<text x="862" y="201" font-family="Segoe UI, Arial, sans-serif" font-size="14" fill="#142c44" font-weight="600" text-anchor="middle">6</text>
+<rect x="895" y="177" width="56" height="37" rx="5" fill="#c1cfdd"><title>04/11/2026 · 10 camion(s) · scénario C</title></rect>
+<text x="923" y="201" font-family="Segoe UI, Arial, sans-serif" font-size="14" fill="#142c44" font-weight="600" text-anchor="middle">10</text>
+<rect x="956" y="177" width="56" height="37" rx="5" fill="#bccbda"><title>05/11/2026 · 11 camion(s) · scénario C</title></rect>
+<text x="984" y="201" font-family="Segoe UI, Arial, sans-serif" font-size="14" fill="#142c44" font-weight="600" text-anchor="middle">11</text>
+<rect x="1017" y="177" width="56" height="37" rx="5" fill="#93a9c1"><title>06/11/2026 · 20 camion(s) · scénario C</title></rect>
+<text x="1045" y="201" font-family="Segoe UI, Arial, sans-serif" font-size="14" fill="#142c44" font-weight="600" text-anchor="middle">20</text>
+<rect x="773" y="220" width="56" height="37" rx="5" fill="#103d72" stroke="#172f49" stroke-width="2"><title>09/11/2026 · 49 camion(s) · scénario C</title></rect>
+<text x="801" y="244" font-family="Segoe UI, Arial, sans-serif" font-size="14" fill="#fff" font-weight="600" text-anchor="middle">49</text>
+<rect x="834" y="220" width="56" height="37" rx="5" fill="#6f8bab"><title>10/11/2026 · 28 camion(s) · scénario C</title></rect>
+<text x="862" y="244" font-family="Segoe UI, Arial, sans-serif" font-size="14" fill="#142c44" font-weight="600" text-anchor="middle">28</text>
+<rect x="895" y="220" width="56" height="37" rx="5" fill="#6b88a9"><title>11/11/2026 · 29 camion(s) · scénario C</title></rect>
+<text x="923" y="244" font-family="Segoe UI, Arial, sans-serif" font-size="14" fill="#142c44" font-weight="600" text-anchor="middle">29</text>
+<rect x="956" y="220" width="56" height="37" rx="5" fill="#8fa6bf"><title>12/11/2026 · 21 camion(s) · scénario C</title></rect>
+<text x="984" y="244" font-family="Segoe UI, Arial, sans-serif" font-size="14" fill="#142c44" font-weight="600" text-anchor="middle">21</text>
+<rect x="1017" y="220" width="56" height="37" rx="5" fill="#7893b1"><title>13/11/2026 · 26 camion(s) · scénario C</title></rect>
+<text x="1045" y="244" font-family="Segoe UI, Arial, sans-serif" font-size="14" fill="#142c44" font-weight="600" text-anchor="middle">26</text>
+<rect x="773" y="263" width="56" height="37" rx="5" fill="#6280a3"><title>16/11/2026 · 31 camion(s) · scénario C</title></rect>
+<text x="801" y="287" font-family="Segoe UI, Arial, sans-serif" font-size="14" fill="#fff" font-weight="600" text-anchor="middle">31</text>
+<rect x="834" y="263" width="56" height="37" rx="5" fill="#7893b1"><title>17/11/2026 · 26 camion(s) · scénario C</title></rect>
+<text x="862" y="287" font-family="Segoe UI, Arial, sans-serif" font-size="14" fill="#142c44" font-weight="600" text-anchor="middle">26</text>
+<rect x="895" y="263" width="56" height="37" rx="5" fill="#98adc4"><title>18/11/2026 · 19 camion(s) · scénario C</title></rect>
+<text x="923" y="287" font-family="Segoe UI, Arial, sans-serif" font-size="14" fill="#142c44" font-weight="600" text-anchor="middle">19</text>
+<rect x="956" y="263" width="56" height="37" rx="5" fill="#8fa6bf"><title>19/11/2026 · 21 camion(s) · scénario C</title></rect>
+<text x="984" y="287" font-family="Segoe UI, Arial, sans-serif" font-size="14" fill="#142c44" font-weight="600" text-anchor="middle">21</text>
+<rect x="1017" y="263" width="56" height="37" rx="5" fill="#103d72" stroke="#172f49" stroke-width="2"><title>20/11/2026 · 49 camion(s) · scénario C</title></rect>
+<text x="1045" y="287" font-family="Segoe UI, Arial, sans-serif" font-size="14" fill="#fff" font-weight="600" text-anchor="middle">49</text>
+<rect x="773" y="306" width="56" height="37" rx="5" fill="#2b5382"><title>23/11/2026 · 43 camion(s) · scénario C</title></rect>
+<text x="801" y="330" font-family="Segoe UI, Arial, sans-serif" font-size="14" fill="#fff" font-weight="600" text-anchor="middle">43</text>
+<rect x="834" y="306" width="56" height="37" rx="5" fill="#748fae"><title>24/11/2026 · 27 camion(s) · scénario C</title></rect>
+<text x="862" y="330" font-family="Segoe UI, Arial, sans-serif" font-size="14" fill="#142c44" font-weight="600" text-anchor="middle">27</text>
+<rect x="895" y="306" width="56" height="37" rx="5" fill="#9cb1c7"><title>25/11/2026 · 18 camion(s) · scénario C</title></rect>
+<text x="923" y="330" font-family="Segoe UI, Arial, sans-serif" font-size="14" fill="#142c44" font-weight="600" text-anchor="middle">18</text>
+<rect x="956" y="306" width="56" height="37" rx="5" fill="#6f8bab"><title>26/11/2026 · 28 camion(s) · scénario C</title></rect>
+<text x="984" y="330" font-family="Segoe UI, Arial, sans-serif" font-size="14" fill="#142c44" font-weight="600" text-anchor="middle">28</text>
+<rect x="1017" y="306" width="56" height="37" rx="5" fill="#8fa6bf"><title>27/11/2026 · 21 camion(s) · scénario C</title></rect>
+<text x="1045" y="330" font-family="Segoe UI, Arial, sans-serif" font-size="14" fill="#142c44" font-weight="600" text-anchor="middle">21</text>
+<rect x="773" y="349" width="56" height="37" rx="5" fill="#4b6e96"><title>30/11/2026 · 36 camion(s) · scénario C</title></rect>
+<text x="801" y="373" font-family="Segoe UI, Arial, sans-serif" font-size="14" fill="#fff" font-weight="600" text-anchor="middle">36</text>
+<rect x="834" y="349" width="56" height="37" rx="5" fill="#54759b"><title>01/12/2026 · 34 camion(s) · scénario C</title></rect>
+<text x="862" y="373" font-family="Segoe UI, Arial, sans-serif" font-size="14" fill="#fff" font-weight="600" text-anchor="middle">34</text>
+<rect x="895" y="349" width="56" height="37" rx="5" fill="#748fae"><title>02/12/2026 · 27 camion(s) · scénario C</title></rect>
+<text x="923" y="373" font-family="Segoe UI, Arial, sans-serif" font-size="14" fill="#142c44" font-weight="600" text-anchor="middle">27</text>
+<rect x="956" y="349" width="56" height="37" rx="5" fill="#afc0d2"><title>03/12/2026 · 14 camion(s) · scénario C</title></rect>
+<text x="984" y="373" font-family="Segoe UI, Arial, sans-serif" font-size="14" fill="#142c44" font-weight="600" text-anchor="middle">14</text>
+<rect x="1017" y="349" width="56" height="37" rx="5" fill="#8fa6bf"><title>04/12/2026 · 21 camion(s) · scénario C</title></rect>
+<text x="1045" y="373" font-family="Segoe UI, Arial, sans-serif" font-size="14" fill="#142c44" font-weight="600" text-anchor="middle">21</text>
+<rect x="773" y="392" width="56" height="37" rx="5" fill="#6280a3"><title>07/12/2026 · 31 camion(s) · scénario C</title></rect>
+<text x="801" y="416" font-family="Segoe UI, Arial, sans-serif" font-size="14" fill="#fff" font-weight="600" text-anchor="middle">31</text>
+<rect x="834" y="392" width="56" height="37" rx="5" fill="#8fa6bf"><title>08/12/2026 · 21 camion(s) · scénario C</title></rect>
+<text x="862" y="416" font-family="Segoe UI, Arial, sans-serif" font-size="14" fill="#142c44" font-weight="600" text-anchor="middle">21</text>
+<rect x="895" y="392" width="56" height="37" rx="5" fill="#8aa2bc"><title>09/12/2026 · 22 camion(s) · scénario C</title></rect>
+<text x="923" y="416" font-family="Segoe UI, Arial, sans-serif" font-size="14" fill="#142c44" font-weight="600" text-anchor="middle">22</text>
+<rect x="956" y="392" width="56" height="37" rx="5" fill="#869eb9"><title>10/12/2026 · 23 camion(s) · scénario C</title></rect>
+<text x="984" y="416" font-family="Segoe UI, Arial, sans-serif" font-size="14" fill="#142c44" font-weight="600" text-anchor="middle">23</text>
+<rect x="1017" y="392" width="56" height="37" rx="5" fill="#8fa6bf"><title>11/12/2026 · 21 camion(s) · scénario C</title></rect>
+<text x="1045" y="416" font-family="Segoe UI, Arial, sans-serif" font-size="14" fill="#142c44" font-weight="600" text-anchor="middle">21</text>
+<rect x="773" y="435" width="56" height="37" rx="5" fill="#b8c7d7"><title>14/12/2026 · 12 camion(s) · scénario C</title></rect>
+<text x="801" y="459" font-family="Segoe UI, Arial, sans-serif" font-size="14" fill="#142c44" font-weight="600" text-anchor="middle">12</text>
+<rect x="834" y="435" width="56" height="37" rx="5" fill="#d7e1ea"><title>15/12/2026 · 5 camion(s) · scénario C</title></rect>
+<text x="862" y="459" font-family="Segoe UI, Arial, sans-serif" font-size="14" fill="#142c44" font-weight="600" text-anchor="middle">5</text>
+<rect x="895" y="435" width="56" height="37" rx="5" fill="#dce5ed"><title>16/12/2026 · 4 camion(s) · scénario C</title></rect>
+<text x="923" y="459" font-family="Segoe UI, Arial, sans-serif" font-size="14" fill="#142c44" font-weight="600" text-anchor="middle">4</text>
+<rect x="956" y="435" width="56" height="37" rx="5" fill="#dce5ed"><title>17/12/2026 · 4 camion(s) · scénario C</title></rect>
+<text x="984" y="459" font-family="Segoe UI, Arial, sans-serif" font-size="14" fill="#142c44" font-weight="600" text-anchor="middle">4</text>
+<rect x="1017" y="435" width="56" height="37" rx="5" fill="#e9f0f5"><title>18/12/2026 · 1 camion(s) · scénario C</title></rect>
+<text x="1045" y="459" font-family="Segoe UI, Arial, sans-serif" font-size="14" fill="#142c44" font-weight="600" text-anchor="middle">1</text>
+<text x="26" y="508" font-family="Segoe UI, Arial, sans-serif" font-size="14" fill="#142c44" font-weight="400" text-anchor="start">Camions par jour</text>
+<rect x="159" y="497" width="170" height="13" rx="3" fill="url(#scale)"/>
+<text x="159" y="529" font-family="Segoe UI, Arial, sans-serif" font-size="14" fill="#142c44" font-weight="400" text-anchor="start">0</text>
+<text x="329" y="529" font-family="Segoe UI, Arial, sans-serif" font-size="14" fill="#142c44" font-weight="400" text-anchor="end">49</text>
+<text x="390" y="508" font-family="Segoe UI, Arial, sans-serif" font-size="14" fill="#405a70" font-weight="400" text-anchor="start">Échelle commune · le contour indique le pic de chaque scénario.</text>
+</svg>

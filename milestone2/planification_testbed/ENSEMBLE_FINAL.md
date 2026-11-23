@@ -1,5 +1,7 @@
 # Plan final fournisseur × usine
 
+Le plan RG05 et RG06 à 53 camions au pic présenté ci-dessous a été suivi d’un essai ciblé, qui ramène le pic à 49. Consulter la [présentation PDF actualisée](presentation-ensemble.pdf) et les [nouveaux exports](ensemble-cible/).
+
 Les deux variantes couvrent les **4 389 lignes préparées de `main`**. Les imputations de cette préparation sont indiquées dans les affectations. La référence quotidienne reconstruite est de **176 724,61 € pour 1 741 camions**.
 
 ![Cartes de chaleur des camions par jour avec la même échelle pour les trois plans](heatmap-ensemble-final.svg)

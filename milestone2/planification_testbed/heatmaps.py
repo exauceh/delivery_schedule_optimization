@@ -7,7 +7,8 @@ from pathlib import Path
 from xml.sax.saxutils import escape
 
 
-def render(root: Path, smoothing_calendar: Path | None = None, final_calendar: Path | None = None) -> Path:
+def render(root: Path, smoothing_calendar: Path | None = None, final_calendar: Path | None = None,
+           output: Path | None = None) -> Path:
     panels = []
     if smoothing_calendar is None and final_calendar is None:
         exports = root / "results" / "fast_plan"
@@ -82,7 +83,7 @@ def render(root: Path, smoothing_calendar: Path | None = None, final_calendar: P
     label(329, legend_y + 32, maximum, anchor="end")
     label(390, legend_y + 11, "Échelle commune · le contour indique le pic de chaque scénario.", fill="#405a70")
     svg.append("</svg>")
-    destination = Path(__file__).with_name(filename)
+    destination = output or Path(__file__).with_name(filename)
     destination.write_text("\n".join(svg), encoding="utf-8")
     return destination
 
@@ -92,5 +93,6 @@ if __name__ == "__main__":
     mode = parser.add_mutually_exclusive_group()
     mode.add_argument("--lissage", type=Path, metavar="CALENDRIER_CSV")
     mode.add_argument("--ensemble", type=Path, metavar="CALENDRIER_CSV")
+    parser.add_argument("--output", type=Path)
     args = parser.parse_args()
-    print(render(Path(__file__).resolve().parents[2], args.lissage, args.ensemble))
+    print(render(Path(__file__).resolve().parents[2], args.lissage, args.ensemble, args.output))

@@ -41,6 +41,16 @@ class Candidate:
 
 
 def select(pool, cost_cap=None, plant_caps=None, peak_first=False):
+    if cost_cap is not None:
+        minimum_by_pair = {}
+        for candidate in pool:
+            minimum_by_pair[candidate.key] = min(
+                minimum_by_pair.get(candidate.key, candidate.cents), candidate.cents
+            )
+        slack = cost_cap - sum(minimum_by_pair.values())
+        if slack < 0:
+            return None
+        pool = [p for p in pool if p.cents - minimum_by_pair[p.key] <= slack]
     by_pair = defaultdict(list)
     for i, candidate in enumerate(pool):
         by_pair[candidate.key].append(i)
@@ -90,7 +100,7 @@ def select(pool, cost_cap=None, plant_caps=None, peak_first=False):
     return None if result is None else [p for p, use in zip(pool, result[:-1], strict=True) if use]
 
 
-def run(repo, output, heuristic_csv):
+def run(repo, output, heuristic_csv, enrich_peaks=False, profile_pairs=None):
     started = perf_counter()
     output.mkdir(parents=True, exist_ok=True)
 
@@ -152,8 +162,10 @@ def run(repo, output, heuristic_csv):
 
     pool = []
     extended = []
+    contexts = {}
     all_lines = []
-    top_pairs = set(read(MAIN, "data/optimized_couples.csv").nlargest(40, "optimised_cost")
+    count = profile_pairs if enrich_peaks and profile_pairs is not None else 180 if enrich_peaks else 40
+    top_pairs = set(read(MAIN, "data/optimized_couples.csv").nlargest(count, "optimised_cost")
                     [KEY].itertuples(index=False, name=None))
     for key, group in source.groupby(KEY, sort=True):
         distance = float(group.distance.iloc[0])
@@ -168,7 +180,7 @@ def run(repo, output, heuristic_csv):
                  for i, r in zip(group.index, group.itertuples(index=False), strict=True)]
         all_lines.extend(lines)
 
-        def build(name, dates):
+        def build(name, dates, lines=lines, key=key, rate=rate):
             dates = [pd.Timestamp(day).date() for day in dates]
             by_day = defaultdict(list)
             for line, day in zip(lines, dates, strict=True):
@@ -210,6 +222,7 @@ def run(repo, output, heuristic_csv):
                     if not candidate.violations and candidate.peak_week_days == len(candidate.weekdays):
                         strict.append(candidate)
         pool.extend(strict)
+        contexts[key] = group, build
         if key in top_pairs:
             for n in range(1, 6):
                 for weekdays in combinations(range(5), n):
@@ -253,6 +266,53 @@ def run(repo, output, heuristic_csv):
     full_profile_pool = [p for p in strict_pool if p.peak_week_days == len(p.weekdays)] + extended
     if len({p.key for p in full_profile_pool}) != source.groupby(KEY).ngroups:
         raise ValueError("RG05 and RG06 pool does not cover every pair")
+    before_day_alternatives = len(full_profile_pool)
+    targeted = []
+    if enrich_peaks:
+        floor_plan = select(full_profile_pool)
+        floor = sum(p.cents for p in floor_plan)
+        anchor = select(full_profile_pool, cost_cap=max(budget, floor), peak_first=True)
+        if anchor is None:
+            raise ValueError("No strict anchor plan")
+        volume_by_day = Counter(t.day for p in anchor for t in p.trucks)
+        targets = sorted(volume_by_day, key=lambda day: (-volume_by_day[day], day))[:3]
+        original_nodes = graph.departure_nodes
+        for peak_day in targets:
+            contributors = sorted(
+                (p for p in anchor if any(t.day == peak_day for t in p.trucks)),
+                key=lambda p: (-sum(t.day == peak_day for t in p.trucks), -p.cents, p.key),
+            )[:10]
+            for selected in contributors:
+                group, build = contexts[selected.key]
+                profiles = [selected.weekdays]
+                alternatives = sorted((p for p in full_profile_pool if p.key == selected.key),
+                                      key=lambda p: (p.cents, p.weekdays))
+                profiles.extend(p.weekdays for p in alternatives if p.weekdays != selected.weekdays)
+                for weekdays in list(dict.fromkeys(profiles))[:2]:
+                    # Remove this departure date from the graph without declaring it
+                    # a holiday: no automatic move to an off-profile weekday.
+                    def nodes_without_peak(*args, **kwargs):
+                        return [node for node in original_nodes(*args, **kwargs) if node[1] != peak_day]
+
+                    graph.departure_nodes = nodes_without_peak
+                    try:
+                        plan = graph.optimal_plan(group, weekdays, holidays, tariff, config, start)
+                    finally:
+                        graph.departure_nodes = original_nodes
+                    if plan is None:
+                        continue
+                    alternative = build("graphe_hors_pointe", plan.dates)
+                    if not alternative.violations and alternative.peak_week_days == len(alternative.weekdays):
+                        targeted.append(alternative)
+        plans["rg05_rg06_avant_ciblage"] = anchor
+        # Identical truck arrivals for one pair have the same effect on lissage.
+        unique = {}
+        for candidate in (*full_profile_pool, *targeted):
+            signature = candidate.key, tuple(sorted(Counter(t.day for t in candidate.trucks).items()))
+            current = unique.get(signature)
+            if current is None or (candidate.cents, candidate.advance) < (current.cents, current.advance):
+                unique[signature] = candidate
+        full_profile_pool = list(unique.values())
     principal = "principal_rg05_rg06"
     plans[principal] = select(full_profile_pool, cost_cap=budget, peak_first=True)
     if plans[principal] is None:
@@ -312,7 +372,11 @@ def run(repo, output, heuristic_csv):
                 output / f"{prefix}economies_par_usine.csv", float_format="%.2f",
             )
     manifest = dict(lines=len(source), candidates=len(pool), strict_candidates=len(strict_pool),
+                    couples_with_all_profiles_tested=len(top_pairs),
                     rg05_rg06_candidates=len(full_profile_pool),
+                    strict_candidates_before_targeting=before_day_alternatives,
+                    targeted_candidates=len(targeted),
+                    rg05_rg06_under_main_budget="principal_rg05_rg06" in plans,
                     strict_same_constraints_possible=strict_same_constraints is not None,
                     principal=principal,
                     main_plant_caps=main_caps, seconds=round(perf_counter() - started, 3))
@@ -326,5 +390,11 @@ if __name__ == "__main__":
     parser.add_argument("--repo", type=Path, default=Path.cwd())
     parser.add_argument("--output", type=Path, default=Path("results/ensemble-calendriers"))
     parser.add_argument("--heuristic", type=Path, help="Optional existing heuristic export for the same input")
+    parser.add_argument("--enrich-peaks", action="store_true",
+                        help="Explore all strict weekday sets and alternatives excluding crowded dates")
+    parser.add_argument("--profile-pairs", type=int,
+                        help="With --enrich-peaks, limit full profile exploration to this many high-cost pairs")
     args = parser.parse_args()
-    run(args.repo, args.output, args.heuristic)
+    if args.profile_pairs is not None and args.profile_pairs < 1:
+        parser.error("--profile-pairs must be positive")
+    run(args.repo, args.output, args.heuristic, args.enrich_peaks, args.profile_pairs)

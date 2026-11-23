@@ -2,6 +2,8 @@
 
 ## Dossier final fournisseur × usine
 
+**Actualisation : plan à 49 camions au pic.** [Présentation PDF illustrée](presentation-ensemble.pdf) · [Carte de chaleur](heatmap-ensemble-cible.svg) · [Exports du plan à 49](ensemble-cible/).
+
 [Document explicatif, cartes de chaleur et exports finaux](ENSEMBLE_FINAL.md)
 
 Le calcul combine trois sources de calendriers sur les 4 389 lignes préparées de `main` au commit `c069c90`. Il reprend le plan de `main`, le plan publié de Wissam au commit `64e34b9` et notre heuristique, qu’il recalcule à partir des mêmes besoins. Le graphe de Wissam fournit d’autres calendriers. Le moteur essaie les combinaisons de jours déjà observées et explore les 31 combinaisons sur les 40 couples les plus coûteux du plan publié de `main`.
@@ -24,6 +26,26 @@ L'exécution régénère les candidats heuristiques puis produit le comparatif, 
 | RG05 et RG06, au coût le plus bas dans le vivier élargi | 111 708,13 € | 759 | 53 | 0 |
 
 Les deux variantes couvrent les mêmes lignes et respectent RG06. Le vivier testé ne permet pas de satisfaire également RG05 sous le plafond de 110 329,59 €. La seconde variante dépasse ce plafond de 1 378,54 €. Elle reste sous 800 camions et présente 65 016,48 € d’économies calculées par rapport à la référence reconstruite. Aucun contrôle de la préférence de fréquence RG07 n’est déduit de ces résultats.
+
+### Expérience sur les jours de pointe
+
+L’option `--enrich-peaks` teste les 31 profils fixes pour chacun des 180 couples. À partir du premier plan RG05 et RG06, elle repère les trois dates les plus chargées. Pour les principaux contributeurs à ces pointes, elle demande aussi au graphe un calendrier qui évite cette date. Les nouveaux chemins passent les mêmes contrôles de dates et de chargement. Le comparatif affiche le résultat avant et après cet ajout ciblé.
+
+```powershell
+python milestone2/planification_testbed/ensemble_calendriers.py --repo ../delivery_schedule_optimization --output results/ensemble-enrichi --enrich-peaks
+```
+
+Ajouter `--profile-pairs 80` pour explorer tous les profils sur les 80 couples les plus coûteux et conserver les profils déjà observés sur les autres. Cette variante garde le ciblage des trois dates de pointe.
+
+| Recherche RG05 et RG06 | Coût | Camions | Pic quotidien | Temps du processus |
+|---|---:|---:|---:|---:|
+| Dossier publié, avant ciblage | 111 708,13 € | 759 | 53 | — |
+| 80 couples avec ciblage | 111 618,27 € | 759 | 49 | 85,03 s |
+| 180 couples avec ciblage | 111 549,39 € | 758 | 48 | 117,08 s |
+
+Le ciblage fait passer le pic de 52 à 49 sur le vivier à 80 couples et de 51 à 48 sur le vivier complet, au même coût pour chaque vivier. Le plafond de 110 329,59 € reste hors d’atteinte avec ces options. Le chronomètre inclut la génération de l’heuristique et l’export, et réutilise les calendriers publiés de `main` et de Wissam.
+
+Le dossier `ensemble-cible/` contient le comparatif, le calendrier, les camions, les affectations et les économies du plan à 49. Depuis le dépôt, la présentation se régénère à partir de ce dossier avec `python milestone2/planification_testbed/make_ensemble_pdf.py`, en installant ReportLab dans l’environnement Python utilisé.
 
 ## Plan mixte fournisseur × usine
 

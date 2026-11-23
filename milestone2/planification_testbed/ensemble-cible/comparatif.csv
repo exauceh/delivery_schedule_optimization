@@ -1,0 +1,11 @@
+scenario,cost_eur,trucks,peak,advance,rg06_violations,rg05_couples_without_full_week,PLT_001,PLT_002,PLT_003,PLT_004
+main,110329.59,761,41,3.444,602,0,8,19,6,8
+wissam,110543.95,760,68,2.985,142,22,18,39,9,18
+heuristique,108637.92,694,54,2.931,234,117,16,36,10,17
+mixte_fenetre,110222.67,737,30,3.196,324,36,8,16,6,8
+fenetre_budget_main_pic_global,109205.56,724,28,3.19,364,46,11,22,8,12
+strict_moins_cher,108790.62,707,56,2.993,0,62,14,43,9,15
+strict_budget_main_pic_global,110314.8,733,32,3.002,0,56,11,24,9,14
+strict_sans_surcout,108790.62,707,51,3.035,0,68,13,40,8,15
+rg05_rg06_avant_ciblage,111618.27,759,52,2.887,0,0,12,41,10,17
+rg05_rg06_moins_cher,111618.27,759,49,2.871,0,0,13,41,10,16
