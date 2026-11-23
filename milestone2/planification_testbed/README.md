@@ -2,6 +2,8 @@
 
 ## Dossier final fournisseur × usine
 
+Le [notebook explicatif du Milestone 3](../../milestone3/milestone3_prime.ipynb) déroule l’algorithme et vérifie les exports.
+
 **Actualisation : plan à 49 camions au pic.** [Présentation PDF illustrée](presentation-ensemble.pdf) · [Carte de chaleur](heatmap-ensemble-cible.svg) · [Exports du plan à 49](ensemble-cible/).
 
 [Document explicatif, cartes de chaleur et exports finaux](ENSEMBLE_FINAL.md)
