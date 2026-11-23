@@ -1,8 +1,9 @@
-"""Add the smoothing model (RG09) to the algorithm presentation, in the style of its existing pages.
+"""Add pages to the algorithm presentation, in the style of its existing pages.
 
-Page 15 ("Lisser : comment le plan d'un couple est choisi") is replaced by two pages:
-the integer programme of one plant and the cost / smoothing frontier.
-The page numbers printed on the following pages are updated.
+- A first page on the starting point: the current situation (Milestone 2) and the imputations of missing data.
+- Page 15 ("Lisser : comment le plan d'un couple est choisi") is replaced by two pages on the smoothing (RG09):
+  the integer programme of one plant and the cost / smoothing frontier.
+The page numbers printed on the existing pages are updated.
 
 Usage (from the project root):
     uv run python milestone3/make_smoothing_pages.py <base.pdf> <out.pdf>
@@ -18,6 +19,7 @@ from dataclasses import dataclass
 from pathlib import Path
 
 import matplotlib.pyplot as plt
+import pandas as pd
 from matplotlib.backends.backend_pdf import PdfPages
 from matplotlib.patches import FancyArrowPatch, FancyBboxPatch, Rectangle
 from pypdf import PdfReader, PdfWriter
@@ -55,6 +57,12 @@ class PlantFrontier:
         return min((p for p in self.points if p[1] <= cheapest + 1e-6), key=lambda p: p[0])
 
 
+def num(v: float, decimals: int = 0) -> str:
+    """French number format: space as thousands separator, comma as decimal mark."""
+    text = f"{v:,.{decimals}f}"
+    return text.replace(",", " ").replace(".", ",")
+
+
 def eur(v: float) -> str:
     return f"{v:,.0f} €".replace(",", " ")
 
@@ -75,6 +83,50 @@ def frontiers() -> tuple[list[PlantFrontier], float]:
         out.append(PlantFrontier(plant, len(opts), sum(len(v) for v in opts.values()), points))
         log.info("%s: %d points, indicator %d -> %d", plant, len(points), points[0][0], points[-1][0])
     return out, cost0
+
+
+@dataclass(frozen=True)
+class StartingPoint:
+    """Figures of the current situation and of the imputations, read from the project files."""
+
+    raw_lines: int
+    lines: int
+    couples: int
+    deliveries: int
+    trucks: int
+    cost: float
+    median_kg: float
+    missing_weight: int
+    missing_volume: int
+    missing_distance: list[str]
+    max_distance: float
+    median_distance: float
+    estimator_cost: dict[str, float]
+    total_t: dict[str, float]
+
+
+def starting_point() -> StartingPoint:
+    """Current situation (reference A, loaded truck by truck) and imputation counts, from the raw and consolidated files."""
+    cfg = pl.PlannerConfig()
+    lines = pl.load_lines(ROOT / "data/consolidated_dataset_max.csv", cfg)
+    tariff = pl.Tariff(pl.load_rate_grid(ROOT / "docs/rate_sheet.csv"), cfg)
+    baseline, _ = pl.current_situation(lines, pl.load_baseline(ROOT / "data/baseline_deliveries_max.csv", lines), tariff, cfg)
+    raw = pd.read_csv(ROOT / "docs/released_schedule.csv")
+    kept = raw[(raw["schedule_quantity"] > 0) & (raw["date"] < "2027-01-01") & ~(raw["weight"] > cfg.truck_kg)]
+    known = pd.read_csv(ROOT / "docs/distances.csv").dropna(subset=["distance"])
+    missing_distance = sorted(set(kept["supplier_id"]) - set(known["supplier_id"]))
+    planning = known[known["supplier_id"].isin(set(kept["supplier_id"]))]["distance"]
+    kpis = {imp: pd.read_csv(ROOT / f"data/baseline_kpis_{imp}.csv").set_index("indicator")["total"] for imp in ("max", "median")}
+    return StartingPoint(
+        raw_lines=len(raw), lines=len(lines), couples=lines.groupby(["supplier_id", "plant"]).ngroups,
+        deliveries=len(baseline), trucks=int(baseline["trucks"].sum()), cost=float(baseline["cost"].sum()),
+        median_kg=float(kpis["max"]["poids médian d'une livraison (kg)"]),
+        missing_weight=int((kept["weight"].isna() | (kept["weight"] <= 0)).sum()),
+        missing_volume=int((kept["volume"].isna() | (kept["volume"] <= 0)).sum()),
+        missing_distance=missing_distance, max_distance=float(planning.max()), median_distance=float(planning.median()),
+        estimator_cost={k: float(v["coût total (EUR)"]) for k, v in kpis.items()},
+        total_t={k: float(v["poids total (t)"]) for k, v in kpis.items()},
+    )
 
 
 # --------------------------------------------------------------------------- drawing helpers
@@ -108,6 +160,61 @@ def canvas(fig: plt.Figure) -> plt.Axes:
 
 
 # --------------------------------------------------------------------------- pages
+def p_current(pdf: PdfPages, number: int, s: StartingPoint) -> None:
+    fig = page("Le point de départ : la situation actuelle et les imputations",
+               f"Planning du 09/11 au 18/12 (6 semaines) · {num(s.lines)} lignes de besoin gardées sur {num(s.raw_lines)} · "
+               f"{s.couples} couples fournisseur × usine", number)
+    ax = canvas(fig)
+    card(ax, 0.0, 0.0, 0.42, 1.0)
+    badge(ax, 0.04, 0.92, 1, BLUE, "Aujourd'hui (Milestone 2)")
+    ax.add_patch(FancyBboxPatch((0.025, 0.66), 0.37, 0.17, boxstyle="round,pad=0,rounding_size=0.015", fc=BLUE_L, ec="none"))
+    ax.text(0.04, 0.745, "Une livraison par couple et par jour de besoin :\nchaque besoin part le jour même, seul.",
+            fontsize=11, color=INK, va="center", linespacing=1.5)
+    figures = [(num(s.deliveries), "livraisons"), (num(s.trucks), "camions"),
+               (eur(s.cost), "sur 6 semaines")]
+    for k, (value, label) in enumerate(figures):
+        x = 0.075 + k * 0.125
+        ax.text(x, 0.53, value, fontsize=17, fontweight="bold", color=BLUE, ha="center")
+        ax.text(x, 0.47, label, fontsize=10, color=BODY, ha="center")
+    ax.text(0.04, 0.37,
+            f"Une livraison pèse en médiane {num(s.median_kg)} kg,\n"
+            f"soit {num(100 * s.median_kg / 24_500, 1)} % d'un camion de 24,5 t :\n"
+            "les camions partent presque vides, dans les\n"
+            "tranches de poids où le kilo coûte le plus cher.",
+            fontsize=11, color=INK, va="top", linespacing=1.5)
+    ax.text(0.04, 0.06, "C'est la référence du saving : livraisons rechargées\ncamion par camion comme le plan (lignes entières).",
+            fontsize=9.5, color=BODY, va="bottom", linespacing=1.4)
+    arrow(ax, 0.425, 0.5, 0.455)
+    card(ax, 0.46, 0.0, 0.54, 1.0)
+    badge(ax, 0.5, 0.92, 2, ORANGE, "Les données manquantes (imputations)")
+    head_y, row_h = 0.8, 0.12
+    cols = [(0.485, "donnée"), (0.62, "manquante"), (0.745, "max (retenu)"), (0.875, "median")]
+    for x, label in cols:
+        ax.text(x, head_y, label, fontsize=10, fontweight="bold", color=INK, va="center")
+    rows = [("poids", f"{s.missing_weight} lignes", "24 500 kg\n(camion plein)", "médiane\ndu couple"),
+            ("volume", f"{s.missing_volume} lignes", "110,4 m³\n(camion plein)", "médiane\ndu couple"),
+            ("distance", f"{len(s.missing_distance)} fournisseur", f"{num(s.max_distance, 1)} km\n(la plus longue)", f"{num(s.median_distance, 1)} km\n(médiane)")]
+    for r, row in enumerate(rows):
+        y = head_y - (r + 1) * row_h
+        ax.add_patch(FancyBboxPatch((0.475, y - 0.05), 0.51, 0.1, boxstyle="round,pad=0,rounding_size=0.012",
+                                    fc=GREY_L if r % 2 == 0 else "white", ec="none"))
+        for (x, _), text in zip(cols, row, strict=True):
+            ax.text(x, y, text, fontsize=10, color=ORANGE if x == 0.745 else INK, va="center", linespacing=1.25,
+                    fontweight="bold" if x == 0.745 else "normal")
+    ax.text(0.485, 0.3,
+            "max : prudent, une ligne inconnue occupe un camion entier.\n"
+            "median : réaliste, elle pèse comme les autres lignes du couple.",
+            fontsize=10.5, color=INK, va="top", linespacing=1.5)
+    cost_gap = s.estimator_cost["median"] / s.estimator_cost["max"] - 1
+    ax.text(0.485, 0.15,
+            f"Effet sur la situation actuelle : {num(s.total_t['max'])} t transportées en max, {num(s.total_t['median'])} t en median ;\n"
+            f"coût actuel {eur(s.estimator_cost['max'])} en max, {eur(s.estimator_cost['median'])} en median ({100 * cost_gap:+.0f} %).",
+            fontsize=9.5, color=BODY, va="top", linespacing=1.5)
+    fig.text(0.5, 0.06, "Toute la suite utilise le jeu « max » : la référence et le plan sont calculés avec les mêmes imputations, "
+             "donc le saving les compare à armes égales.", ha="center", fontsize=9.5, color=BODY)
+    pdf.savefig(fig); plt.close(fig)
+
+
 def p_model(pdf: PdfPages, number: int, fronts: list[PlantFrontier]) -> None:
     fig = page("Lisser : le modèle mathématique d'une usine",
                "Un programme linéaire en nombres entiers (HiGHS) choisit un plan par couple, pour tous les couples de l'usine à la fois", number)
@@ -224,22 +331,24 @@ def number_overlay(number: int, width: float, height: float) -> PdfReader:
 if __name__ == "__main__":
     base, out = Path(sys.argv[1]), Path(sys.argv[2])
     fronts, _ = frontiers()
-    new = io.BytesIO()
-    with PdfPages(new) as pdf:
-        p_model(pdf, REPLACED_PAGE, fronts)
-        p_frontier(pdf, REPLACED_PAGE + 1, fronts)
-    new.seek(0)
-    reader, added = PdfReader(base), PdfReader(new)
+    first, smoothing = io.BytesIO(), io.BytesIO()
+    with PdfPages(first) as pdf:
+        p_current(pdf, 1, starting_point())
+    with PdfPages(smoothing) as pdf:  # one page added in front, so the replaced page moves down by one
+        p_model(pdf, REPLACED_PAGE + 1, fronts)
+        p_frontier(pdf, REPLACED_PAGE + 2, fronts)
+    reader = PdfReader(base)
     writer = PdfWriter()
+    for extra in PdfReader(first).pages:
+        writer.add_page(extra)
     for k, pg in enumerate(reader.pages, start=1):
         if k == REPLACED_PAGE:
-            for extra in added.pages:
+            for extra in PdfReader(smoothing).pages:
                 writer.add_page(extra)
             continue
         kept = writer.add_page(pg)
-        if k > REPLACED_PAGE:
-            box = kept.mediabox
-            kept.merge_page(number_overlay(len(writer.pages), float(box.width), float(box.height)).pages[0])
+        box = kept.mediabox  # every existing page moves: its printed number is replaced
+        kept.merge_page(number_overlay(len(writer.pages), float(box.width), float(box.height)).pages[0])
     writer.add_metadata(reader.metadata or {})
     with out.open("wb") as fh:
         writer.write(fh)
