@@ -95,14 +95,10 @@ class StartingPoint:
     deliveries: int
     trucks: int
     cost: float
-    median_kg: float
     missing_weight: int
     missing_volume: int
     missing_distance: list[str]
     max_distance: float
-    median_distance: float
-    estimator_cost: dict[str, float]
-    total_t: dict[str, float]
 
 
 def starting_point() -> StartingPoint:
@@ -116,16 +112,12 @@ def starting_point() -> StartingPoint:
     known = pd.read_csv(ROOT / "docs/distances.csv").dropna(subset=["distance"])
     missing_distance = sorted(set(kept["supplier_id"]) - set(known["supplier_id"]))
     planning = known[known["supplier_id"].isin(set(kept["supplier_id"]))]["distance"]
-    kpis = {imp: pd.read_csv(ROOT / f"data/baseline_kpis_{imp}.csv").set_index("indicator")["total"] for imp in ("max", "median")}
     return StartingPoint(
         raw_lines=len(raw), lines=len(lines), couples=lines.groupby(["supplier_id", "plant"]).ngroups,
         deliveries=len(baseline), trucks=int(baseline["trucks"].sum()), cost=float(baseline["cost"].sum()),
-        median_kg=float(kpis["max"]["poids médian d'une livraison (kg)"]),
         missing_weight=int((kept["weight"].isna() | (kept["weight"] <= 0)).sum()),
         missing_volume=int((kept["volume"].isna() | (kept["volume"] <= 0)).sum()),
-        missing_distance=missing_distance, max_distance=float(planning.max()), median_distance=float(planning.median()),
-        estimator_cost={k: float(v["coût total (EUR)"]) for k, v in kpis.items()},
-        total_t={k: float(v["poids total (t)"]) for k, v in kpis.items()},
+        missing_distance=missing_distance, max_distance=float(planning.max()),
     )
 
 
@@ -165,7 +157,7 @@ def p_current(pdf: PdfPages, number: int, s: StartingPoint) -> None:
                f"Planning du 09/11 au 18/12 (6 semaines) · {num(s.lines)} lignes de besoin gardées sur {num(s.raw_lines)} · "
                f"{s.couples} couples fournisseur × usine", number)
     ax = canvas(fig)
-    card(ax, 0.0, 0.0, 0.42, 1.0)
+    card(ax, 0.0, 0.33, 0.42, 0.67)
     badge(ax, 0.04, 0.92, 1, BLUE, "Aujourd'hui (Milestone 2)")
     ax.add_patch(FancyBboxPatch((0.025, 0.66), 0.37, 0.17, boxstyle="round,pad=0,rounding_size=0.015", fc=BLUE_L, ec="none"))
     ax.text(0.04, 0.745, "Une livraison par couple et par jour de besoin :\nchaque besoin part le jour même, seul.",
@@ -176,41 +168,24 @@ def p_current(pdf: PdfPages, number: int, s: StartingPoint) -> None:
         x = 0.075 + k * 0.125
         ax.text(x, 0.53, value, fontsize=17, fontweight="bold", color=BLUE, ha="center")
         ax.text(x, 0.47, label, fontsize=10, color=BODY, ha="center")
-    ax.text(0.04, 0.37,
-            f"Une livraison pèse en médiane {num(s.median_kg)} kg,\n"
-            f"soit {num(100 * s.median_kg / 24_500, 1)} % d'un camion de 24,5 t :\n"
-            "les camions partent presque vides, dans les\n"
-            "tranches de poids où le kilo coûte le plus cher.",
-            fontsize=11, color=INK, va="top", linespacing=1.5)
-    ax.text(0.04, 0.06, "C'est la référence du saving : livraisons rechargées\ncamion par camion comme le plan (lignes entières).",
-            fontsize=9.5, color=BODY, va="bottom", linespacing=1.4)
-    arrow(ax, 0.425, 0.5, 0.455)
-    card(ax, 0.46, 0.0, 0.54, 1.0)
+    arrow(ax, 0.425, 0.66, 0.455)
+    card(ax, 0.46, 0.33, 0.54, 0.67)
     badge(ax, 0.5, 0.92, 2, ORANGE, "Les données manquantes (imputations)")
     head_y, row_h = 0.8, 0.12
-    cols = [(0.485, "donnée"), (0.62, "manquante"), (0.745, "max (retenu)"), (0.875, "median")]
+    cols = [(0.485, "donnée"), (0.65, "manquante"), (0.815, "valeur imputée")]
     for x, label in cols:
         ax.text(x, head_y, label, fontsize=10, fontweight="bold", color=INK, va="center")
-    rows = [("poids", f"{s.missing_weight} lignes", "24 500 kg\n(camion plein)", "médiane\ndu couple"),
-            ("volume", f"{s.missing_volume} lignes", "110,4 m³\n(camion plein)", "médiane\ndu couple"),
-            ("distance", f"{len(s.missing_distance)} fournisseur", f"{num(s.max_distance, 1)} km\n(la plus longue)", f"{num(s.median_distance, 1)} km\n(médiane)")]
+    rows = [("poids", f"{s.missing_weight} lignes", "24 500 kg\n(camion plein)"),
+            ("volume", f"{s.missing_volume} lignes", "110,4 m³\n(camion plein)"),
+            ("distance", f"{len(s.missing_distance)} fournisseur", f"{num(s.max_distance, 1)} km\n(la plus longue)")]
     for r, row in enumerate(rows):
         y = head_y - (r + 1) * row_h
         ax.add_patch(FancyBboxPatch((0.475, y - 0.05), 0.51, 0.1, boxstyle="round,pad=0,rounding_size=0.012",
                                     fc=GREY_L if r % 2 == 0 else "white", ec="none"))
         for (x, _), text in zip(cols, row, strict=True):
-            ax.text(x, y, text, fontsize=10, color=ORANGE if x == 0.745 else INK, va="center", linespacing=1.25,
-                    fontweight="bold" if x == 0.745 else "normal")
-    ax.text(0.485, 0.3,
-            "max : prudent, une ligne inconnue occupe un camion entier.\n"
-            "median : réaliste, elle pèse comme les autres lignes du couple.",
-            fontsize=10.5, color=INK, va="top", linespacing=1.5)
-    cost_gap = s.estimator_cost["median"] / s.estimator_cost["max"] - 1
-    ax.text(0.485, 0.15,
-            f"Effet sur la situation actuelle : {num(s.total_t['max'])} t transportées en max, {num(s.total_t['median'])} t en median ;\n"
-            f"coût actuel {eur(s.estimator_cost['max'])} en max, {eur(s.estimator_cost['median'])} en median ({100 * cost_gap:+.0f} %).",
-            fontsize=9.5, color=BODY, va="top", linespacing=1.5)
-    fig.text(0.5, 0.06, "Toute la suite utilise le jeu « max » : la référence et le plan sont calculés avec les mêmes imputations, "
+            ax.text(x, y, text, fontsize=10, color=ORANGE if x == 0.815 else INK, va="center", linespacing=1.25,
+                    fontweight="bold" if x == 0.815 else "normal")
+    fig.text(0.5, 0.27, "La référence et le plan sont calculés avec les mêmes imputations, "
              "donc le saving les compare à armes égales.", ha="center", fontsize=9.5, color=BODY)
     pdf.savefig(fig); plt.close(fig)
 
