@@ -30,6 +30,8 @@ def test_outputs_are_those_of_the_milestone_3_notebook(input_paths: dict[InputNa
     )
     result = run_pipeline(inputs, RunConfig(planner=PlannerConfig()))
     assert result.checks_passed
+    tests = result.tables[OutputName.OUTPUT_TESTS]  # milestone 4 suites on the real outputs, H06 (SUP_00130) included
+    assert tests["respecté"].all(), tests.loc[~tests["respecté"], ["fonction", "détail"]].to_dict("records")
     written = write_tables({name: result.tables[name] for name in COMPARED}, tmp_path)
     for name in COMPARED:
         actual = written[name].read_text(encoding="utf-8").replace("\r\n", "\n")

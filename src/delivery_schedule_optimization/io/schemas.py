@@ -71,3 +71,4 @@ class OutputName(StrEnum):
     SAVING = "sortie3_saving"
     CURRENT_DELIVERIES = "situation_actuelle_livraisons"
     CHECKS = "controles"
+    OUTPUT_TESTS = "tests_sorties"

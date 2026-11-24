@@ -80,10 +80,12 @@ Chaque exécution écrit dans `runs/<run_id>/output/` :
 | `consolidated_dataset.csv`, `anomaly_register.csv` | Données préparées et anomalies détectées (DQ01 à DQ07) |
 | `situation_actuelle_livraisons.csv` | Situation actuelle : une livraison par couple et par jour de besoin, avec ses camions et son coût |
 | `controles.csv` | Chaque règle métier (RG01 à RG11) vérifiée sur le plan final |
+| `tests_sorties.csv` | Les suites de tests du Milestone 4 rejouées sur les sorties : contraintes recalculées depuis les lignes, données manquantes (H05, H06), exhaustivité, absence de rupture, cohérence du saving |
 
 `runs/<run_id>/manifest.json` enregistre l'empreinte SHA-256 des entrées, tous les paramètres utilisés (valeurs par
-défaut comprises), la durée de chaque étape, les principaux indicateurs et le résultat des contrôles : les mêmes
-entrées et les mêmes paramètres donnent toujours les mêmes résultats.
+défaut comprises), la durée de chaque étape, les principaux indicateurs et le résultat des contrôles et des tests de
+sortie (`checks_passed`, faux si un seul échoue) : les mêmes entrées et les mêmes paramètres donnent toujours les mêmes
+résultats.
 
 ## API
 
@@ -141,7 +143,8 @@ src/delivery_schedule_optimization/
 │   ├── selection.py    choix du profil (RG07)
 │   └── smoothing.py    répartition des livraisons par usine (RG09, programme linéaire en nombres entiers, HiGHS)
 ├── reporting/     sorties 1, 2, 3 et indicateurs
-├── validation/    contrôles des règles métier sur le plan final (à compléter par le jalon 4)
+├── validation/    contrôles des règles métier (checks.py), tests du Milestone 4 sur les sorties d'une exécution
+│                  (output_tests.py) et cas unitaires du moteur (engine_cases.py)
 ├── pipeline.py    flux principal : préparation → situation actuelle → plans → sorties → contrôles (ni fichier, ni API)
 ├── service.py     exécute une exécution enregistrée : entrées → pipeline → sorties → manifeste
 ├── storage/       exécutions sur disque (runs/<run_id>/) ; une base de données peut s'ajouter derrière la même interface
@@ -150,10 +153,10 @@ src/delivery_schedule_optimization/
 ├── settings.py    réglages techniques (DSO_*)
 └── planner.py     ancien module unique, réexporte le moteur pour les notebooks des milestones
 tests/
-├── unit/          calendrier, chargement, tarification, préparation, entrées et paramètres
-├── integration/   pipeline sur un petit planning, API, ligne de commande
+├── unit/          calendrier, chargement, tarification, préparation, entrées et paramètres, cas du moteur (Milestone 4)
+├── integration/   pipeline sur un petit planning, tests de sortie (et sorties cassées exprès), API, ligne de commande
 └── regression/    le vrai planning donne exactement les sorties du notebook milestone 3 (marqué slow)
-milestone1/ … milestone3/   notebooks des milestones (analyses, rapports)
+milestone1/ … milestone4/   notebooks des milestones (analyses, rapports ; milestone4 : tests et analyse avant / après)
 ```
 
 Le moteur et les objets métier ne connaissent ni les fichiers, ni l'API, ni le stockage : la ligne de commande,
@@ -168,7 +171,7 @@ pas à pas, avec des liens vers le code, dans [`milestone3/optimiseur.md`](miles
 uv run ruff check src tests main.py     # lint
 uv run mypy                             # typage strict
 uv run pytest -m "not slow"             # tests rapides (quelques secondes)
-uv run pytest -m slow                   # non-régression sur le vrai planning (de 30 s à 2 min)
+uv run pytest -m slow                   # non-régression sur le vrai planning et recherche locale (de 30 s à 2 min)
 ```
 
 La CI (`.github/workflows/ci.yml`) lance les mêmes contrôles, le test de non-régression et la construction de

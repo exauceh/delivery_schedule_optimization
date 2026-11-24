@@ -1,4 +1,4 @@
-"""Main flow of the engine: raw inputs -> preparation -> current situation -> plans -> outputs -> checks.
+"""Main flow of the engine: raw inputs -> preparation -> current situation -> plans -> outputs -> checks and tests.
 
 The pipeline has no knowledge of files, of the API or of the storage: it takes the three raw input tables and the
 parameters, and returns every table and indicator of the run. The CLI, the API and the tests all go through it.
@@ -27,6 +27,7 @@ from .pricing.tariff import Tariff, rate_grid
 from .reporting.kpis import plan_kpis
 from .reporting.outputs import build_outputs
 from .validation.checks import check
+from .validation.output_tests import RunTables, run_output_tests
 
 logger = logging.getLogger(__name__)
 
@@ -100,9 +101,15 @@ def run_pipeline(inputs: RawInputs, config: RunConfig) -> PipelineResult:
         kpis = plan_kpis(lines, deliveries_before, outputs.trucks, outputs.allocations)
     with timer.stage("checks"):
         checks = check(lines, plans, outputs.trucks, outputs.allocations, holidays, tariff, planner, candidates)
-        checks_passed = bool(checks["respecté"].all())
-        if not checks_passed:
+        if not checks["respecté"].all():
             logger.error("Business rules violated: %s", checks.loc[~checks["respecté"], "contrôle"].tolist())
+        # Milestone 4 test suites, replayed on the output tables of this run only (they do not call the engine)
+        output_tests = run_output_tests(
+            RunTables(lines=lines, distances=inputs.distances, deliveries_before=deliveries_before, profiles=outputs.profiles,
+                      trucks=outputs.trucks, allocations=outputs.allocations, contents=outputs.truck_contents,
+                      saving=outputs.saving),
+            holidays, tariff, planner)
+        checks_passed = bool(checks["respecté"].all() and output_tests["respecté"].all())
     logger.info("Run done: cost %.0f -> %.0f EUR (saving %.1f %%), %d -> %d trucks", kpis["cost_before"], kpis["cost_after"],
                 kpis["saving_pct"], kpis["trucks_before"], kpis["trucks_after"])
     tables = {
@@ -115,6 +122,7 @@ def run_pipeline(inputs: RawInputs, config: RunConfig) -> PipelineResult:
         OutputName.ALLOCATIONS: outputs.allocations,
         OutputName.SAVING: outputs.saving,
         OutputName.CHECKS: checks,
+        OutputName.OUTPUT_TESTS: output_tests,
     }
     rate_sheet: dict[str, str | float | None] = {"valid_from": inputs.rate_sheet.valid_from, "margin": inputs.rate_sheet.margin,
                                                  "diesel_surcharge": inputs.rate_sheet.diesel_surcharge}

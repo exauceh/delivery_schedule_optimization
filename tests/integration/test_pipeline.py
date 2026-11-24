@@ -12,13 +12,8 @@ from delivery_schedule_optimization.pipeline import PipelineResult, RawInputs, R
 
 
 @pytest.fixture(scope="module")
-def result(small_inputs: dict[InputName, bytes]) -> PipelineResult:
-    inputs = RawInputs(
-        schedule=read_schedule(small_inputs[InputName.SCHEDULE]),
-        distances=read_distances(small_inputs[InputName.DISTANCES]),
-        rate_sheet=read_rate_sheet(small_inputs[InputName.RATE_SHEET]),
-    )
-    return run_pipeline(inputs, RunConfig(planner=PlannerConfig(workers=1)))
+def result(small_result: PipelineResult) -> PipelineResult:
+    return small_result
 
 
 def test_every_business_rule_is_respected(result: PipelineResult) -> None:

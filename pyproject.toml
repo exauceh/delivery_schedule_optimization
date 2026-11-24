@@ -76,5 +76,5 @@ plugins = ["pydantic.mypy"]
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 addopts = "-ra"
-markers = ["slow: full run on the real planning (about 2 minutes)"]
+markers = ["slow: full run on the real planning or long engine case (about 2 minutes in all)"]
 log_level = "INFO"
