@@ -22,8 +22,6 @@ CoupleJob = tuple[pd.DataFrame, set[date], Tariff, PlannerConfig, date]  # lines
 def candidate_plans(lines: pd.DataFrame, holidays: set[date], tariff: Tariff, config: PlannerConfig) -> Candidates:
     """Best valid plan of every couple on each set of days (exact dynamic programme), duplicates removed.
 
-    With `lowest_profile_first`, profiles are evaluated from the lowest: once a profile has a plan whose
-    departures all fit in one truck, the higher profiles are not needed (they would never be chosen).
     The couples are independent (RG01): they are spread over `workers` processes. The result does not
     depend on the number of processes.
     """
@@ -56,27 +54,10 @@ def couple_candidates(job: CoupleJob) -> list[CouplePlan]:
     plans: dict[tuple[tuple[int, ...], tuple[date, ...]], CouplePlan] = {}
     for size in sorted(config.allowed_frequencies):
         for days in itertools.combinations(range(5), size):
-            for need_day in (False, True):
-                plan = optimal_plan(group, days, holidays, tariff, config, start, need_day)
-                if plan is not None and not config.strict_coverage:
-                    plan = reassign(group, plan, holidays, tariff, config, start)
-                if plan is not None:
-                    plans.setdefault((plan.profile, tuple(plan.dates.tolist())), plan)
-        if config.lowest_profile_first and any(p.overflow_departures == 0 for p in plans.values()):
-            break
+            plan = optimal_plan(group, days, holidays, tariff, config, start)
+            if plan is not None and not config.strict_coverage:
+                plan = reassign(group, plan, tariff, config)
+            if plan is not None:
+                plans.setdefault((plan.profile, tuple(plan.dates.tolist())), plan)
     return list(plans.values())
 
-
-def lower_bound(lines: pd.DataFrame, holidays: set[date], tariff: Tariff, config: PlannerConfig) -> float:
-    """Cost if every couple could leave any working day (no fixed days), same method as the real plans.
-    With strict RG06 it is a lower bound (exact programme); with RG06 relaxed it is an estimate (local search)."""
-    start = plan_start(lines, config)
-    total = 0.0
-    for _, group in lines.groupby(COUPLE, sort=True):
-        plan = optimal_plan(group, tuple(range(5)), holidays, tariff, config, start, same_days=False)
-        if plan is None:
-            raise ValueError("lower bound: a couple has no plan even without fixed days")
-        if not config.strict_coverage:  # same assignment improvement as the real plans (then an estimate, not a bound)
-            plan = reassign(group, plan, holidays, tariff, config, start, same_days=False)
-        total += plan.cost
-    return total

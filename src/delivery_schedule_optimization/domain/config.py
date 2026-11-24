@@ -29,10 +29,6 @@ class PlannerConfig:
     # planner only spreads the days among plans of the same cost (smoothing for free).
     smoothing_budget: float = 0.0
     smoothing_time_limit: float = 60.0  # seconds given to the solver
-    objective: str = "cost"  # "cost": cheapest plan first; "trucks": fewest trucks first, then cost
-    # Profile = largest number of deliveries in one week ("3 2 1 1 2 1" = profile 3). True = also prefer the
-    # lowest profile before the cost (former RG07 reading); False = the profile is the result of the best plan.
-    lowest_profile_first: bool = False
     # RG06 (coverage). False (default) = a need may leave with ANY planned departure of its couple within its
     # window [date - max_advance_days, date]; True = only with the latest departure on or before its date.
     strict_coverage: bool = False
@@ -41,12 +37,6 @@ class PlannerConfig:
     # Client answer "add delivery days rather than trucks": True = fewest overflowing departures before the
     # cost; False = the cost decides alone (a departure may take a second truck if this is cheaper).
     overflow_first: bool = False
-    improvement_passes: int = 20  # greedy reference planner (`plan_couple`) only
-    # First possible delivery day: nothing ships before the schedule is released. None = date of the first need.
-    plan_start: str | None = None
-    # Needs with no profile day on or after plan_start in their window: "need_day" = delivered on their own
-    # date (as today), "first_day" = grouped on the first day of the plan.
-    startup_delivery: str = "need_day"
 
 
 @dataclass(frozen=True)

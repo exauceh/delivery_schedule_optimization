@@ -81,7 +81,7 @@ def reference_plan(lines: pd.DataFrame, holidays: set[date], tariff: Tariff, con
     """Scenario A rebuilt with the planner's packing (used to compare with `prime`, whose reference packs whole lines)."""
     plans: Plans = {}
     for key, group in lines.groupby(COUPLE, sort=True):
-        plan = plan_couple(group, tuple(range(5)), holidays, tariff, config, optimize=False)
+        plan = plan_couple(group, tuple(range(5)), holidays, tariff, config)
         if plan is None or (plan.dates != group["date"].to_numpy(dtype="datetime64[D]")).any():
             raise ValueError(f"need outside a working day for {key}")
         plans[(str(key[0]), str(key[1]))] = plan

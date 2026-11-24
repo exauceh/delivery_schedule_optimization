@@ -15,22 +15,19 @@ from ..pricing.tariff import Tariff
 from .loading import pack
 from .plans import evaluate_departures
 
-Criteria = tuple[float, ...]  # (overflow, price, trucks, advance) or (overflow, trucks, price, advance)
+Criteria = tuple[float, ...]  # (overflow, price, trucks, advance)
 State = tuple[object, ...]  # () or (weekdays mask, busiest week reached, week, departures in the week)
 Label = tuple[Criteria, tuple[int, State] | None]  # best criteria to reach a node, and its predecessor
 
 
-def departure_nodes(due: list[date], days: tuple[int, ...], holidays: set[date], first_day: date
-                    ) -> list[tuple[date | None, date]]:
+def departure_nodes(due: list[date], days: tuple[int, ...], holidays: set[date], first_day: date) -> list[Option]:
     """Possible departures of a couple on a set of days: (profile day, delivery date), by date.
 
-    - every day of the set from the first day of the plan to the last need (RG05), a public holiday being
-      delivered on the previous working day (RG10);
-    - before the first profile day of the plan, any working day (start-up departure, profile day None):
-      the needs dated before it have no profile day in their window.
+    Every day of the set from the first day of the plan to the last need (RG05), a public holiday being
+    delivered on the previous working day (RG10).
     """
     last = max(due)
-    nodes: dict[date, tuple[date | None, date]] = {}
+    nodes: dict[date, Option] = {}
     day = first_day
     while day <= last:
         if day.weekday() in days:
@@ -40,18 +37,11 @@ def departure_nodes(due: list[date], days: tuple[int, ...], holidays: set[date],
             if delivery >= first_day:
                 nodes.setdefault(delivery, (day, delivery))
         day += timedelta(days=1)
-    first_profile = min(nodes, default=last + timedelta(days=1))
-    day = first_day
-    while day < first_profile and day <= last:
-        if is_working_day(day, holidays):
-            nodes.setdefault(day, (None, day))
-        day += timedelta(days=1)
     return [nodes[d] for d in sorted(nodes)]
 
 
 def optimal_plan(lines: pd.DataFrame, days: tuple[int, ...], holidays: set[date], tariff: Tariff,
-                 config: PlannerConfig, start: date, startup_need_day: bool = False,
-                 same_days: bool = True) -> CouplePlan | None:
+                 config: PlannerConfig, start: date) -> CouplePlan | None:
     """Best plan of one couple on one set of days, by dynamic programming (exact).
 
     With RG06 a plan is fully defined by its departure days: each need leaves with the latest departure
@@ -60,11 +50,6 @@ def optimal_plan(lines: pd.DataFrame, days: tuple[int, ...], holidays: set[date]
     with demand time windows). Order of the criteria: overflowing departures (RG07, client answer), cost,
     trucks, advance. If the best path does not respect the "same days" rule, a second dynamic programme
     keeps track of the days used and of the busiest week.
-
-    Start-up (needs dated before the first profile day of the plan): the programme chooses the start-up
-    departures like the others (usually one); with `startup_need_day`, each start-up need leaves on its
-    own date, as today (more departures, but none moved to the first day: an option for smoothing).
-    With `same_days=False` the "same days" rule is ignored (lower bound of the cost, for information only).
     """
     first_day = first_working_day(start, holidays)
     due_dates = lines["date"].dt.date.to_numpy()
@@ -75,25 +60,19 @@ def optimal_plan(lines: pd.DataFrame, days: tuple[int, ...], holidays: set[date]
     imputed = lines["imputed_full_truck"].to_numpy(bool)
     distance = float(lines["distance"].iloc[0])
     cache: dict[tuple[int, int | None], Criteria | str | None] = {}
-    startup_days = {d for s, d in nodes if s is None}
-    first_profile = min((d for s, d in nodes if s is not None), default=date.max)
     EMPTY = "empty"  # a departure must carry at least one need
 
     def segment(i: int, j: int | None) -> Criteria | str | None:
         """Criteria of the departure of node i, which serves the needs up to node j (excluded).
         None = forbidden (and so for every earlier node), EMPTY = nothing to carry."""
         if (i, j) not in cache:
-            slot, delivery = nodes[i]
+            delivery = nodes[i][1]
             end = nodes[j][1] if j is not None else date.max
             idx = np.flatnonzero((due_dates >= delivery) & (due_dates < end))
             if not len(idx):
                 cache[i, j] = EMPTY
             elif (max(due_dates[idx]) - delivery).days > config.max_advance_days:
                 cache[i, j] = None  # RG03
-            elif slot is None and max(due_dates[idx]) >= first_profile:
-                cache[i, j] = None  # a start-up departure only carries needs dated before the first profile day
-            elif startup_need_day and any(d in startup_days and d != delivery for d in due_dates[idx]):
-                cache[i, j] = None  # start-up need that must leave on its own date
             else:
                 packed = pack(weight[idx], volume[idx], config)
                 kg = np.array([weight[idx[t]].sum() for t in packed])
@@ -104,8 +83,7 @@ def optimal_plan(lines: pd.DataFrame, days: tuple[int, ...], holidays: set[date]
                 advance = sum((d - delivery).days for d in due_dates[idx])
                 price = float(tariff(np.full(len(kg), distance), kg).sum())
                 first = over if config.overflow_first else 0  # overflow is compared first only on demand
-                cache[i, j] = ((first, len(kg), price, advance) if config.objective == "trucks"
-                               else (first, price, len(kg), advance))
+                cache[i, j] = (first, price, len(kg), advance)
         return cache[i, j]
 
     def add(a: Criteria, b: Criteria) -> Criteria:
@@ -116,9 +94,9 @@ def optimal_plan(lines: pd.DataFrame, days: tuple[int, ...], holidays: set[date]
         full_mask = sum(1 << d for d in days)
 
         def step(state: State, node: Option) -> State:
-            slot = node[0]
-            if not track or slot is None:
+            if not track:
                 return state
+            slot = node[0]
             mask, full, week, count = cast(tuple[int, bool, date | None, int], state)
             count = count + 1 if monday(slot) == week else 1
             return (mask | 1 << slot.weekday(), full or count == len(days), monday(slot), count)
@@ -167,6 +145,6 @@ def optimal_plan(lines: pd.DataFrame, days: tuple[int, ...], holidays: set[date]
         if path is None:
             return None
         plan = evaluate_departures(lines, path, days, tariff, config)
-        if not same_days or (plan.same_days and plan.frequency in config.allowed_frequencies):
+        if plan.same_days and plan.frequency in config.allowed_frequencies:
             return plan
     return None

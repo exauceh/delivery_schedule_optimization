@@ -19,11 +19,10 @@ FrontierPoint = tuple[int, float, Plans]  # (smoothing indicator, cost, one plan
 
 
 def smoothing_options(candidates: Candidates, chosen: Plans, config: PlannerConfig = PlannerConfig()) -> Candidates:
-    """Plans a couple may take when smoothing: same number of overflowing departures as its RG07 choice
-    (and the same profile with `lowest_profile_first`), so that RG07 stays respected."""
+    """Plans a couple may take when smoothing: with `overflow_first`, same number of overflowing departures
+    as its RG07 choice, so that RG07 stays respected."""
     return {
-        key: sorted([p for p in plans if (not config.overflow_first or p.overflow_departures == chosen[key].overflow_departures)
-                     and (not config.lowest_profile_first or p.frequency == chosen[key].frequency)],
+        key: sorted([p for p in plans if not config.overflow_first or p.overflow_departures == chosen[key].overflow_departures],
                     key=lambda p: selection_key(p, config))
         for key, plans in candidates.items()
     }

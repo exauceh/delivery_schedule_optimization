@@ -12,7 +12,9 @@ per-truck pricing, automatic checks) with these corrections:
 3. Every line of the consolidated dataset is planned, imputed loads included (RG08).
 4. Delivery days are spread between the couples of each plant (RG09), without changing the
    profile chosen by RG07.
-5. Nothing ships before the schedule is released (start of the plan).
+5. Client answer: the first needs may also leave up to `max_advance_days` before their date, so the plan
+   starts `max_advance_days` before the first need and every need has a profile day in its window
+   (no start-up exception).
 
 Optimisation (exact):
 - per couple and set of days, the departure days are chosen by dynamic programming. With RG06 (a delivery

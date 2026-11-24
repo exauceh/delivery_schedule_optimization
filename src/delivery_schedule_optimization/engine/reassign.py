@@ -10,22 +10,18 @@ from datetime import date
 import numpy as np
 import pandas as pd
 
-from ..domain.calendar import first_working_day
 from ..domain.config import PlannerConfig
 from ..domain.models import CouplePlan
 from ..pricing.tariff import Tariff
-from .graph import departure_nodes
 from .loading import pack
 from .plans import evaluate
 
 
-def reassign(lines: pd.DataFrame, plan: CouplePlan, holidays: set[date], tariff: Tariff, config: PlannerConfig,
-             start: date, same_days: bool = True) -> CouplePlan:
+def reassign(lines: pd.DataFrame, plan: CouplePlan, tariff: Tariff, config: PlannerConfig) -> CouplePlan:
     """RG06 relaxed: improve the assignment of the needs to the planned departures (local search).
 
-    Each need may leave with any planned departure of its couple within [date - max_advance_days, date]
-    (a start-up departure only takes needs dated before the first profile day). Three moves, kept when the
-    objective strictly decreases:
+    Each need may leave with any planned departure of its couple within [date - max_advance_days, date].
+    Three moves, kept when the cost strictly decreases:
     1. empty a whole departure into the others;
     2. move one line to another departure;
     3. only when 1 and 2 find nothing in a pass: move TWO lines of the same departure together to another
@@ -37,11 +33,7 @@ def reassign(lines: pd.DataFrame, plan: CouplePlan, holidays: set[date], tariff:
     weight, volume = lines["weight"].to_numpy(float), lines["volume"].to_numpy(float)
     distance = float(lines["distance"].iloc[0])
     slot_of = {d: s for s, d in zip(plan.slots, plan.dates.tolist())}
-    first_day = first_working_day(start, holidays)
-    first_profile = min((d for s, d in departure_nodes([max(due)], plan.allowed_days, holidays, first_day) if s is not None),
-                        default=date.max)
-    options = [[d for d in sorted(slot_of) if 0 <= (t - d).days <= config.max_advance_days
-                and (slot_of[d] is not None or t < first_profile)] for t in due]
+    options = [[d for d in sorted(slot_of) if 0 <= (t - d).days <= config.max_advance_days] for t in due]
     assign = list(plan.dates.tolist())
     members: dict[date, set[int]] = defaultdict(set)
     for i, d in enumerate(assign):
@@ -58,14 +50,14 @@ def reassign(lines: pd.DataFrame, plan: CouplePlan, holidays: set[date], tariff:
             packed = pack(weight[pos], volume[pos], config)
             trucks = len(packed)
             price = float(tariff(np.full(trucks, distance), [weight[pos[t]].sum() for t in packed]).sum())
-        return trucks * 1e6 + price if config.objective == "trucks" else price + trucks * 1e-6
+        return price + trucks * 1e-6  # fewer trucks only breaks ties
 
     current = {d: cost(m) for d, m in members.items()}
 
     def valid(new_assign: list[date]) -> CouplePlan | None:
         candidate = evaluate(lines, [[(slot_of[d], d)] for d in new_assign], [0] * len(new_assign),
                              plan.allowed_days, tariff, config)
-        ok = not same_days or (candidate.same_days and candidate.frequency in config.allowed_frequencies)
+        ok = candidate.same_days and candidate.frequency in config.allowed_frequencies
         return candidate if ok else None
 
     allowed = [set(o) for o in options]
@@ -145,7 +137,4 @@ def reassign(lines: pd.DataFrame, plan: CouplePlan, holidays: set[date], tariff:
     result = valid(assign)
     if result is None:
         return plan
-    better = (
-        (result.n_trucks, result.cost) < (plan.n_trucks, plan.cost - 1e-9) if config.objective == "trucks"
-        else result.cost < plan.cost - 1e-9)
-    return result if better else plan
+    return result if result.cost < plan.cost - 1e-9 else plan

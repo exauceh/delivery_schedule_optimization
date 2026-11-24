@@ -237,7 +237,7 @@ def p_model(pdf: PdfPages, number: int, fronts: list[PlantFrontier]) -> None:
     ax.text(0.715, 0.4,
             "Pourquoi chaque semaine ?\n"
             "Avec le seul pic global, une semaine\n"
-            "très chargée (le démarrage) cache\n"
+            "très chargée cache\n"
             "toutes les autres : le solveur n'aurait\n"
             "plus aucune raison de les lisser.\n\n"
             "Résultat : le plan le moins cher\n"

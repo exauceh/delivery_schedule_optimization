@@ -16,10 +16,8 @@ from ..engine.selection import selection_key
 from ..pricing.tariff import Tariff
 
 
-def delivery_rule(slot: date | None, delivery: pd.Timestamp) -> str:
+def delivery_rule(slot: date, delivery: pd.Timestamp) -> str:
     """Why a need leaves on that day (EF10)."""
-    if slot is None:
-        return "démarrage"
     return "jour du profil" if delivery.date() == slot else "férié avancé"
 
 
@@ -49,7 +47,7 @@ def export(lines: pd.DataFrame, plans: Plans, scenario: str, tariff: Tariff, con
                 slot = plan.slots[position]
                 alloc_rows.append({
                     "truck_id": truck_id, "delivery_date": day, "need_date": row.date,
-                    "advance_days": (cast(pd.Timestamp, row.date) - day).days, "profile_day": pd.Timestamp(slot) if slot else pd.NaT,
+                    "advance_days": (cast(pd.Timestamp, row.date) - day).days, "profile_day": pd.Timestamp(slot),
                     "delivery_rule": delivery_rule(slot, day),
                     "line_id": row.line_id, "supplier_id": key[0], "plant": key[1],
                     "unloading_point": row.unloading_point, "material": row.material,
@@ -111,7 +109,6 @@ def couple_summary(lines: pd.DataFrame, baseline: pd.DataFrame, plans_B: Plans, 
             "current_profile": max(pattern_before), "current_weekly_pattern": " ".join(map(str, pattern_before)),
             "profile": plan.frequency, "profile_days": days(plan.profile),
             "weekly_pattern": " ".join(map(str, pattern_after)),
-            "startup_deliveries": len({d for s, d in zip(plan.slots, plan.dates.tolist()) if s is None}),
             "deliveries_before": len(before), "deliveries_after": len(np.unique(plan.dates)),
             "trucks_before": int(before["trucks"].sum()), "trucks_after": plan.n_trucks,
             "trucks_per_active_week": plan.n_trucks / max(1, sum(n > 0 for n in pattern_after)),
@@ -127,7 +124,7 @@ def couple_summary(lines: pd.DataFrame, baseline: pd.DataFrame, plans_B: Plans, 
 
 
 PROFILE_COLUMNS = ["supplier_id", "plant", "distance", "current_profile", "current_weekly_pattern", "profile", "profile_days",
-                   "weekly_pattern", "startup_deliveries", "trucks_per_active_week", "mean_fill_weight_pct", "mean_advance_days", "reason"]
+                   "weekly_pattern", "trucks_per_active_week", "mean_fill_weight_pct", "mean_advance_days", "reason"]
 SAVING_COLUMNS = ["supplier_id", "plant", "distance", "deliveries_before", "deliveries_after", "trucks_before", "trucks_after",
                   "imputed_full_truck_lines", "cost_before", "cost_after", "saving", "saving_pct"]
 

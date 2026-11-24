@@ -35,4 +35,4 @@ def test_outputs_are_those_of_the_milestone_3_notebook(input_paths: dict[InputNa
         actual = written[name].read_text(encoding="utf-8").replace("\r\n", "\n")
         expected = (EXPECTED / f"{name}.csv").read_text(encoding="utf-8").replace("\r\n", "\n")
         assert actual == expected, f"{name} differs from the milestone 3 notebook"
-    assert result.kpis["saving"] == pytest.approx(66_181, abs=1)
+    assert result.kpis["saving"] == pytest.approx(66_267, abs=1)

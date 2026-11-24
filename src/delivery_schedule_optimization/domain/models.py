@@ -9,7 +9,7 @@ from datetime import date
 import numpy as np
 
 CoupleKey = tuple[str, str]  # (supplier_id, plant)
-Option = tuple[date | None, date]  # (profile day, delivery date); profile day None = start-up delivery
+Option = tuple[date, date]  # (profile day, delivery date)
 SortKey = tuple[float | tuple[int, ...], ...]  # lexicographic criteria of a plan
 
 
@@ -17,7 +17,7 @@ SortKey = tuple[float | tuple[int, ...], ...]  # lexicographic criteria of a pla
 class CouplePlan:
     allowed_days: tuple[int, ...]  # set of days evaluated
     profile: tuple[int, ...]  # days actually used (= the fixed delivery days of the couple)
-    slots: list[date | None]  # profile day served by each line (None = start-up delivery)
+    slots: list[date]  # profile day served by each line
     dates: np.ndarray  # delivery date of each line of the couple
     trucks: list[tuple[np.datetime64, list[int]]]  # (date, positions of the couple's lines)
     truck_weights: np.ndarray

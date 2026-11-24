@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import itertools
 from datetime import date, timedelta
+from typing import cast
 
 import holidays as holiday_calendars
 import pandas as pd
@@ -22,7 +23,9 @@ def day_sets(config: PlannerConfig) -> list[tuple[int, ...]]:
 
 
 def plan_start(lines: pd.DataFrame, config: PlannerConfig) -> date:
-    return pd.Timestamp(config.plan_start).date() if config.plan_start else lines["date"].min().date()
+    """First possible delivery day: `max_advance_days` before the first need (client answer), so that every need,
+    the first ones included, has a profile day in its window."""
+    return cast(date, lines["date"].min().date()) - timedelta(days=config.max_advance_days)
 
 
 def is_working_day(day: date, holidays: set[date]) -> bool:

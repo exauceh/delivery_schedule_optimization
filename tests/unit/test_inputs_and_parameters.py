@@ -46,5 +46,5 @@ def test_invalid_parameters_are_rejected(parameters: dict[str, object]) -> None:
 
 
 def test_dumped_parameters_can_be_parsed_back() -> None:
-    planner, preparation = parse_parameters({"planner": {"objective": "trucks"}})
+    planner, preparation = parse_parameters({"planner": {"overflow_first": True, "strict_coverage": True}})
     assert parse_parameters(dump_parameters(planner, preparation)) == (planner, preparation)

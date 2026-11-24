@@ -10,10 +10,10 @@ from .baseline.current import current_deliveries, current_situation, load_baseli
 from .domain.calendar import day_sets, first_working_day, horizon_weeks, is_working_day, monday, plan_start, public_holidays
 from .domain.config import COUPLE, DAY_NAMES, PlannerConfig
 from .domain.models import CouplePlan
-from .engine.candidates import candidate_plans, couple_candidates, lower_bound
+from .engine.candidates import candidate_plans, couple_candidates
 from .engine.graph import departure_nodes, optimal_plan
 from .engine.loading import pack
-from .engine.plans import delivery_dates, delivery_options, evaluate, evaluate_departures, plan_couple, plan_key
+from .engine.plans import delivery_dates, delivery_options, evaluate, evaluate_departures, plan_couple
 from .engine.reassign import reassign
 from .engine.selection import choose_profiles, selection_key
 from .engine.smoothing import plant_frontier, smooth, smoothing_indicator, smoothing_options
@@ -22,7 +22,7 @@ from .preparation.lines import load_lines
 from .pricing.tariff import Tariff, rate_grid
 from .reporting.kpis import plant_day_load
 from .reporting.outputs import couple_summary, delivery_rule, export, truck_contents
-from .validation.checks import check, first_profile_day, rg06_coverage
+from .validation.checks import check, rg06_coverage
 
 __all__ = [
     "COUPLE",
@@ -45,18 +45,15 @@ __all__ = [
     "evaluate",
     "evaluate_departures",
     "export",
-    "first_profile_day",
     "first_working_day",
     "horizon_weeks",
     "is_working_day",
     "load_baseline",
     "load_lines",
-    "lower_bound",
     "monday",
     "optimal_plan",
     "pack",
     "plan_couple",
-    "plan_key",
     "plan_start",
     "plant_day_load",
     "plant_frontier",
