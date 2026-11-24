@@ -1,0 +1,24 @@
+{
+  "avec_imputation": {
+    "lines": 4389,
+    "groups": 180,
+    "certified": 163,
+    "trucks": 756,
+    "reference_eur": 176724.61,
+    "lower_eur": 107668.7,
+    "cost_eur": 109345.78,
+    "saving_eur": 67378.83,
+    "gap_eur": 1677.09
+  },
+  "sans_imputation_tarifable": {
+    "lines": 4251,
+    "groups": 171,
+    "certified": 156,
+    "trucks": 627,
+    "reference_eur": 142964.05,
+    "lower_eur": 74397.8,
+    "cost_eur": 75895.85,
+    "saving_eur": 67068.2,
+    "gap_eur": 1498.05
+  }
+}

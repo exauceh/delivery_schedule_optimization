@@ -1,0 +1,993 @@
+scope,supplier_id,plant,profile,lower,upper,input_cutoff
+avec_imputation,SUP_00011,PLT_004,0,31659,32598.0,31579
+avec_imputation,SUP_00011,PLT_004,0 1,31579,,31579
+avec_imputation,SUP_00011,PLT_004,0 1 2,31579,,31579
+avec_imputation,SUP_00011,PLT_004,0 1 2 3,31579,,31579
+avec_imputation,SUP_00011,PLT_004,0 1 2 3 4,31579,,31579
+avec_imputation,SUP_00011,PLT_004,0 1 2 4,31579,,31579
+avec_imputation,SUP_00011,PLT_004,0 1 3,30678,,31579
+avec_imputation,SUP_00011,PLT_004,0 1 3 4,30678,,31579
+avec_imputation,SUP_00011,PLT_004,0 1 4,30678,,31579
+avec_imputation,SUP_00011,PLT_004,0 2,31579,,31579
+avec_imputation,SUP_00011,PLT_004,0 2 3,30678,,31579
+avec_imputation,SUP_00011,PLT_004,0 2 3 4,30678,,31579
+avec_imputation,SUP_00011,PLT_004,0 2 4,30678,,31579
+avec_imputation,SUP_00011,PLT_004,0 3,31579,,31579
+avec_imputation,SUP_00011,PLT_004,0 3 4,30678,,31579
+avec_imputation,SUP_00011,PLT_004,0 4,30678,31579.0,31579
+avec_imputation,SUP_00011,PLT_004,1,33107,37023.0,31579
+avec_imputation,SUP_00011,PLT_004,1 2,31579,,31579
+avec_imputation,SUP_00011,PLT_004,1 2 3,31579,,31579
+avec_imputation,SUP_00011,PLT_004,1 2 3 4,31579,,31579
+avec_imputation,SUP_00011,PLT_004,1 2 4,31579,,31579
+avec_imputation,SUP_00011,PLT_004,1 3,31579,,31579
+avec_imputation,SUP_00011,PLT_004,1 3 4,31579,,31579
+avec_imputation,SUP_00011,PLT_004,1 4,31579,,31579
+avec_imputation,SUP_00011,PLT_004,2,33336,37188.0,31579
+avec_imputation,SUP_00011,PLT_004,2 3,31579,,31579
+avec_imputation,SUP_00011,PLT_004,2 3 4,31579,,31579
+avec_imputation,SUP_00011,PLT_004,2 4,31579,,31579
+avec_imputation,SUP_00011,PLT_004,3,32344,38994.0,31579
+avec_imputation,SUP_00011,PLT_004,3 4,31579,,31579
+avec_imputation,SUP_00011,PLT_004,4,31659,38820.0,31579
+avec_imputation,SUP_00035,PLT_002,0,12927,13394.0,12276
+avec_imputation,SUP_00035,PLT_002,0 1,12276,,12276
+avec_imputation,SUP_00035,PLT_002,0 1 2,12276,,12276
+avec_imputation,SUP_00035,PLT_002,0 1 2 3,12276,,12276
+avec_imputation,SUP_00035,PLT_002,0 1 2 3 4,12276,,12276
+avec_imputation,SUP_00035,PLT_002,0 1 2 4,12276,,12276
+avec_imputation,SUP_00035,PLT_002,0 1 3,10502,,12276
+avec_imputation,SUP_00035,PLT_002,0 1 3 4,9506,,12276
+avec_imputation,SUP_00035,PLT_002,0 1 4,9506,,12276
+avec_imputation,SUP_00035,PLT_002,0 2,12276,,12276
+avec_imputation,SUP_00035,PLT_002,0 2 3,12276,,12276
+avec_imputation,SUP_00035,PLT_002,0 2 3 4,12276,,12276
+avec_imputation,SUP_00035,PLT_002,0 2 4,10290,,12276
+avec_imputation,SUP_00035,PLT_002,0 3,10941,,12276
+avec_imputation,SUP_00035,PLT_002,0 3 4,10713,,12276
+avec_imputation,SUP_00035,PLT_002,0 4,12101,12171.0,12276
+avec_imputation,SUP_00035,PLT_002,1,12578,15337.0,12276
+avec_imputation,SUP_00035,PLT_002,1 2,12276,,12276
+avec_imputation,SUP_00035,PLT_002,1 2 3,12276,,12276
+avec_imputation,SUP_00035,PLT_002,1 2 3 4,9783,,12276
+avec_imputation,SUP_00035,PLT_002,1 2 4,10249,,12276
+avec_imputation,SUP_00035,PLT_002,1 3,12276,,12276
+avec_imputation,SUP_00035,PLT_002,1 3 4,9783,,12276
+avec_imputation,SUP_00035,PLT_002,1 4,10249,12276.0,12276
+avec_imputation,SUP_00035,PLT_002,2,13142,14837.0,12276
+avec_imputation,SUP_00035,PLT_002,2 3,12344,,12276
+avec_imputation,SUP_00035,PLT_002,2 3 4,10388,,12276
+avec_imputation,SUP_00035,PLT_002,2 4,10854,,12276
+avec_imputation,SUP_00035,PLT_002,3,12344,13899.0,12276
+avec_imputation,SUP_00035,PLT_002,3 4,11120,,12276
+avec_imputation,SUP_00035,PLT_002,4,12171,12171.0,12276
+avec_imputation,SUP_00037,PLT_002,0,46203,47875.0,42120
+avec_imputation,SUP_00037,PLT_002,0 1,41470,42120.0,42120
+avec_imputation,SUP_00037,PLT_002,0 1 2,40627,,42120
+avec_imputation,SUP_00037,PLT_002,0 1 2 3,40627,,42120
+avec_imputation,SUP_00037,PLT_002,0 1 2 3 4,40627,,42120
+avec_imputation,SUP_00037,PLT_002,0 1 2 4,40627,,42120
+avec_imputation,SUP_00037,PLT_002,0 1 3,40627,,42120
+avec_imputation,SUP_00037,PLT_002,0 1 3 4,40627,,42120
+avec_imputation,SUP_00037,PLT_002,0 1 4,40627,,42120
+avec_imputation,SUP_00037,PLT_002,0 2,41470,42120.0,42120
+avec_imputation,SUP_00037,PLT_002,0 2 3,40627,,42120
+avec_imputation,SUP_00037,PLT_002,0 2 3 4,40627,,42120
+avec_imputation,SUP_00037,PLT_002,0 2 4,40627,,42120
+avec_imputation,SUP_00037,PLT_002,0 3,40627,41064.0,42120
+avec_imputation,SUP_00037,PLT_002,0 3 4,40628,43560.0,42120
+avec_imputation,SUP_00037,PLT_002,0 4,43301,,42120
+avec_imputation,SUP_00037,PLT_002,1,41470,42120.0,42120
+avec_imputation,SUP_00037,PLT_002,1 2,40627,,42120
+avec_imputation,SUP_00037,PLT_002,1 2 3,40627,,42120
+avec_imputation,SUP_00037,PLT_002,1 2 3 4,40627,,42120
+avec_imputation,SUP_00037,PLT_002,1 2 4,40627,,42120
+avec_imputation,SUP_00037,PLT_002,1 3,40627,42120.0,42120
+avec_imputation,SUP_00037,PLT_002,1 3 4,40627,,42120
+avec_imputation,SUP_00037,PLT_002,1 4,40627,43560.0,42120
+avec_imputation,SUP_00037,PLT_002,2,41470,42120.0,42120
+avec_imputation,SUP_00037,PLT_002,2 3,41470,42120.0,42120
+avec_imputation,SUP_00037,PLT_002,2 3 4,40627,41064.0,42120
+avec_imputation,SUP_00037,PLT_002,2 4,40627,44616.0,42120
+avec_imputation,SUP_00037,PLT_002,3,42120,43301.0,42120
+avec_imputation,SUP_00037,PLT_002,3 4,40627,42120.0,42120
+avec_imputation,SUP_00037,PLT_002,4,43301,55594.0,42120
+avec_imputation,SUP_00041,PLT_004,0,18723,20145.0,18320
+avec_imputation,SUP_00041,PLT_004,0 1,18320,,18320
+avec_imputation,SUP_00041,PLT_004,0 1 2,18320,,18320
+avec_imputation,SUP_00041,PLT_004,0 1 2 3,18320,,18320
+avec_imputation,SUP_00041,PLT_004,0 1 2 3 4,18320,,18320
+avec_imputation,SUP_00041,PLT_004,0 1 2 4,18320,,18320
+avec_imputation,SUP_00041,PLT_004,0 1 3,17268,,18320
+avec_imputation,SUP_00041,PLT_004,0 1 3 4,17268,,18320
+avec_imputation,SUP_00041,PLT_004,0 1 4,17268,,18320
+avec_imputation,SUP_00041,PLT_004,0 2,18320,,18320
+avec_imputation,SUP_00041,PLT_004,0 2 3,18320,,18320
+avec_imputation,SUP_00041,PLT_004,0 2 3 4,18320,,18320
+avec_imputation,SUP_00041,PLT_004,0 2 4,18320,,18320
+avec_imputation,SUP_00041,PLT_004,0 3,18320,,18320
+avec_imputation,SUP_00041,PLT_004,0 3 4,17268,,18320
+avec_imputation,SUP_00041,PLT_004,0 4,18320,,18320
+avec_imputation,SUP_00041,PLT_004,1,18320,19333.0,18320
+avec_imputation,SUP_00041,PLT_004,1 2,18320,,18320
+avec_imputation,SUP_00041,PLT_004,1 2 3,18320,,18320
+avec_imputation,SUP_00041,PLT_004,1 2 3 4,17268,,18320
+avec_imputation,SUP_00041,PLT_004,1 2 4,17268,,18320
+avec_imputation,SUP_00041,PLT_004,1 3,18320,,18320
+avec_imputation,SUP_00041,PLT_004,1 3 4,17268,,18320
+avec_imputation,SUP_00041,PLT_004,1 4,17268,18320.0,18320
+avec_imputation,SUP_00041,PLT_004,2,19713,20759.0,18320
+avec_imputation,SUP_00041,PLT_004,2 3,18320,,18320
+avec_imputation,SUP_00041,PLT_004,2 3 4,18320,,18320
+avec_imputation,SUP_00041,PLT_004,2 4,18320,,18320
+avec_imputation,SUP_00041,PLT_004,3,18768,20741.0,18320
+avec_imputation,SUP_00041,PLT_004,3 4,18320,,18320
+avec_imputation,SUP_00041,PLT_004,4,18320,20548.0,18320
+avec_imputation,SUP_00045,PLT_001,0,30907,34099.0,30907
+avec_imputation,SUP_00045,PLT_001,0 1,30907,,30907
+avec_imputation,SUP_00045,PLT_001,0 1 2,30907,,30907
+avec_imputation,SUP_00045,PLT_001,0 1 2 3,28922,,30907
+avec_imputation,SUP_00045,PLT_001,0 1 2 3 4,28922,,30907
+avec_imputation,SUP_00045,PLT_001,0 1 2 4,28922,,30907
+avec_imputation,SUP_00045,PLT_001,0 1 3,28922,,30907
+avec_imputation,SUP_00045,PLT_001,0 1 3 4,28922,,30907
+avec_imputation,SUP_00045,PLT_001,0 1 4,30907,,30907
+avec_imputation,SUP_00045,PLT_001,0 2,30907,,30907
+avec_imputation,SUP_00045,PLT_001,0 2 3,28922,,30907
+avec_imputation,SUP_00045,PLT_001,0 2 3 4,28922,,30907
+avec_imputation,SUP_00045,PLT_001,0 2 4,28922,31373.0,30907
+avec_imputation,SUP_00045,PLT_001,0 3,28922,,30907
+avec_imputation,SUP_00045,PLT_001,0 3 4,30907,,30907
+avec_imputation,SUP_00045,PLT_001,0 4,30907,,30907
+avec_imputation,SUP_00045,PLT_001,1,31871,32733.0,30907
+avec_imputation,SUP_00045,PLT_001,1 2,28922,30907.0,30907
+avec_imputation,SUP_00045,PLT_001,1 2 3,28922,,30907
+avec_imputation,SUP_00045,PLT_001,1 2 3 4,28922,,30907
+avec_imputation,SUP_00045,PLT_001,1 2 4,28922,,30907
+avec_imputation,SUP_00045,PLT_001,1 3,30907,32579.0,30907
+avec_imputation,SUP_00045,PLT_001,1 3 4,30907,,30907
+avec_imputation,SUP_00045,PLT_001,1 4,30907,,30907
+avec_imputation,SUP_00045,PLT_001,2,31039,35916.0,30907
+avec_imputation,SUP_00045,PLT_001,2 3,30907,,30907
+avec_imputation,SUP_00045,PLT_001,2 3 4,30907,,30907
+avec_imputation,SUP_00045,PLT_001,2 4,30907,,30907
+avec_imputation,SUP_00045,PLT_001,3,32787,36863.0,30907
+avec_imputation,SUP_00045,PLT_001,3 4,32077,,30907
+avec_imputation,SUP_00045,PLT_001,4,32895,37513.0,30907
+avec_imputation,SUP_00053,PLT_001,0,11787,12716.0,11020
+avec_imputation,SUP_00053,PLT_001,0 1,11337,,11020
+avec_imputation,SUP_00053,PLT_001,0 1 2,11337,,11020
+avec_imputation,SUP_00053,PLT_001,0 1 2 3,11020,,11020
+avec_imputation,SUP_00053,PLT_001,0 1 2 3 4,11020,,11020
+avec_imputation,SUP_00053,PLT_001,0 1 2 4,11020,,11020
+avec_imputation,SUP_00053,PLT_001,0 1 3,11020,,11020
+avec_imputation,SUP_00053,PLT_001,0 1 3 4,10572,,11020
+avec_imputation,SUP_00053,PLT_001,0 1 4,11161,,11020
+avec_imputation,SUP_00053,PLT_001,0 2,11337,,11020
+avec_imputation,SUP_00053,PLT_001,0 2 3,11020,,11020
+avec_imputation,SUP_00053,PLT_001,0 2 3 4,11020,,11020
+avec_imputation,SUP_00053,PLT_001,0 2 4,11037,,11020
+avec_imputation,SUP_00053,PLT_001,0 3,11020,,11020
+avec_imputation,SUP_00053,PLT_001,0 3 4,11020,,11020
+avec_imputation,SUP_00053,PLT_001,0 4,11487,11924.0,11020
+avec_imputation,SUP_00053,PLT_001,1,11554,11956.0,11020
+avec_imputation,SUP_00053,PLT_001,1 2,11554,,11020
+avec_imputation,SUP_00053,PLT_001,1 2 3,11020,,11020
+avec_imputation,SUP_00053,PLT_001,1 2 3 4,11020,,11020
+avec_imputation,SUP_00053,PLT_001,1 2 4,11020,,11020
+avec_imputation,SUP_00053,PLT_001,1 3,10572,11020.0,11020
+avec_imputation,SUP_00053,PLT_001,1 3 4,11020,,11020
+avec_imputation,SUP_00053,PLT_001,1 4,11161,,11020
+avec_imputation,SUP_00053,PLT_001,2,13304,13304.0,11020
+avec_imputation,SUP_00053,PLT_001,2 3,11186,,11020
+avec_imputation,SUP_00053,PLT_001,2 3 4,11020,,11020
+avec_imputation,SUP_00053,PLT_001,2 4,11337,,11020
+avec_imputation,SUP_00053,PLT_001,3,11186,14049.0,11020
+avec_imputation,SUP_00053,PLT_001,3 4,11020,,11020
+avec_imputation,SUP_00053,PLT_001,4,11924,13794.0,11020
+avec_imputation,SUP_00080,PLT_004,0,31505,31505.0,29124
+avec_imputation,SUP_00080,PLT_004,0 1,29124,,29124
+avec_imputation,SUP_00080,PLT_004,0 1 2,29124,,29124
+avec_imputation,SUP_00080,PLT_004,0 1 2 3,23077,,29124
+avec_imputation,SUP_00080,PLT_004,0 1 2 3 4,21914,,29124
+avec_imputation,SUP_00080,PLT_004,0 1 2 4,24127,,29124
+avec_imputation,SUP_00080,PLT_004,0 1 3,29124,,29124
+avec_imputation,SUP_00080,PLT_004,0 1 3 4,22465,,29124
+avec_imputation,SUP_00080,PLT_004,0 1 4,26494,,29124
+avec_imputation,SUP_00080,PLT_004,0 2,29124,,29124
+avec_imputation,SUP_00080,PLT_004,0 2 3,29124,,29124
+avec_imputation,SUP_00080,PLT_004,0 2 3 4,29124,,29124
+avec_imputation,SUP_00080,PLT_004,0 2 4,29124,,29124
+avec_imputation,SUP_00080,PLT_004,0 3,29124,,29124
+avec_imputation,SUP_00080,PLT_004,0 3 4,29124,,29124
+avec_imputation,SUP_00080,PLT_004,0 4,29124,29124.0,29124
+avec_imputation,SUP_00080,PLT_004,1,32296,33862.0,29124
+avec_imputation,SUP_00080,PLT_004,1 2,29856,,29124
+avec_imputation,SUP_00080,PLT_004,1 2 3,29124,,29124
+avec_imputation,SUP_00080,PLT_004,1 2 3 4,23043,,29124
+avec_imputation,SUP_00080,PLT_004,1 2 4,29124,,29124
+avec_imputation,SUP_00080,PLT_004,1 3,29124,,29124
+avec_imputation,SUP_00080,PLT_004,1 3 4,23767,,29124
+avec_imputation,SUP_00080,PLT_004,1 4,29124,,29124
+avec_imputation,SUP_00080,PLT_004,2,32604,35993.0,29124
+avec_imputation,SUP_00080,PLT_004,2 3,29124,,29124
+avec_imputation,SUP_00080,PLT_004,2 3 4,29124,,29124
+avec_imputation,SUP_00080,PLT_004,2 4,29124,,29124
+avec_imputation,SUP_00080,PLT_004,3,30446,36220.0,29124
+avec_imputation,SUP_00080,PLT_004,3 4,29124,,29124
+avec_imputation,SUP_00080,PLT_004,4,29124,37291.0,29124
+avec_imputation,SUP_00085,PLT_004,0,49080,49080.0,45296
+avec_imputation,SUP_00085,PLT_004,0 1,49080,,45296
+avec_imputation,SUP_00085,PLT_004,0 1 2,48847,,45296
+avec_imputation,SUP_00085,PLT_004,0 1 2 3,45296,,45296
+avec_imputation,SUP_00085,PLT_004,0 1 2 3 4,41290,45296.0,45296
+avec_imputation,SUP_00085,PLT_004,0 1 2 4,45296,,45296
+avec_imputation,SUP_00085,PLT_004,0 1 3,45296,,45296
+avec_imputation,SUP_00085,PLT_004,0 1 3 4,45296,,45296
+avec_imputation,SUP_00085,PLT_004,0 1 4,48847,,45296
+avec_imputation,SUP_00085,PLT_004,0 2,48847,,45296
+avec_imputation,SUP_00085,PLT_004,0 2 3,45296,,45296
+avec_imputation,SUP_00085,PLT_004,0 2 3 4,45296,,45296
+avec_imputation,SUP_00085,PLT_004,0 2 4,46118,,45296
+avec_imputation,SUP_00085,PLT_004,0 3,49080,,45296
+avec_imputation,SUP_00085,PLT_004,0 3 4,49080,,45296
+avec_imputation,SUP_00085,PLT_004,0 4,49080,,45296
+avec_imputation,SUP_00085,PLT_004,1,55779,55779.0,45296
+avec_imputation,SUP_00085,PLT_004,1 2,55779,,45296
+avec_imputation,SUP_00085,PLT_004,1 2 3,53387,,45296
+avec_imputation,SUP_00085,PLT_004,1 2 3 4,45296,,45296
+avec_imputation,SUP_00085,PLT_004,1 2 4,45296,,45296
+avec_imputation,SUP_00085,PLT_004,1 3,53387,,45296
+avec_imputation,SUP_00085,PLT_004,1 3 4,45440,,45296
+avec_imputation,SUP_00085,PLT_004,1 4,49080,,45296
+avec_imputation,SUP_00085,PLT_004,2,57260,61800.0,45296
+avec_imputation,SUP_00085,PLT_004,2 3,55101,,45296
+avec_imputation,SUP_00085,PLT_004,2 3 4,49080,,45296
+avec_imputation,SUP_00085,PLT_004,2 4,49080,,45296
+avec_imputation,SUP_00085,PLT_004,3,55101,67091.0,45296
+avec_imputation,SUP_00085,PLT_004,3 4,49080,,45296
+avec_imputation,SUP_00085,PLT_004,4,49080,49080.0,45296
+avec_imputation,SUP_00087,PLT_004,0,33957,35701.0,33957
+avec_imputation,SUP_00087,PLT_004,0 1,33957,,33957
+avec_imputation,SUP_00087,PLT_004,0 1 2,33957,,33957
+avec_imputation,SUP_00087,PLT_004,0 1 2 3,33957,,33957
+avec_imputation,SUP_00087,PLT_004,0 1 2 3 4,33957,,33957
+avec_imputation,SUP_00087,PLT_004,0 1 2 4,33957,,33957
+avec_imputation,SUP_00087,PLT_004,0 1 3,33957,,33957
+avec_imputation,SUP_00087,PLT_004,0 1 3 4,29651,,33957
+avec_imputation,SUP_00087,PLT_004,0 1 4,33957,,33957
+avec_imputation,SUP_00087,PLT_004,0 2,33957,,33957
+avec_imputation,SUP_00087,PLT_004,0 2 3,33957,,33957
+avec_imputation,SUP_00087,PLT_004,0 2 3 4,29651,,33957
+avec_imputation,SUP_00087,PLT_004,0 2 4,33957,,33957
+avec_imputation,SUP_00087,PLT_004,0 3,33957,,33957
+avec_imputation,SUP_00087,PLT_004,0 3 4,29855,,33957
+avec_imputation,SUP_00087,PLT_004,0 4,31846,33957.0,33957
+avec_imputation,SUP_00087,PLT_004,1,36059,37248.0,33957
+avec_imputation,SUP_00087,PLT_004,1 2,34037,,33957
+avec_imputation,SUP_00087,PLT_004,1 2 3,33957,,33957
+avec_imputation,SUP_00087,PLT_004,1 2 3 4,33957,,33957
+avec_imputation,SUP_00087,PLT_004,1 2 4,33957,,33957
+avec_imputation,SUP_00087,PLT_004,1 3,33957,,33957
+avec_imputation,SUP_00087,PLT_004,1 3 4,29651,,33957
+avec_imputation,SUP_00087,PLT_004,1 4,33957,,33957
+avec_imputation,SUP_00087,PLT_004,2,36573,39502.0,33957
+avec_imputation,SUP_00087,PLT_004,2 3,33957,,33957
+avec_imputation,SUP_00087,PLT_004,2 3 4,33957,,33957
+avec_imputation,SUP_00087,PLT_004,2 4,33957,,33957
+avec_imputation,SUP_00087,PLT_004,3,34302,41374.0,33957
+avec_imputation,SUP_00087,PLT_004,3 4,33957,,33957
+avec_imputation,SUP_00087,PLT_004,4,33957,43353.0,33957
+avec_imputation,SUP_00091,PLT_001,0,18287,18287.0,15954
+avec_imputation,SUP_00091,PLT_001,0 1,18287,,15954
+avec_imputation,SUP_00091,PLT_001,0 1 2,15626,,15954
+avec_imputation,SUP_00091,PLT_001,0 1 2 3,15954,,15954
+avec_imputation,SUP_00091,PLT_001,0 1 2 3 4,15954,,15954
+avec_imputation,SUP_00091,PLT_001,0 1 2 4,15954,,15954
+avec_imputation,SUP_00091,PLT_001,0 1 3,17529,,15954
+avec_imputation,SUP_00091,PLT_001,0 1 3 4,17529,,15954
+avec_imputation,SUP_00091,PLT_001,0 1 4,17714,,15954
+avec_imputation,SUP_00091,PLT_001,0 2,15626,15954.0,15954
+avec_imputation,SUP_00091,PLT_001,0 2 3,15954,,15954
+avec_imputation,SUP_00091,PLT_001,0 2 3 4,15954,,15954
+avec_imputation,SUP_00091,PLT_001,0 2 4,15626,,15954
+avec_imputation,SUP_00091,PLT_001,0 3,17714,,15954
+avec_imputation,SUP_00091,PLT_001,0 3 4,17714,,15954
+avec_imputation,SUP_00091,PLT_001,0 4,17714,,15954
+avec_imputation,SUP_00091,PLT_001,1,18287,18287.0,15954
+avec_imputation,SUP_00091,PLT_001,1 2,15626,,15954
+avec_imputation,SUP_00091,PLT_001,1 2 3,15954,,15954
+avec_imputation,SUP_00091,PLT_001,1 2 3 4,15626,,15954
+avec_imputation,SUP_00091,PLT_001,1 2 4,15626,,15954
+avec_imputation,SUP_00091,PLT_001,1 3,17529,,15954
+avec_imputation,SUP_00091,PLT_001,1 3 4,17529,,15954
+avec_imputation,SUP_00091,PLT_001,1 4,17714,,15954
+avec_imputation,SUP_00091,PLT_001,2,15954,19222.0,15954
+avec_imputation,SUP_00091,PLT_001,2 3,15954,,15954
+avec_imputation,SUP_00091,PLT_001,2 3 4,15626,,15954
+avec_imputation,SUP_00091,PLT_001,2 4,15626,,15954
+avec_imputation,SUP_00091,PLT_001,3,17863,18798.0,15954
+avec_imputation,SUP_00091,PLT_001,3 4,17714,,15954
+avec_imputation,SUP_00091,PLT_001,4,17714,19540.0,15954
+avec_imputation,SUP_00091,PLT_004,0,13614,14278.0,13486
+avec_imputation,SUP_00091,PLT_004,0 1,12225,,13486
+avec_imputation,SUP_00091,PLT_004,0 1 2,13486,,13486
+avec_imputation,SUP_00091,PLT_004,0 1 2 3,13486,,13486
+avec_imputation,SUP_00091,PLT_004,0 1 2 3 4,11124,,13486
+avec_imputation,SUP_00091,PLT_004,0 1 2 4,11124,,13486
+avec_imputation,SUP_00091,PLT_004,0 1 3,13273,13439.0,13486
+avec_imputation,SUP_00091,PLT_004,0 1 3 4,11599,,13486
+avec_imputation,SUP_00091,PLT_004,0 1 4,11599,,13486
+avec_imputation,SUP_00091,PLT_004,0 2,11675,,13486
+avec_imputation,SUP_00091,PLT_004,0 2 3,13486,,13486
+avec_imputation,SUP_00091,PLT_004,0 2 3 4,11599,,13486
+avec_imputation,SUP_00091,PLT_004,0 2 4,11599,,13486
+avec_imputation,SUP_00091,PLT_004,0 3,12045,,13486
+avec_imputation,SUP_00091,PLT_004,0 3 4,11713,,13486
+avec_imputation,SUP_00091,PLT_004,0 4,13170,13186.0,13486
+avec_imputation,SUP_00091,PLT_004,1,13486,14406.0,13486
+avec_imputation,SUP_00091,PLT_004,1 2,12186,,13486
+avec_imputation,SUP_00091,PLT_004,1 2 3,13486,,13486
+avec_imputation,SUP_00091,PLT_004,1 2 3 4,11124,,13486
+avec_imputation,SUP_00091,PLT_004,1 2 4,11124,,13486
+avec_imputation,SUP_00091,PLT_004,1 3,13175,13413.0,13486
+avec_imputation,SUP_00091,PLT_004,1 3 4,11599,,13486
+avec_imputation,SUP_00091,PLT_004,1 4,11599,13486.0,13486
+avec_imputation,SUP_00091,PLT_004,2,13486,14612.0,13486
+avec_imputation,SUP_00091,PLT_004,2 3,13486,,13486
+avec_imputation,SUP_00091,PLT_004,2 3 4,11599,,13486
+avec_imputation,SUP_00091,PLT_004,2 4,13303,13375.0,13486
+avec_imputation,SUP_00091,PLT_004,3,13710,15310.0,13486
+avec_imputation,SUP_00091,PLT_004,3 4,13258,13423.0,13486
+avec_imputation,SUP_00091,PLT_004,4,13486,15764.0,13486
+avec_imputation,SUP_00094,PLT_004,0,20233,20261.0,19352
+avec_imputation,SUP_00094,PLT_004,0 1,19352,,19352
+avec_imputation,SUP_00094,PLT_004,0 1 2,19352,,19352
+avec_imputation,SUP_00094,PLT_004,0 1 2 3,19352,,19352
+avec_imputation,SUP_00094,PLT_004,0 1 2 3 4,19352,,19352
+avec_imputation,SUP_00094,PLT_004,0 1 2 4,19352,,19352
+avec_imputation,SUP_00094,PLT_004,0 1 3,19352,,19352
+avec_imputation,SUP_00094,PLT_004,0 1 3 4,19352,,19352
+avec_imputation,SUP_00094,PLT_004,0 1 4,17364,,19352
+avec_imputation,SUP_00094,PLT_004,0 2,19352,,19352
+avec_imputation,SUP_00094,PLT_004,0 2 3,19352,,19352
+avec_imputation,SUP_00094,PLT_004,0 2 3 4,19352,,19352
+avec_imputation,SUP_00094,PLT_004,0 2 4,17364,,19352
+avec_imputation,SUP_00094,PLT_004,0 3,19352,,19352
+avec_imputation,SUP_00094,PLT_004,0 3 4,17364,,19352
+avec_imputation,SUP_00094,PLT_004,0 4,18608,19352.0,19352
+avec_imputation,SUP_00094,PLT_004,1,19929,21806.0,19352
+avec_imputation,SUP_00094,PLT_004,1 2,19352,,19352
+avec_imputation,SUP_00094,PLT_004,1 2 3,19352,,19352
+avec_imputation,SUP_00094,PLT_004,1 2 3 4,19352,,19352
+avec_imputation,SUP_00094,PLT_004,1 2 4,19352,,19352
+avec_imputation,SUP_00094,PLT_004,1 3,19352,,19352
+avec_imputation,SUP_00094,PLT_004,1 3 4,19352,,19352
+avec_imputation,SUP_00094,PLT_004,1 4,19352,,19352
+avec_imputation,SUP_00094,PLT_004,2,20823,23068.0,19352
+avec_imputation,SUP_00094,PLT_004,2 3,19457,,19352
+avec_imputation,SUP_00094,PLT_004,2 3 4,19352,,19352
+avec_imputation,SUP_00094,PLT_004,2 4,19352,,19352
+avec_imputation,SUP_00094,PLT_004,3,20823,24591.0,19352
+avec_imputation,SUP_00094,PLT_004,3 4,19352,,19352
+avec_imputation,SUP_00094,PLT_004,4,19352,19806.0,19352
+avec_imputation,SUP_00107,PLT_001,0,18647,19023.0,16477
+avec_imputation,SUP_00107,PLT_001,0 1,16477,,16477
+avec_imputation,SUP_00107,PLT_001,0 1 2,16477,,16477
+avec_imputation,SUP_00107,PLT_001,0 1 2 3,15624,,16477
+avec_imputation,SUP_00107,PLT_001,0 1 2 3 4,15624,,16477
+avec_imputation,SUP_00107,PLT_001,0 1 2 4,16477,,16477
+avec_imputation,SUP_00107,PLT_001,0 1 3,15624,,16477
+avec_imputation,SUP_00107,PLT_001,0 1 3 4,15624,,16477
+avec_imputation,SUP_00107,PLT_001,0 1 4,16477,,16477
+avec_imputation,SUP_00107,PLT_001,0 2,16477,,16477
+avec_imputation,SUP_00107,PLT_001,0 2 3,15624,,16477
+avec_imputation,SUP_00107,PLT_001,0 2 3 4,15624,,16477
+avec_imputation,SUP_00107,PLT_001,0 2 4,16477,,16477
+avec_imputation,SUP_00107,PLT_001,0 3,15932,16220.0,16477
+avec_imputation,SUP_00107,PLT_001,0 3 4,15624,,16477
+avec_imputation,SUP_00107,PLT_001,0 4,18110,,16477
+avec_imputation,SUP_00107,PLT_001,1,16846,19490.0,16477
+avec_imputation,SUP_00107,PLT_001,1 2,16477,,16477
+avec_imputation,SUP_00107,PLT_001,1 2 3,15624,,16477
+avec_imputation,SUP_00107,PLT_001,1 2 3 4,15624,,16477
+avec_imputation,SUP_00107,PLT_001,1 2 4,15624,,16477
+avec_imputation,SUP_00107,PLT_001,1 3,15624,,16477
+avec_imputation,SUP_00107,PLT_001,1 3 4,15624,,16477
+avec_imputation,SUP_00107,PLT_001,1 4,16477,,16477
+avec_imputation,SUP_00107,PLT_001,2,17492,19330.0,16477
+avec_imputation,SUP_00107,PLT_001,2 3,15624,17941.0,16477
+avec_imputation,SUP_00107,PLT_001,2 3 4,15624,,16477
+avec_imputation,SUP_00107,PLT_001,2 4,16477,,16477
+avec_imputation,SUP_00107,PLT_001,3,16212,16212.0,16477
+avec_imputation,SUP_00107,PLT_001,3 4,15624,,16477
+avec_imputation,SUP_00107,PLT_001,4,18279,20602.0,16477
+avec_imputation,SUP_00118,PLT_001,0,35559,38028.0,35127
+avec_imputation,SUP_00118,PLT_001,0 1,35127,,35127
+avec_imputation,SUP_00118,PLT_001,0 1 2,35127,,35127
+avec_imputation,SUP_00118,PLT_001,0 1 2 3,29192,,35127
+avec_imputation,SUP_00118,PLT_001,0 1 2 3 4,29192,,35127
+avec_imputation,SUP_00118,PLT_001,0 1 2 4,29925,,35127
+avec_imputation,SUP_00118,PLT_001,0 1 3,35127,,35127
+avec_imputation,SUP_00118,PLT_001,0 1 3 4,29925,,35127
+avec_imputation,SUP_00118,PLT_001,0 1 4,30855,,35127
+avec_imputation,SUP_00118,PLT_001,0 2,35127,,35127
+avec_imputation,SUP_00118,PLT_001,0 2 3,29925,,35127
+avec_imputation,SUP_00118,PLT_001,0 2 3 4,29925,,35127
+avec_imputation,SUP_00118,PLT_001,0 2 4,29925,,35127
+avec_imputation,SUP_00118,PLT_001,0 3,35127,,35127
+avec_imputation,SUP_00118,PLT_001,0 3 4,29925,,35127
+avec_imputation,SUP_00118,PLT_001,0 4,34624,35067.0,35127
+avec_imputation,SUP_00118,PLT_001,1,38709,40824.0,35127
+avec_imputation,SUP_00118,PLT_001,1 2,35966,,35127
+avec_imputation,SUP_00118,PLT_001,1 2 3,35127,,35127
+avec_imputation,SUP_00118,PLT_001,1 2 3 4,29925,,35127
+avec_imputation,SUP_00118,PLT_001,1 2 4,29925,,35127
+avec_imputation,SUP_00118,PLT_001,1 3,35127,,35127
+avec_imputation,SUP_00118,PLT_001,1 3 4,29925,,35127
+avec_imputation,SUP_00118,PLT_001,1 4,35127,,35127
+avec_imputation,SUP_00118,PLT_001,2,37215,42108.0,35127
+avec_imputation,SUP_00118,PLT_001,2 3,35127,,35127
+avec_imputation,SUP_00118,PLT_001,2 3 4,29925,,35127
+avec_imputation,SUP_00118,PLT_001,2 4,35127,,35127
+avec_imputation,SUP_00118,PLT_001,3,35887,42326.0,35127
+avec_imputation,SUP_00118,PLT_001,3 4,35127,,35127
+avec_imputation,SUP_00118,PLT_001,4,35127,45185.0,35127
+avec_imputation,SUP_00145,PLT_002,0,54788,55225.0,52936
+avec_imputation,SUP_00145,PLT_002,0 1,52936,,52936
+avec_imputation,SUP_00145,PLT_002,0 1 2,52936,,52936
+avec_imputation,SUP_00145,PLT_002,0 1 2 3,49858,,52936
+avec_imputation,SUP_00145,PLT_002,0 1 2 3 4,48559,,52936
+avec_imputation,SUP_00145,PLT_002,0 1 2 4,49084,,52936
+avec_imputation,SUP_00145,PLT_002,0 1 3,52936,,52936
+avec_imputation,SUP_00145,PLT_002,0 1 3 4,52135,52650.0,52936
+avec_imputation,SUP_00145,PLT_002,0 1 4,52220,52650.0,52936
+avec_imputation,SUP_00145,PLT_002,0 2,52936,,52936
+avec_imputation,SUP_00145,PLT_002,0 2 3,52936,,52936
+avec_imputation,SUP_00145,PLT_002,0 2 3 4,49757,,52936
+avec_imputation,SUP_00145,PLT_002,0 2 4,49757,,52936
+avec_imputation,SUP_00145,PLT_002,0 3,52936,,52936
+avec_imputation,SUP_00145,PLT_002,0 3 4,49945,,52936
+avec_imputation,SUP_00145,PLT_002,0 4,53114,,52936
+avec_imputation,SUP_00145,PLT_002,1,54230,57475.0,52936
+avec_imputation,SUP_00145,PLT_002,1 2,52936,,52936
+avec_imputation,SUP_00145,PLT_002,1 2 3,52936,,52936
+avec_imputation,SUP_00145,PLT_002,1 2 3 4,50205,,52936
+avec_imputation,SUP_00145,PLT_002,1 2 4,52650,52650.0,52936
+avec_imputation,SUP_00145,PLT_002,1 3,52936,,52936
+avec_imputation,SUP_00145,PLT_002,1 3 4,50205,,52936
+avec_imputation,SUP_00145,PLT_002,1 4,52650,52650.0,52936
+avec_imputation,SUP_00145,PLT_002,2,55722,57446.0,52936
+avec_imputation,SUP_00145,PLT_002,2 3,52936,,52936
+avec_imputation,SUP_00145,PLT_002,2 3 4,50205,,52936
+avec_imputation,SUP_00145,PLT_002,2 4,52936,,52936
+avec_imputation,SUP_00145,PLT_002,3,52936,58023.0,52936
+avec_imputation,SUP_00145,PLT_002,3 4,52917,52917.0,52936
+avec_imputation,SUP_00145,PLT_002,4,53640,60362.0,52936
+avec_imputation,SUP_00145,PLT_004,0,34634,37301.0,33476
+avec_imputation,SUP_00145,PLT_004,0 1,33476,,33476
+avec_imputation,SUP_00145,PLT_004,0 1 2,33476,,33476
+avec_imputation,SUP_00145,PLT_004,0 1 2 3,33476,,33476
+avec_imputation,SUP_00145,PLT_004,0 1 2 3 4,32153,,33476
+avec_imputation,SUP_00145,PLT_004,0 1 2 4,33476,,33476
+avec_imputation,SUP_00145,PLT_004,0 1 3,33476,,33476
+avec_imputation,SUP_00145,PLT_004,0 1 3 4,32153,,33476
+avec_imputation,SUP_00145,PLT_004,0 1 4,32153,34168.0,33476
+avec_imputation,SUP_00145,PLT_004,0 2,33476,,33476
+avec_imputation,SUP_00145,PLT_004,0 2 3,33476,,33476
+avec_imputation,SUP_00145,PLT_004,0 2 3 4,33476,,33476
+avec_imputation,SUP_00145,PLT_004,0 2 4,32153,,33476
+avec_imputation,SUP_00145,PLT_004,0 3,33476,,33476
+avec_imputation,SUP_00145,PLT_004,0 3 4,32153,,33476
+avec_imputation,SUP_00145,PLT_004,0 4,33476,33476.0,33476
+avec_imputation,SUP_00145,PLT_004,1,36042,38152.0,33476
+avec_imputation,SUP_00145,PLT_004,1 2,34861,,33476
+avec_imputation,SUP_00145,PLT_004,1 2 3,33476,,33476
+avec_imputation,SUP_00145,PLT_004,1 2 3 4,33476,,33476
+avec_imputation,SUP_00145,PLT_004,1 2 4,33476,,33476
+avec_imputation,SUP_00145,PLT_004,1 3,33476,,33476
+avec_imputation,SUP_00145,PLT_004,1 3 4,33476,,33476
+avec_imputation,SUP_00145,PLT_004,1 4,33476,,33476
+avec_imputation,SUP_00145,PLT_004,2,38722,41350.0,33476
+avec_imputation,SUP_00145,PLT_004,2 3,36089,,33476
+avec_imputation,SUP_00145,PLT_004,2 3 4,33476,,33476
+avec_imputation,SUP_00145,PLT_004,2 4,33476,,33476
+avec_imputation,SUP_00145,PLT_004,3,36586,42424.0,33476
+avec_imputation,SUP_00145,PLT_004,3 4,33546,,33476
+avec_imputation,SUP_00145,PLT_004,4,35832,43131.0,33476
+avec_imputation,SUP_00149,PLT_004,0,23523,23788.0,23033
+avec_imputation,SUP_00149,PLT_004,0 1,23033,,23033
+avec_imputation,SUP_00149,PLT_004,0 1 2,20993,,23033
+avec_imputation,SUP_00149,PLT_004,0 1 2 3,20903,,23033
+avec_imputation,SUP_00149,PLT_004,0 1 2 3 4,20903,,23033
+avec_imputation,SUP_00149,PLT_004,0 1 2 4,20903,,23033
+avec_imputation,SUP_00149,PLT_004,0 1 3,20903,,23033
+avec_imputation,SUP_00149,PLT_004,0 1 3 4,20903,,23033
+avec_imputation,SUP_00149,PLT_004,0 1 4,20993,,23033
+avec_imputation,SUP_00149,PLT_004,0 2,23033,,23033
+avec_imputation,SUP_00149,PLT_004,0 2 3,20903,,23033
+avec_imputation,SUP_00149,PLT_004,0 2 3 4,20903,,23033
+avec_imputation,SUP_00149,PLT_004,0 2 4,20903,,23033
+avec_imputation,SUP_00149,PLT_004,0 3,23033,,23033
+avec_imputation,SUP_00149,PLT_004,0 3 4,21215,,23033
+avec_imputation,SUP_00149,PLT_004,0 4,22421,23119.0,23033
+avec_imputation,SUP_00149,PLT_004,1,24518,25049.0,23033
+avec_imputation,SUP_00149,PLT_004,1 2,23366,,23033
+avec_imputation,SUP_00149,PLT_004,1 2 3,23033,,23033
+avec_imputation,SUP_00149,PLT_004,1 2 3 4,20903,,23033
+avec_imputation,SUP_00149,PLT_004,1 2 4,20903,23033.0,23033
+avec_imputation,SUP_00149,PLT_004,1 3,23033,,23033
+avec_imputation,SUP_00149,PLT_004,1 3 4,20903,,23033
+avec_imputation,SUP_00149,PLT_004,1 4,23033,,23033
+avec_imputation,SUP_00149,PLT_004,2,25014,26615.0,23033
+avec_imputation,SUP_00149,PLT_004,2 3,23852,,23033
+avec_imputation,SUP_00149,PLT_004,2 3 4,20903,,23033
+avec_imputation,SUP_00149,PLT_004,2 4,23033,,23033
+avec_imputation,SUP_00149,PLT_004,3,25133,28327.0,23033
+avec_imputation,SUP_00149,PLT_004,3 4,23033,,23033
+avec_imputation,SUP_00149,PLT_004,4,23368,29665.0,23033
+sans_imputation_tarifable,SUP_00011,PLT_004,0,31659,32598.0,31579
+sans_imputation_tarifable,SUP_00011,PLT_004,0 1,31579,,31579
+sans_imputation_tarifable,SUP_00011,PLT_004,0 1 2,31579,,31579
+sans_imputation_tarifable,SUP_00011,PLT_004,0 1 2 3,31579,,31579
+sans_imputation_tarifable,SUP_00011,PLT_004,0 1 2 3 4,31579,,31579
+sans_imputation_tarifable,SUP_00011,PLT_004,0 1 2 4,31579,,31579
+sans_imputation_tarifable,SUP_00011,PLT_004,0 1 3,30678,,31579
+sans_imputation_tarifable,SUP_00011,PLT_004,0 1 3 4,30678,,31579
+sans_imputation_tarifable,SUP_00011,PLT_004,0 1 4,30678,,31579
+sans_imputation_tarifable,SUP_00011,PLT_004,0 2,31579,,31579
+sans_imputation_tarifable,SUP_00011,PLT_004,0 2 3,30678,,31579
+sans_imputation_tarifable,SUP_00011,PLT_004,0 2 3 4,30678,,31579
+sans_imputation_tarifable,SUP_00011,PLT_004,0 2 4,30678,,31579
+sans_imputation_tarifable,SUP_00011,PLT_004,0 3,31579,,31579
+sans_imputation_tarifable,SUP_00011,PLT_004,0 3 4,30678,,31579
+sans_imputation_tarifable,SUP_00011,PLT_004,0 4,30678,31579.0,31579
+sans_imputation_tarifable,SUP_00011,PLT_004,1,33107,37023.0,31579
+sans_imputation_tarifable,SUP_00011,PLT_004,1 2,31579,,31579
+sans_imputation_tarifable,SUP_00011,PLT_004,1 2 3,31579,,31579
+sans_imputation_tarifable,SUP_00011,PLT_004,1 2 3 4,31579,,31579
+sans_imputation_tarifable,SUP_00011,PLT_004,1 2 4,31579,,31579
+sans_imputation_tarifable,SUP_00011,PLT_004,1 3,31579,,31579
+sans_imputation_tarifable,SUP_00011,PLT_004,1 3 4,31579,,31579
+sans_imputation_tarifable,SUP_00011,PLT_004,1 4,31579,,31579
+sans_imputation_tarifable,SUP_00011,PLT_004,2,33336,37188.0,31579
+sans_imputation_tarifable,SUP_00011,PLT_004,2 3,31579,,31579
+sans_imputation_tarifable,SUP_00011,PLT_004,2 3 4,31579,,31579
+sans_imputation_tarifable,SUP_00011,PLT_004,2 4,31579,,31579
+sans_imputation_tarifable,SUP_00011,PLT_004,3,32344,38994.0,31579
+sans_imputation_tarifable,SUP_00011,PLT_004,3 4,31579,,31579
+sans_imputation_tarifable,SUP_00011,PLT_004,4,31659,38820.0,31579
+sans_imputation_tarifable,SUP_00035,PLT_002,0,12927,13394.0,12276
+sans_imputation_tarifable,SUP_00035,PLT_002,0 1,12276,,12276
+sans_imputation_tarifable,SUP_00035,PLT_002,0 1 2,12276,,12276
+sans_imputation_tarifable,SUP_00035,PLT_002,0 1 2 3,12276,,12276
+sans_imputation_tarifable,SUP_00035,PLT_002,0 1 2 3 4,12276,,12276
+sans_imputation_tarifable,SUP_00035,PLT_002,0 1 2 4,12276,,12276
+sans_imputation_tarifable,SUP_00035,PLT_002,0 1 3,10502,,12276
+sans_imputation_tarifable,SUP_00035,PLT_002,0 1 3 4,9506,,12276
+sans_imputation_tarifable,SUP_00035,PLT_002,0 1 4,9506,,12276
+sans_imputation_tarifable,SUP_00035,PLT_002,0 2,12276,,12276
+sans_imputation_tarifable,SUP_00035,PLT_002,0 2 3,12276,,12276
+sans_imputation_tarifable,SUP_00035,PLT_002,0 2 3 4,12276,,12276
+sans_imputation_tarifable,SUP_00035,PLT_002,0 2 4,10290,,12276
+sans_imputation_tarifable,SUP_00035,PLT_002,0 3,10941,,12276
+sans_imputation_tarifable,SUP_00035,PLT_002,0 3 4,10713,,12276
+sans_imputation_tarifable,SUP_00035,PLT_002,0 4,12101,12171.0,12276
+sans_imputation_tarifable,SUP_00035,PLT_002,1,12578,15337.0,12276
+sans_imputation_tarifable,SUP_00035,PLT_002,1 2,12276,,12276
+sans_imputation_tarifable,SUP_00035,PLT_002,1 2 3,12276,,12276
+sans_imputation_tarifable,SUP_00035,PLT_002,1 2 3 4,9783,,12276
+sans_imputation_tarifable,SUP_00035,PLT_002,1 2 4,10249,,12276
+sans_imputation_tarifable,SUP_00035,PLT_002,1 3,12276,,12276
+sans_imputation_tarifable,SUP_00035,PLT_002,1 3 4,9783,,12276
+sans_imputation_tarifable,SUP_00035,PLT_002,1 4,10249,12276.0,12276
+sans_imputation_tarifable,SUP_00035,PLT_002,2,13142,14837.0,12276
+sans_imputation_tarifable,SUP_00035,PLT_002,2 3,12344,,12276
+sans_imputation_tarifable,SUP_00035,PLT_002,2 3 4,10388,,12276
+sans_imputation_tarifable,SUP_00035,PLT_002,2 4,10854,,12276
+sans_imputation_tarifable,SUP_00035,PLT_002,3,12344,13899.0,12276
+sans_imputation_tarifable,SUP_00035,PLT_002,3 4,11120,,12276
+sans_imputation_tarifable,SUP_00035,PLT_002,4,12171,12171.0,12276
+sans_imputation_tarifable,SUP_00037,PLT_002,0,46203,47875.0,42120
+sans_imputation_tarifable,SUP_00037,PLT_002,0 1,41470,42120.0,42120
+sans_imputation_tarifable,SUP_00037,PLT_002,0 1 2,40627,,42120
+sans_imputation_tarifable,SUP_00037,PLT_002,0 1 2 3,40627,,42120
+sans_imputation_tarifable,SUP_00037,PLT_002,0 1 2 3 4,40627,,42120
+sans_imputation_tarifable,SUP_00037,PLT_002,0 1 2 4,40627,,42120
+sans_imputation_tarifable,SUP_00037,PLT_002,0 1 3,40627,,42120
+sans_imputation_tarifable,SUP_00037,PLT_002,0 1 3 4,40627,,42120
+sans_imputation_tarifable,SUP_00037,PLT_002,0 1 4,40627,,42120
+sans_imputation_tarifable,SUP_00037,PLT_002,0 2,41470,42120.0,42120
+sans_imputation_tarifable,SUP_00037,PLT_002,0 2 3,40627,,42120
+sans_imputation_tarifable,SUP_00037,PLT_002,0 2 3 4,40627,,42120
+sans_imputation_tarifable,SUP_00037,PLT_002,0 2 4,40627,,42120
+sans_imputation_tarifable,SUP_00037,PLT_002,0 3,40627,41064.0,42120
+sans_imputation_tarifable,SUP_00037,PLT_002,0 3 4,40628,43560.0,42120
+sans_imputation_tarifable,SUP_00037,PLT_002,0 4,43301,,42120
+sans_imputation_tarifable,SUP_00037,PLT_002,1,41470,42120.0,42120
+sans_imputation_tarifable,SUP_00037,PLT_002,1 2,40627,,42120
+sans_imputation_tarifable,SUP_00037,PLT_002,1 2 3,40627,,42120
+sans_imputation_tarifable,SUP_00037,PLT_002,1 2 3 4,40627,,42120
+sans_imputation_tarifable,SUP_00037,PLT_002,1 2 4,40627,,42120
+sans_imputation_tarifable,SUP_00037,PLT_002,1 3,40627,42120.0,42120
+sans_imputation_tarifable,SUP_00037,PLT_002,1 3 4,40627,,42120
+sans_imputation_tarifable,SUP_00037,PLT_002,1 4,40627,43560.0,42120
+sans_imputation_tarifable,SUP_00037,PLT_002,2,41470,42120.0,42120
+sans_imputation_tarifable,SUP_00037,PLT_002,2 3,41470,42120.0,42120
+sans_imputation_tarifable,SUP_00037,PLT_002,2 3 4,40627,41064.0,42120
+sans_imputation_tarifable,SUP_00037,PLT_002,2 4,40627,44616.0,42120
+sans_imputation_tarifable,SUP_00037,PLT_002,3,42120,43301.0,42120
+sans_imputation_tarifable,SUP_00037,PLT_002,3 4,40627,42120.0,42120
+sans_imputation_tarifable,SUP_00037,PLT_002,4,43301,55594.0,42120
+sans_imputation_tarifable,SUP_00041,PLT_004,0,18723,20145.0,18320
+sans_imputation_tarifable,SUP_00041,PLT_004,0 1,18320,,18320
+sans_imputation_tarifable,SUP_00041,PLT_004,0 1 2,18320,,18320
+sans_imputation_tarifable,SUP_00041,PLT_004,0 1 2 3,18320,,18320
+sans_imputation_tarifable,SUP_00041,PLT_004,0 1 2 3 4,18320,,18320
+sans_imputation_tarifable,SUP_00041,PLT_004,0 1 2 4,18320,,18320
+sans_imputation_tarifable,SUP_00041,PLT_004,0 1 3,17268,,18320
+sans_imputation_tarifable,SUP_00041,PLT_004,0 1 3 4,17268,,18320
+sans_imputation_tarifable,SUP_00041,PLT_004,0 1 4,17268,,18320
+sans_imputation_tarifable,SUP_00041,PLT_004,0 2,18320,,18320
+sans_imputation_tarifable,SUP_00041,PLT_004,0 2 3,18320,,18320
+sans_imputation_tarifable,SUP_00041,PLT_004,0 2 3 4,18320,,18320
+sans_imputation_tarifable,SUP_00041,PLT_004,0 2 4,18320,,18320
+sans_imputation_tarifable,SUP_00041,PLT_004,0 3,18320,,18320
+sans_imputation_tarifable,SUP_00041,PLT_004,0 3 4,17268,,18320
+sans_imputation_tarifable,SUP_00041,PLT_004,0 4,18320,,18320
+sans_imputation_tarifable,SUP_00041,PLT_004,1,18320,19333.0,18320
+sans_imputation_tarifable,SUP_00041,PLT_004,1 2,18320,,18320
+sans_imputation_tarifable,SUP_00041,PLT_004,1 2 3,18320,,18320
+sans_imputation_tarifable,SUP_00041,PLT_004,1 2 3 4,17268,,18320
+sans_imputation_tarifable,SUP_00041,PLT_004,1 2 4,17268,,18320
+sans_imputation_tarifable,SUP_00041,PLT_004,1 3,18320,,18320
+sans_imputation_tarifable,SUP_00041,PLT_004,1 3 4,17268,,18320
+sans_imputation_tarifable,SUP_00041,PLT_004,1 4,17268,18320.0,18320
+sans_imputation_tarifable,SUP_00041,PLT_004,2,19713,20759.0,18320
+sans_imputation_tarifable,SUP_00041,PLT_004,2 3,18320,,18320
+sans_imputation_tarifable,SUP_00041,PLT_004,2 3 4,18320,,18320
+sans_imputation_tarifable,SUP_00041,PLT_004,2 4,18320,,18320
+sans_imputation_tarifable,SUP_00041,PLT_004,3,18768,20741.0,18320
+sans_imputation_tarifable,SUP_00041,PLT_004,3 4,18320,,18320
+sans_imputation_tarifable,SUP_00041,PLT_004,4,18320,20548.0,18320
+sans_imputation_tarifable,SUP_00045,PLT_001,0,30907,34099.0,30907
+sans_imputation_tarifable,SUP_00045,PLT_001,0 1,30907,,30907
+sans_imputation_tarifable,SUP_00045,PLT_001,0 1 2,30907,,30907
+sans_imputation_tarifable,SUP_00045,PLT_001,0 1 2 3,28922,,30907
+sans_imputation_tarifable,SUP_00045,PLT_001,0 1 2 3 4,28922,,30907
+sans_imputation_tarifable,SUP_00045,PLT_001,0 1 2 4,28922,,30907
+sans_imputation_tarifable,SUP_00045,PLT_001,0 1 3,28922,,30907
+sans_imputation_tarifable,SUP_00045,PLT_001,0 1 3 4,28922,,30907
+sans_imputation_tarifable,SUP_00045,PLT_001,0 1 4,30907,,30907
+sans_imputation_tarifable,SUP_00045,PLT_001,0 2,30907,,30907
+sans_imputation_tarifable,SUP_00045,PLT_001,0 2 3,28922,,30907
+sans_imputation_tarifable,SUP_00045,PLT_001,0 2 3 4,28922,,30907
+sans_imputation_tarifable,SUP_00045,PLT_001,0 2 4,28922,31373.0,30907
+sans_imputation_tarifable,SUP_00045,PLT_001,0 3,28922,,30907
+sans_imputation_tarifable,SUP_00045,PLT_001,0 3 4,30907,,30907
+sans_imputation_tarifable,SUP_00045,PLT_001,0 4,30907,,30907
+sans_imputation_tarifable,SUP_00045,PLT_001,1,31871,32733.0,30907
+sans_imputation_tarifable,SUP_00045,PLT_001,1 2,28922,30907.0,30907
+sans_imputation_tarifable,SUP_00045,PLT_001,1 2 3,28922,,30907
+sans_imputation_tarifable,SUP_00045,PLT_001,1 2 3 4,28922,,30907
+sans_imputation_tarifable,SUP_00045,PLT_001,1 2 4,28922,,30907
+sans_imputation_tarifable,SUP_00045,PLT_001,1 3,30907,32579.0,30907
+sans_imputation_tarifable,SUP_00045,PLT_001,1 3 4,30907,,30907
+sans_imputation_tarifable,SUP_00045,PLT_001,1 4,30907,,30907
+sans_imputation_tarifable,SUP_00045,PLT_001,2,31039,35916.0,30907
+sans_imputation_tarifable,SUP_00045,PLT_001,2 3,30907,,30907
+sans_imputation_tarifable,SUP_00045,PLT_001,2 3 4,30907,,30907
+sans_imputation_tarifable,SUP_00045,PLT_001,2 4,30907,,30907
+sans_imputation_tarifable,SUP_00045,PLT_001,3,32787,36863.0,30907
+sans_imputation_tarifable,SUP_00045,PLT_001,3 4,32077,,30907
+sans_imputation_tarifable,SUP_00045,PLT_001,4,32895,37513.0,30907
+sans_imputation_tarifable,SUP_00053,PLT_001,0,11787,12716.0,11020
+sans_imputation_tarifable,SUP_00053,PLT_001,0 1,11337,,11020
+sans_imputation_tarifable,SUP_00053,PLT_001,0 1 2,11337,,11020
+sans_imputation_tarifable,SUP_00053,PLT_001,0 1 2 3,11020,,11020
+sans_imputation_tarifable,SUP_00053,PLT_001,0 1 2 3 4,11020,,11020
+sans_imputation_tarifable,SUP_00053,PLT_001,0 1 2 4,11020,,11020
+sans_imputation_tarifable,SUP_00053,PLT_001,0 1 3,11020,,11020
+sans_imputation_tarifable,SUP_00053,PLT_001,0 1 3 4,10572,,11020
+sans_imputation_tarifable,SUP_00053,PLT_001,0 1 4,11161,,11020
+sans_imputation_tarifable,SUP_00053,PLT_001,0 2,11337,,11020
+sans_imputation_tarifable,SUP_00053,PLT_001,0 2 3,11020,,11020
+sans_imputation_tarifable,SUP_00053,PLT_001,0 2 3 4,11020,,11020
+sans_imputation_tarifable,SUP_00053,PLT_001,0 2 4,11037,,11020
+sans_imputation_tarifable,SUP_00053,PLT_001,0 3,11020,,11020
+sans_imputation_tarifable,SUP_00053,PLT_001,0 3 4,11020,,11020
+sans_imputation_tarifable,SUP_00053,PLT_001,0 4,11487,11924.0,11020
+sans_imputation_tarifable,SUP_00053,PLT_001,1,11554,11956.0,11020
+sans_imputation_tarifable,SUP_00053,PLT_001,1 2,11554,,11020
+sans_imputation_tarifable,SUP_00053,PLT_001,1 2 3,11020,,11020
+sans_imputation_tarifable,SUP_00053,PLT_001,1 2 3 4,11020,,11020
+sans_imputation_tarifable,SUP_00053,PLT_001,1 2 4,11020,,11020
+sans_imputation_tarifable,SUP_00053,PLT_001,1 3,10572,11020.0,11020
+sans_imputation_tarifable,SUP_00053,PLT_001,1 3 4,11020,,11020
+sans_imputation_tarifable,SUP_00053,PLT_001,1 4,11161,,11020
+sans_imputation_tarifable,SUP_00053,PLT_001,2,13304,13304.0,11020
+sans_imputation_tarifable,SUP_00053,PLT_001,2 3,11186,,11020
+sans_imputation_tarifable,SUP_00053,PLT_001,2 3 4,11020,,11020
+sans_imputation_tarifable,SUP_00053,PLT_001,2 4,11337,,11020
+sans_imputation_tarifable,SUP_00053,PLT_001,3,11186,14049.0,11020
+sans_imputation_tarifable,SUP_00053,PLT_001,3 4,11020,,11020
+sans_imputation_tarifable,SUP_00053,PLT_001,4,11924,13794.0,11020
+sans_imputation_tarifable,SUP_00080,PLT_004,0,31505,31505.0,29124
+sans_imputation_tarifable,SUP_00080,PLT_004,0 1,29124,,29124
+sans_imputation_tarifable,SUP_00080,PLT_004,0 1 2,29124,,29124
+sans_imputation_tarifable,SUP_00080,PLT_004,0 1 2 3,23077,,29124
+sans_imputation_tarifable,SUP_00080,PLT_004,0 1 2 3 4,21914,,29124
+sans_imputation_tarifable,SUP_00080,PLT_004,0 1 2 4,24127,,29124
+sans_imputation_tarifable,SUP_00080,PLT_004,0 1 3,29124,,29124
+sans_imputation_tarifable,SUP_00080,PLT_004,0 1 3 4,22465,,29124
+sans_imputation_tarifable,SUP_00080,PLT_004,0 1 4,26494,,29124
+sans_imputation_tarifable,SUP_00080,PLT_004,0 2,29124,,29124
+sans_imputation_tarifable,SUP_00080,PLT_004,0 2 3,29124,,29124
+sans_imputation_tarifable,SUP_00080,PLT_004,0 2 3 4,29124,,29124
+sans_imputation_tarifable,SUP_00080,PLT_004,0 2 4,29124,,29124
+sans_imputation_tarifable,SUP_00080,PLT_004,0 3,29124,,29124
+sans_imputation_tarifable,SUP_00080,PLT_004,0 3 4,29124,,29124
+sans_imputation_tarifable,SUP_00080,PLT_004,0 4,29124,29124.0,29124
+sans_imputation_tarifable,SUP_00080,PLT_004,1,32296,33862.0,29124
+sans_imputation_tarifable,SUP_00080,PLT_004,1 2,29856,,29124
+sans_imputation_tarifable,SUP_00080,PLT_004,1 2 3,29124,,29124
+sans_imputation_tarifable,SUP_00080,PLT_004,1 2 3 4,23043,,29124
+sans_imputation_tarifable,SUP_00080,PLT_004,1 2 4,29124,,29124
+sans_imputation_tarifable,SUP_00080,PLT_004,1 3,29124,,29124
+sans_imputation_tarifable,SUP_00080,PLT_004,1 3 4,23767,,29124
+sans_imputation_tarifable,SUP_00080,PLT_004,1 4,29124,,29124
+sans_imputation_tarifable,SUP_00080,PLT_004,2,32604,35993.0,29124
+sans_imputation_tarifable,SUP_00080,PLT_004,2 3,29124,,29124
+sans_imputation_tarifable,SUP_00080,PLT_004,2 3 4,29124,,29124
+sans_imputation_tarifable,SUP_00080,PLT_004,2 4,29124,,29124
+sans_imputation_tarifable,SUP_00080,PLT_004,3,30446,36220.0,29124
+sans_imputation_tarifable,SUP_00080,PLT_004,3 4,29124,,29124
+sans_imputation_tarifable,SUP_00080,PLT_004,4,29124,37291.0,29124
+sans_imputation_tarifable,SUP_00085,PLT_004,0,49080,49080.0,45296
+sans_imputation_tarifable,SUP_00085,PLT_004,0 1,49080,,45296
+sans_imputation_tarifable,SUP_00085,PLT_004,0 1 2,48847,,45296
+sans_imputation_tarifable,SUP_00085,PLT_004,0 1 2 3,45296,,45296
+sans_imputation_tarifable,SUP_00085,PLT_004,0 1 2 3 4,41290,45296.0,45296
+sans_imputation_tarifable,SUP_00085,PLT_004,0 1 2 4,45296,,45296
+sans_imputation_tarifable,SUP_00085,PLT_004,0 1 3,45296,,45296
+sans_imputation_tarifable,SUP_00085,PLT_004,0 1 3 4,45296,,45296
+sans_imputation_tarifable,SUP_00085,PLT_004,0 1 4,48847,,45296
+sans_imputation_tarifable,SUP_00085,PLT_004,0 2,48847,,45296
+sans_imputation_tarifable,SUP_00085,PLT_004,0 2 3,45296,,45296
+sans_imputation_tarifable,SUP_00085,PLT_004,0 2 3 4,45296,,45296
+sans_imputation_tarifable,SUP_00085,PLT_004,0 2 4,46118,,45296
+sans_imputation_tarifable,SUP_00085,PLT_004,0 3,49080,,45296
+sans_imputation_tarifable,SUP_00085,PLT_004,0 3 4,49080,,45296
+sans_imputation_tarifable,SUP_00085,PLT_004,0 4,49080,,45296
+sans_imputation_tarifable,SUP_00085,PLT_004,1,55779,55779.0,45296
+sans_imputation_tarifable,SUP_00085,PLT_004,1 2,55779,,45296
+sans_imputation_tarifable,SUP_00085,PLT_004,1 2 3,53387,,45296
+sans_imputation_tarifable,SUP_00085,PLT_004,1 2 3 4,45296,,45296
+sans_imputation_tarifable,SUP_00085,PLT_004,1 2 4,45296,,45296
+sans_imputation_tarifable,SUP_00085,PLT_004,1 3,53387,,45296
+sans_imputation_tarifable,SUP_00085,PLT_004,1 3 4,45440,,45296
+sans_imputation_tarifable,SUP_00085,PLT_004,1 4,49080,,45296
+sans_imputation_tarifable,SUP_00085,PLT_004,2,57260,61800.0,45296
+sans_imputation_tarifable,SUP_00085,PLT_004,2 3,55101,,45296
+sans_imputation_tarifable,SUP_00085,PLT_004,2 3 4,49080,,45296
+sans_imputation_tarifable,SUP_00085,PLT_004,2 4,49080,,45296
+sans_imputation_tarifable,SUP_00085,PLT_004,3,55101,67091.0,45296
+sans_imputation_tarifable,SUP_00085,PLT_004,3 4,49080,,45296
+sans_imputation_tarifable,SUP_00085,PLT_004,4,49080,49080.0,45296
+sans_imputation_tarifable,SUP_00087,PLT_004,0,33957,35701.0,33957
+sans_imputation_tarifable,SUP_00087,PLT_004,0 1,33957,,33957
+sans_imputation_tarifable,SUP_00087,PLT_004,0 1 2,33957,,33957
+sans_imputation_tarifable,SUP_00087,PLT_004,0 1 2 3,33957,,33957
+sans_imputation_tarifable,SUP_00087,PLT_004,0 1 2 3 4,33957,,33957
+sans_imputation_tarifable,SUP_00087,PLT_004,0 1 2 4,33957,,33957
+sans_imputation_tarifable,SUP_00087,PLT_004,0 1 3,33957,,33957
+sans_imputation_tarifable,SUP_00087,PLT_004,0 1 3 4,29651,,33957
+sans_imputation_tarifable,SUP_00087,PLT_004,0 1 4,33957,,33957
+sans_imputation_tarifable,SUP_00087,PLT_004,0 2,33957,,33957
+sans_imputation_tarifable,SUP_00087,PLT_004,0 2 3,33957,,33957
+sans_imputation_tarifable,SUP_00087,PLT_004,0 2 3 4,29651,,33957
+sans_imputation_tarifable,SUP_00087,PLT_004,0 2 4,33957,,33957
+sans_imputation_tarifable,SUP_00087,PLT_004,0 3,33957,,33957
+sans_imputation_tarifable,SUP_00087,PLT_004,0 3 4,29855,,33957
+sans_imputation_tarifable,SUP_00087,PLT_004,0 4,31846,33957.0,33957
+sans_imputation_tarifable,SUP_00087,PLT_004,1,36059,37248.0,33957
+sans_imputation_tarifable,SUP_00087,PLT_004,1 2,34037,,33957
+sans_imputation_tarifable,SUP_00087,PLT_004,1 2 3,33957,,33957
+sans_imputation_tarifable,SUP_00087,PLT_004,1 2 3 4,33957,,33957
+sans_imputation_tarifable,SUP_00087,PLT_004,1 2 4,33957,,33957
+sans_imputation_tarifable,SUP_00087,PLT_004,1 3,33957,,33957
+sans_imputation_tarifable,SUP_00087,PLT_004,1 3 4,29651,,33957
+sans_imputation_tarifable,SUP_00087,PLT_004,1 4,33957,,33957
+sans_imputation_tarifable,SUP_00087,PLT_004,2,36573,39502.0,33957
+sans_imputation_tarifable,SUP_00087,PLT_004,2 3,33957,,33957
+sans_imputation_tarifable,SUP_00087,PLT_004,2 3 4,33957,,33957
+sans_imputation_tarifable,SUP_00087,PLT_004,2 4,33957,,33957
+sans_imputation_tarifable,SUP_00087,PLT_004,3,34302,41374.0,33957
+sans_imputation_tarifable,SUP_00087,PLT_004,3 4,33957,,33957
+sans_imputation_tarifable,SUP_00087,PLT_004,4,33957,43353.0,33957
+sans_imputation_tarifable,SUP_00091,PLT_004,0,13614,14278.0,13486
+sans_imputation_tarifable,SUP_00091,PLT_004,0 1,12225,,13486
+sans_imputation_tarifable,SUP_00091,PLT_004,0 1 2,13486,,13486
+sans_imputation_tarifable,SUP_00091,PLT_004,0 1 2 3,13486,,13486
+sans_imputation_tarifable,SUP_00091,PLT_004,0 1 2 3 4,11124,,13486
+sans_imputation_tarifable,SUP_00091,PLT_004,0 1 2 4,11124,,13486
+sans_imputation_tarifable,SUP_00091,PLT_004,0 1 3,13273,13439.0,13486
+sans_imputation_tarifable,SUP_00091,PLT_004,0 1 3 4,11599,,13486
+sans_imputation_tarifable,SUP_00091,PLT_004,0 1 4,11599,,13486
+sans_imputation_tarifable,SUP_00091,PLT_004,0 2,11675,,13486
+sans_imputation_tarifable,SUP_00091,PLT_004,0 2 3,13486,,13486
+sans_imputation_tarifable,SUP_00091,PLT_004,0 2 3 4,11599,,13486
+sans_imputation_tarifable,SUP_00091,PLT_004,0 2 4,11599,,13486
+sans_imputation_tarifable,SUP_00091,PLT_004,0 3,12045,,13486
+sans_imputation_tarifable,SUP_00091,PLT_004,0 3 4,11713,,13486
+sans_imputation_tarifable,SUP_00091,PLT_004,0 4,13170,13186.0,13486
+sans_imputation_tarifable,SUP_00091,PLT_004,1,13486,14406.0,13486
+sans_imputation_tarifable,SUP_00091,PLT_004,1 2,12186,,13486
+sans_imputation_tarifable,SUP_00091,PLT_004,1 2 3,13486,,13486
+sans_imputation_tarifable,SUP_00091,PLT_004,1 2 3 4,11124,,13486
+sans_imputation_tarifable,SUP_00091,PLT_004,1 2 4,11124,,13486
+sans_imputation_tarifable,SUP_00091,PLT_004,1 3,13175,13413.0,13486
+sans_imputation_tarifable,SUP_00091,PLT_004,1 3 4,11599,,13486
+sans_imputation_tarifable,SUP_00091,PLT_004,1 4,11599,13486.0,13486
+sans_imputation_tarifable,SUP_00091,PLT_004,2,13486,14612.0,13486
+sans_imputation_tarifable,SUP_00091,PLT_004,2 3,13486,,13486
+sans_imputation_tarifable,SUP_00091,PLT_004,2 3 4,11599,,13486
+sans_imputation_tarifable,SUP_00091,PLT_004,2 4,13303,13375.0,13486
+sans_imputation_tarifable,SUP_00091,PLT_004,3,13710,15310.0,13486
+sans_imputation_tarifable,SUP_00091,PLT_004,3 4,13258,13423.0,13486
+sans_imputation_tarifable,SUP_00091,PLT_004,4,13486,15764.0,13486
+sans_imputation_tarifable,SUP_00094,PLT_004,0,20233,20261.0,19352
+sans_imputation_tarifable,SUP_00094,PLT_004,0 1,19352,,19352
+sans_imputation_tarifable,SUP_00094,PLT_004,0 1 2,19352,,19352
+sans_imputation_tarifable,SUP_00094,PLT_004,0 1 2 3,19352,,19352
+sans_imputation_tarifable,SUP_00094,PLT_004,0 1 2 3 4,19352,,19352
+sans_imputation_tarifable,SUP_00094,PLT_004,0 1 2 4,19352,,19352
+sans_imputation_tarifable,SUP_00094,PLT_004,0 1 3,19352,,19352
+sans_imputation_tarifable,SUP_00094,PLT_004,0 1 3 4,19352,,19352
+sans_imputation_tarifable,SUP_00094,PLT_004,0 1 4,17364,,19352
+sans_imputation_tarifable,SUP_00094,PLT_004,0 2,19352,,19352
+sans_imputation_tarifable,SUP_00094,PLT_004,0 2 3,19352,,19352
+sans_imputation_tarifable,SUP_00094,PLT_004,0 2 3 4,19352,,19352
+sans_imputation_tarifable,SUP_00094,PLT_004,0 2 4,17364,,19352
+sans_imputation_tarifable,SUP_00094,PLT_004,0 3,19352,,19352
+sans_imputation_tarifable,SUP_00094,PLT_004,0 3 4,17364,,19352
+sans_imputation_tarifable,SUP_00094,PLT_004,0 4,18608,19352.0,19352
+sans_imputation_tarifable,SUP_00094,PLT_004,1,19929,21806.0,19352
+sans_imputation_tarifable,SUP_00094,PLT_004,1 2,19352,,19352
+sans_imputation_tarifable,SUP_00094,PLT_004,1 2 3,19352,,19352
+sans_imputation_tarifable,SUP_00094,PLT_004,1 2 3 4,19352,,19352
+sans_imputation_tarifable,SUP_00094,PLT_004,1 2 4,19352,,19352
+sans_imputation_tarifable,SUP_00094,PLT_004,1 3,19352,,19352
+sans_imputation_tarifable,SUP_00094,PLT_004,1 3 4,19352,,19352
+sans_imputation_tarifable,SUP_00094,PLT_004,1 4,19352,,19352
+sans_imputation_tarifable,SUP_00094,PLT_004,2,20823,23068.0,19352
+sans_imputation_tarifable,SUP_00094,PLT_004,2 3,19457,,19352
+sans_imputation_tarifable,SUP_00094,PLT_004,2 3 4,19352,,19352
+sans_imputation_tarifable,SUP_00094,PLT_004,2 4,19352,,19352
+sans_imputation_tarifable,SUP_00094,PLT_004,3,20823,24591.0,19352
+sans_imputation_tarifable,SUP_00094,PLT_004,3 4,19352,,19352
+sans_imputation_tarifable,SUP_00094,PLT_004,4,19352,19806.0,19352
+sans_imputation_tarifable,SUP_00107,PLT_001,0,18647,19023.0,16477
+sans_imputation_tarifable,SUP_00107,PLT_001,0 1,16477,,16477
+sans_imputation_tarifable,SUP_00107,PLT_001,0 1 2,16477,,16477
+sans_imputation_tarifable,SUP_00107,PLT_001,0 1 2 3,15624,,16477
+sans_imputation_tarifable,SUP_00107,PLT_001,0 1 2 3 4,15624,,16477
+sans_imputation_tarifable,SUP_00107,PLT_001,0 1 2 4,16477,,16477
+sans_imputation_tarifable,SUP_00107,PLT_001,0 1 3,15624,,16477
+sans_imputation_tarifable,SUP_00107,PLT_001,0 1 3 4,15624,,16477
+sans_imputation_tarifable,SUP_00107,PLT_001,0 1 4,16477,,16477
+sans_imputation_tarifable,SUP_00107,PLT_001,0 2,16477,,16477
+sans_imputation_tarifable,SUP_00107,PLT_001,0 2 3,15624,,16477
+sans_imputation_tarifable,SUP_00107,PLT_001,0 2 3 4,15624,,16477
+sans_imputation_tarifable,SUP_00107,PLT_001,0 2 4,16477,,16477
+sans_imputation_tarifable,SUP_00107,PLT_001,0 3,15932,16220.0,16477
+sans_imputation_tarifable,SUP_00107,PLT_001,0 3 4,15624,,16477
+sans_imputation_tarifable,SUP_00107,PLT_001,0 4,18110,,16477
+sans_imputation_tarifable,SUP_00107,PLT_001,1,16846,19490.0,16477
+sans_imputation_tarifable,SUP_00107,PLT_001,1 2,16477,,16477
+sans_imputation_tarifable,SUP_00107,PLT_001,1 2 3,15624,,16477
+sans_imputation_tarifable,SUP_00107,PLT_001,1 2 3 4,15624,,16477
+sans_imputation_tarifable,SUP_00107,PLT_001,1 2 4,15624,,16477
+sans_imputation_tarifable,SUP_00107,PLT_001,1 3,15624,,16477
+sans_imputation_tarifable,SUP_00107,PLT_001,1 3 4,15624,,16477
+sans_imputation_tarifable,SUP_00107,PLT_001,1 4,16477,,16477
+sans_imputation_tarifable,SUP_00107,PLT_001,2,17492,19330.0,16477
+sans_imputation_tarifable,SUP_00107,PLT_001,2 3,15624,17941.0,16477
+sans_imputation_tarifable,SUP_00107,PLT_001,2 3 4,15624,,16477
+sans_imputation_tarifable,SUP_00107,PLT_001,2 4,16477,,16477
+sans_imputation_tarifable,SUP_00107,PLT_001,3,16212,16212.0,16477
+sans_imputation_tarifable,SUP_00107,PLT_001,3 4,15624,,16477
+sans_imputation_tarifable,SUP_00107,PLT_001,4,18279,20602.0,16477
+sans_imputation_tarifable,SUP_00118,PLT_001,0,35559,38028.0,35127
+sans_imputation_tarifable,SUP_00118,PLT_001,0 1,35127,,35127
+sans_imputation_tarifable,SUP_00118,PLT_001,0 1 2,35127,,35127
+sans_imputation_tarifable,SUP_00118,PLT_001,0 1 2 3,29192,,35127
+sans_imputation_tarifable,SUP_00118,PLT_001,0 1 2 3 4,29192,,35127
+sans_imputation_tarifable,SUP_00118,PLT_001,0 1 2 4,29925,,35127
+sans_imputation_tarifable,SUP_00118,PLT_001,0 1 3,35127,,35127
+sans_imputation_tarifable,SUP_00118,PLT_001,0 1 3 4,29925,,35127
+sans_imputation_tarifable,SUP_00118,PLT_001,0 1 4,30855,,35127
+sans_imputation_tarifable,SUP_00118,PLT_001,0 2,35127,,35127
+sans_imputation_tarifable,SUP_00118,PLT_001,0 2 3,29925,,35127
+sans_imputation_tarifable,SUP_00118,PLT_001,0 2 3 4,29925,,35127
+sans_imputation_tarifable,SUP_00118,PLT_001,0 2 4,29925,,35127
+sans_imputation_tarifable,SUP_00118,PLT_001,0 3,35127,,35127
+sans_imputation_tarifable,SUP_00118,PLT_001,0 3 4,29925,,35127
+sans_imputation_tarifable,SUP_00118,PLT_001,0 4,34624,35067.0,35127
+sans_imputation_tarifable,SUP_00118,PLT_001,1,38709,40824.0,35127
+sans_imputation_tarifable,SUP_00118,PLT_001,1 2,35966,,35127
+sans_imputation_tarifable,SUP_00118,PLT_001,1 2 3,35127,,35127
+sans_imputation_tarifable,SUP_00118,PLT_001,1 2 3 4,29925,,35127
+sans_imputation_tarifable,SUP_00118,PLT_001,1 2 4,29925,,35127
+sans_imputation_tarifable,SUP_00118,PLT_001,1 3,35127,,35127
+sans_imputation_tarifable,SUP_00118,PLT_001,1 3 4,29925,,35127
+sans_imputation_tarifable,SUP_00118,PLT_001,1 4,35127,,35127
+sans_imputation_tarifable,SUP_00118,PLT_001,2,37215,42108.0,35127
+sans_imputation_tarifable,SUP_00118,PLT_001,2 3,35127,,35127
+sans_imputation_tarifable,SUP_00118,PLT_001,2 3 4,29925,,35127
+sans_imputation_tarifable,SUP_00118,PLT_001,2 4,35127,,35127
+sans_imputation_tarifable,SUP_00118,PLT_001,3,35887,42326.0,35127
+sans_imputation_tarifable,SUP_00118,PLT_001,3 4,35127,,35127
+sans_imputation_tarifable,SUP_00118,PLT_001,4,35127,45185.0,35127
+sans_imputation_tarifable,SUP_00145,PLT_004,0,34634,37301.0,33476
+sans_imputation_tarifable,SUP_00145,PLT_004,0 1,33476,,33476
+sans_imputation_tarifable,SUP_00145,PLT_004,0 1 2,33476,,33476
+sans_imputation_tarifable,SUP_00145,PLT_004,0 1 2 3,33476,,33476
+sans_imputation_tarifable,SUP_00145,PLT_004,0 1 2 3 4,32153,,33476
+sans_imputation_tarifable,SUP_00145,PLT_004,0 1 2 4,33476,,33476
+sans_imputation_tarifable,SUP_00145,PLT_004,0 1 3,33476,,33476
+sans_imputation_tarifable,SUP_00145,PLT_004,0 1 3 4,32153,,33476
+sans_imputation_tarifable,SUP_00145,PLT_004,0 1 4,32153,34168.0,33476
+sans_imputation_tarifable,SUP_00145,PLT_004,0 2,33476,,33476
+sans_imputation_tarifable,SUP_00145,PLT_004,0 2 3,33476,,33476
+sans_imputation_tarifable,SUP_00145,PLT_004,0 2 3 4,33476,,33476
+sans_imputation_tarifable,SUP_00145,PLT_004,0 2 4,32153,,33476
+sans_imputation_tarifable,SUP_00145,PLT_004,0 3,33476,,33476
+sans_imputation_tarifable,SUP_00145,PLT_004,0 3 4,32153,,33476
+sans_imputation_tarifable,SUP_00145,PLT_004,0 4,33476,33476.0,33476
+sans_imputation_tarifable,SUP_00145,PLT_004,1,36042,38152.0,33476
+sans_imputation_tarifable,SUP_00145,PLT_004,1 2,34861,,33476
+sans_imputation_tarifable,SUP_00145,PLT_004,1 2 3,33476,,33476
+sans_imputation_tarifable,SUP_00145,PLT_004,1 2 3 4,33476,,33476
+sans_imputation_tarifable,SUP_00145,PLT_004,1 2 4,33476,,33476
+sans_imputation_tarifable,SUP_00145,PLT_004,1 3,33476,,33476
+sans_imputation_tarifable,SUP_00145,PLT_004,1 3 4,33476,,33476
+sans_imputation_tarifable,SUP_00145,PLT_004,1 4,33476,,33476
+sans_imputation_tarifable,SUP_00145,PLT_004,2,38722,41350.0,33476
+sans_imputation_tarifable,SUP_00145,PLT_004,2 3,36089,,33476
+sans_imputation_tarifable,SUP_00145,PLT_004,2 3 4,33476,,33476
+sans_imputation_tarifable,SUP_00145,PLT_004,2 4,33476,,33476
+sans_imputation_tarifable,SUP_00145,PLT_004,3,36586,42424.0,33476
+sans_imputation_tarifable,SUP_00145,PLT_004,3 4,33546,,33476
+sans_imputation_tarifable,SUP_00145,PLT_004,4,35832,43131.0,33476
+sans_imputation_tarifable,SUP_00149,PLT_004,0,23523,23788.0,23033
+sans_imputation_tarifable,SUP_00149,PLT_004,0 1,23033,,23033
+sans_imputation_tarifable,SUP_00149,PLT_004,0 1 2,20993,,23033
+sans_imputation_tarifable,SUP_00149,PLT_004,0 1 2 3,20903,,23033
+sans_imputation_tarifable,SUP_00149,PLT_004,0 1 2 3 4,20903,,23033
+sans_imputation_tarifable,SUP_00149,PLT_004,0 1 2 4,20903,,23033
+sans_imputation_tarifable,SUP_00149,PLT_004,0 1 3,20903,,23033
+sans_imputation_tarifable,SUP_00149,PLT_004,0 1 3 4,20903,,23033
+sans_imputation_tarifable,SUP_00149,PLT_004,0 1 4,20993,,23033
+sans_imputation_tarifable,SUP_00149,PLT_004,0 2,23033,,23033
+sans_imputation_tarifable,SUP_00149,PLT_004,0 2 3,20903,,23033
+sans_imputation_tarifable,SUP_00149,PLT_004,0 2 3 4,20903,,23033
+sans_imputation_tarifable,SUP_00149,PLT_004,0 2 4,20903,,23033
+sans_imputation_tarifable,SUP_00149,PLT_004,0 3,23033,,23033
+sans_imputation_tarifable,SUP_00149,PLT_004,0 3 4,21215,,23033
+sans_imputation_tarifable,SUP_00149,PLT_004,0 4,22421,23119.0,23033
+sans_imputation_tarifable,SUP_00149,PLT_004,1,24518,25049.0,23033
+sans_imputation_tarifable,SUP_00149,PLT_004,1 2,23366,,23033
+sans_imputation_tarifable,SUP_00149,PLT_004,1 2 3,23033,,23033
+sans_imputation_tarifable,SUP_00149,PLT_004,1 2 3 4,20903,,23033
+sans_imputation_tarifable,SUP_00149,PLT_004,1 2 4,20903,23033.0,23033
+sans_imputation_tarifable,SUP_00149,PLT_004,1 3,23033,,23033
+sans_imputation_tarifable,SUP_00149,PLT_004,1 3 4,20903,,23033
+sans_imputation_tarifable,SUP_00149,PLT_004,1 4,23033,,23033
+sans_imputation_tarifable,SUP_00149,PLT_004,2,25014,26615.0,23033
+sans_imputation_tarifable,SUP_00149,PLT_004,2 3,23852,,23033
+sans_imputation_tarifable,SUP_00149,PLT_004,2 3 4,20903,,23033
+sans_imputation_tarifable,SUP_00149,PLT_004,2 4,23033,,23033
+sans_imputation_tarifable,SUP_00149,PLT_004,3,25133,28327.0,23033
+sans_imputation_tarifable,SUP_00149,PLT_004,3 4,23033,,23033
+sans_imputation_tarifable,SUP_00149,PLT_004,4,23368,29665.0,23033

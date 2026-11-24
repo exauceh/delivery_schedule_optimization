@@ -1,0 +1,352 @@
+scope,supplier_id,plant,lines,method,exact_model,solver_status,upper,reference,trucks,certified,profile,early_trucks,early_lines,run,open_profiles,lower,forced,sans_calendrier,fenetres_separees
+avec_imputation,SUP_00116,PLT_002,3,wissam,True,0,475,1425,1,True,0,0,0,novembre-consolide-prolonge,,475,0,475,475
+sans_imputation_tarifable,SUP_00116,PLT_002,3,wissam,True,0,475,1425,1,True,0,0,0,novembre-consolide-prolonge,,475,0,475,475
+avec_imputation,SUP_00132,PLT_002,1,profil_simple,True,0,666,666,1,True,3,0,0,novembre-consolide-prolonge,,666,0,666,666
+sans_imputation_tarifable,SUP_00132,PLT_002,1,profil_simple,True,0,666,666,1,True,3,0,0,novembre-consolide-prolonge,,666,0,666,666
+avec_imputation,SUP_00122,PLT_002,3,wissam,True,0,692,2076,1,True,4,0,0,novembre-consolide-prolonge,,692,0,692,692
+sans_imputation_tarifable,SUP_00122,PLT_002,3,wissam,True,0,692,2076,1,True,4,0,0,novembre-consolide-prolonge,,692,0,692,692
+avec_imputation,SUP_00118,PLT_003,1,profil_simple,True,0,733,733,1,True,3,0,0,novembre-consolide-prolonge,,733,0,733,733
+sans_imputation_tarifable,SUP_00118,PLT_003,1,profil_simple,True,0,733,733,1,True,3,0,0,novembre-consolide-prolonge,,733,0,733,733
+avec_imputation,SUP_00150,PLT_003,1,profil_simple,True,0,777,777,1,True,1,0,0,novembre-consolide-prolonge,,777,0,777,777
+sans_imputation_tarifable,SUP_00150,PLT_003,1,profil_simple,True,0,777,777,1,True,1,0,0,novembre-consolide-prolonge,,777,0,777,777
+avec_imputation,SUP_00052,PLT_002,1,profil_simple,True,0,826,826,1,True,4,0,0,novembre-consolide-prolonge,,826,0,826,826
+sans_imputation_tarifable,SUP_00052,PLT_002,1,profil_simple,True,0,826,826,1,True,4,0,0,novembre-consolide-prolonge,,826,0,826,826
+avec_imputation,SUP_00009,PLT_004,1,profil_simple,True,0,856,856,1,True,1,0,0,novembre-consolide-prolonge,,856,0,856,856
+avec_imputation,SUP_00149,PLT_002,1,profil_simple,True,0,856,856,1,True,3,0,0,novembre-consolide-prolonge,,856,0,856,856
+sans_imputation_tarifable,SUP_00009,PLT_004,1,profil_simple,True,0,856,856,1,True,1,0,0,novembre-consolide-prolonge,,856,0,856,856
+sans_imputation_tarifable,SUP_00149,PLT_002,1,profil_simple,True,0,856,856,1,True,3,0,0,novembre-consolide-prolonge,,856,0,856,856
+avec_imputation,SUP_00053,PLT_002,5,profil_simple,True,0,950,2375,2,True,3,0,0,novembre-consolide-prolonge,,950,0,475,950
+sans_imputation_tarifable,SUP_00053,PLT_002,5,profil_simple,True,0,950,2375,2,True,3,0,0,novembre-consolide-prolonge,,950,0,475,950
+avec_imputation,SUP_00039,PLT_002,3,wissam,True,0,1027,2199,1,True,4,0,0,novembre-consolide-prolonge,,1027,0,1027,1027
+sans_imputation_tarifable,SUP_00039,PLT_002,3,wissam,True,0,1027,2199,1,True,4,0,0,novembre-consolide-prolonge,,1027,0,1027,1027
+avec_imputation,SUP_00016,PLT_002,1,profil_simple,True,0,1027,1027,1,True,1,0,0,novembre-consolide-prolonge,,1027,0,1027,1027
+sans_imputation_tarifable,SUP_00016,PLT_002,1,profil_simple,True,0,1027,1027,1,True,1,0,0,novembre-consolide-prolonge,,1027,0,1027,1027
+avec_imputation,SUP_00117,PLT_001,1,profil_simple,True,0,1073,1073,1,True,1,0,0,novembre-consolide-prolonge,,1073,0,1073,1073
+sans_imputation_tarifable,SUP_00117,PLT_001,1,profil_simple,True,0,1073,1073,1,True,1,0,0,novembre-consolide-prolonge,,1073,0,1073,1073
+avec_imputation,SUP_00113,PLT_002,3,wissam,True,0,1074,2382,1,True,0,0,0,novembre-consolide-prolonge,,1074,0,1074,1074
+sans_imputation_tarifable,SUP_00113,PLT_002,3,wissam,True,0,1074,2382,1,True,0,0,0,novembre-consolide-prolonge,,1074,0,1074,1074
+avec_imputation,SUP_00094,PLT_002,1,profil_simple,True,0,1074,1074,1,True,0,0,0,novembre-consolide-prolonge,,1074,0,1074,1074
+sans_imputation_tarifable,SUP_00094,PLT_002,1,profil_simple,True,0,1074,1074,1,True,0,0,0,novembre-consolide-prolonge,,1074,0,1074,1074
+avec_imputation,SUP_00130,PLT_001,1,profil_simple,True,0,1183,1183,1,True,1,0,0,novembre-consolide-prolonge,,1183,0,1183,1183
+avec_imputation,SUP_00066,PLT_002,3,wissam,True,0,1306,2568,1,True,4,0,0,novembre-consolide-prolonge,,1306,0,1306,1306
+avec_imputation,SUP_00143,PLT_002,3,wissam,True,0,1306,2568,1,True,4,0,0,novembre-consolide-prolonge,,1306,0,1306,1306
+sans_imputation_tarifable,SUP_00066,PLT_002,3,wissam,True,0,1306,2568,1,True,4,0,0,novembre-consolide-prolonge,,1306,0,1306,1306
+sans_imputation_tarifable,SUP_00143,PLT_002,3,wissam,True,0,1306,2568,1,True,4,0,0,novembre-consolide-prolonge,,1306,0,1306,1306
+avec_imputation,SUP_00068,PLT_002,2,profil_simple,True,0,1306,1712,1,True,3,0,0,novembre-consolide-prolonge,,1306,0,1306,1306
+sans_imputation_tarifable,SUP_00068,PLT_002,2,profil_simple,True,0,1306,1712,1,True,3,0,0,novembre-consolide-prolonge,,1306,0,1306,1306
+avec_imputation,SUP_00020,PLT_002,3,wissam,True,0,1307,2942,1,True,4,0,0,novembre-consolide-prolonge,,1307,0,1307,1307
+avec_imputation,SUP_00033,PLT_002,3,wissam,True,0,1307,2382,1,True,4,0,0,novembre-consolide-prolonge,,1307,0,1307,1307
+sans_imputation_tarifable,SUP_00020,PLT_002,3,wissam,True,0,1307,2942,1,True,4,0,0,novembre-consolide-prolonge,,1307,0,1307,1307
+sans_imputation_tarifable,SUP_00033,PLT_002,3,wissam,True,0,1307,2382,1,True,4,0,0,novembre-consolide-prolonge,,1307,0,1307,1307
+avec_imputation,SUP_00094,PLT_001,1,profil_simple,True,0,1307,1307,1,True,1,0,0,novembre-consolide-prolonge,,1307,0,1307,1307
+avec_imputation,SUP_00099,PLT_003,1,profil_simple,True,0,1307,1307,1,True,3,0,0,novembre-consolide-prolonge,,1307,0,1307,1307
+sans_imputation_tarifable,SUP_00094,PLT_001,1,profil_simple,True,0,1307,1307,1,True,1,0,0,novembre-consolide-prolonge,,1307,0,1307,1307
+sans_imputation_tarifable,SUP_00099,PLT_003,1,profil_simple,True,0,1307,1307,1,True,3,0,0,novembre-consolide-prolonge,,1307,0,1307,1307
+avec_imputation,SUP_00092,PLT_003,1,profil_simple,True,0,1314,1314,1,True,1,0,0,novembre-consolide-prolonge,,1314,0,1314,1314
+avec_imputation,SUP_00128,PLT_003,1,profil_simple,True,0,1314,1314,1,True,3,0,0,novembre-consolide-prolonge,,1314,0,1314,1314
+sans_imputation_tarifable,SUP_00092,PLT_003,1,profil_simple,True,0,1314,1314,1,True,1,0,0,novembre-consolide-prolonge,,1314,0,1314,1314
+sans_imputation_tarifable,SUP_00128,PLT_003,1,profil_simple,True,0,1314,1314,1,True,3,0,0,novembre-consolide-prolonge,,1314,0,1314,1314
+avec_imputation,SUP_00019,PLT_001,2,profil_simple,True,0,1435,2168,1,True,4,0,0,novembre-consolide-prolonge,,1435,0,1435,1435
+sans_imputation_tarifable,SUP_00019,PLT_001,2,profil_simple,True,0,1435,2168,1,True,4,0,0,novembre-consolide-prolonge,,1435,0,1435,1435
+avec_imputation,SUP_00149,PLT_003,2,profil_simple,True,0,1712,1712,2,True,0,0,0,novembre-consolide-prolonge,,1712,0,1306,1712
+sans_imputation_tarifable,SUP_00149,PLT_003,2,profil_simple,True,0,1712,1712,2,True,0,0,0,novembre-consolide-prolonge,,1712,0,1306,1712
+avec_imputation,SUP_00090,PLT_001,1,profil_simple,True,0,1735,1735,1,True,4,0,0,novembre-consolide-prolonge,,1735,0,1735,1735
+sans_imputation_tarifable,SUP_00090,PLT_001,1,profil_simple,True,0,1735,1735,1,True,4,0,0,novembre-consolide-prolonge,,1735,0,1735,1735
+avec_imputation,SUP_00124,PLT_001,2,profil_simple,True,0,1843,1843,1,True,0,0,0,novembre-consolide-prolonge,,1843,0,1843,1843
+sans_imputation_tarifable,SUP_00124,PLT_001,2,profil_simple,True,0,1843,1843,1,True,0,0,0,novembre-consolide-prolonge,,1843,0,1843,1843
+avec_imputation,SUP_00016,PLT_001,4,wissam,True,0,2054,3520,2,True,2,0,0,novembre-consolide-prolonge,,2054,0,1435,2054
+sans_imputation_tarifable,SUP_00016,PLT_001,4,wissam,True,0,2054,3520,2,True,2,0,0,novembre-consolide-prolonge,,2054,0,1435,2054
+avec_imputation,SUP_00010,PLT_001,4,profil_simple,True,0,2076,2768,3,True,3,0,0,novembre-consolide-prolonge,,2076,0,692,2076
+avec_imputation,SUP_00145,PLT_001,4,wissam,True,0,2076,2768,3,True,1 4,0,0,novembre-consolide-prolonge,,2076,0,1314,2076
+sans_imputation_tarifable,SUP_00010,PLT_001,4,profil_simple,True,0,2076,2768,3,True,3,0,0,novembre-consolide-prolonge,,2076,0,692,2076
+sans_imputation_tarifable,SUP_00145,PLT_001,4,wissam,True,0,2076,2768,3,True,1 4,0,0,novembre-consolide-prolonge,,2076,0,1314,2076
+avec_imputation,SUP_00092,PLT_001,3,profil_simple,True,0,2076,2076,3,True,2,0,0,novembre-consolide-prolonge,,2076,0,692,2076
+sans_imputation_tarifable,SUP_00092,PLT_001,3,profil_simple,True,0,2076,2076,3,True,2,0,0,novembre-consolide-prolonge,,2076,0,692,2076
+avec_imputation,SUP_00150,PLT_002,2,wissam,True,0,2517,3848,1,True,4,0,0,novembre-consolide-prolonge,,2517,0,2517,2517
+sans_imputation_tarifable,SUP_00150,PLT_002,2,wissam,True,0,2517,3848,1,True,4,0,0,novembre-consolide-prolonge,,2517,0,2517,2517
+avec_imputation,SUP_00126,PLT_003,1,profil_simple,True,0,2517,2517,1,True,1,0,0,novembre-consolide-prolonge,,2517,0,2517,2517
+sans_imputation_tarifable,SUP_00126,PLT_003,1,profil_simple,True,0,2517,2517,1,True,1,0,0,novembre-consolide-prolonge,,2517,0,2517,2517
+avec_imputation,SUP_00086,PLT_001,4,profil_simple,True,0,2653,2653,3,True,1,0,0,novembre-consolide-prolonge,,2653,0,1557,2653
+sans_imputation_tarifable,SUP_00086,PLT_001,4,profil_simple,True,0,2653,2653,3,True,1,0,0,novembre-consolide-prolonge,,2653,0,1557,2653
+avec_imputation,SUP_00151,PLT_002,8,wissam,True,0,2773,6504,2,True,4,0,0,novembre-consolide-prolonge,,2773,0,2040,2773
+sans_imputation_tarifable,SUP_00151,PLT_002,8,wissam,True,0,2773,6504,2,True,4,0,0,novembre-consolide-prolonge,,2773,0,2040,2773
+avec_imputation,SUP_00130,PLT_002,3,wissam,True,0,2809,5112,1,True,4,0,0,novembre-consolide-prolonge,,2809,0,2809,2809
+avec_imputation,SUP_00149,PLT_001,4,profil_simple,True,0,2848,3452,2,True,2,0,0,novembre-consolide-prolonge,,2848,0,2235,2848
+sans_imputation_tarifable,SUP_00149,PLT_001,4,profil_simple,True,0,2848,3452,2,True,2,0,0,novembre-consolide-prolonge,,2848,0,2235,2848
+avec_imputation,SUP_00061,PLT_004,1,profil_simple,True,0,2902,2902,1,True,0,0,0,novembre-consolide-prolonge,,2902,0,2902,2902
+sans_imputation_tarifable,SUP_00061,PLT_004,1,profil_simple,True,0,2902,2902,1,True,0,0,0,novembre-consolide-prolonge,,2902,0,2902,2902
+avec_imputation,SUP_00086,PLT_002,11,wissam,False,0,3095,5351,1,True,4,0,0,novembre-consolide-prolonge,,3095,0,3095,3095
+sans_imputation_tarifable,SUP_00086,PLT_002,11,wissam,False,0,3095,5351,1,True,4,0,0,novembre-consolide-prolonge,,3095,0,3095,3095
+avec_imputation,SUP_00016,PLT_003,2,profil_simple,True,0,3315,3315,2,True,3,0,0,novembre-consolide-prolonge,,3315,0,2288,3315
+sans_imputation_tarifable,SUP_00016,PLT_003,2,profil_simple,True,0,3315,3315,2,True,3,0,0,novembre-consolide-prolonge,,3315,0,2288,3315
+avec_imputation,SUP_00079,PLT_001,4,profil_simple,True,0,3452,4075,3,True,3,0,0,novembre-consolide-prolonge,,3452,0,2235,3452
+sans_imputation_tarifable,SUP_00079,PLT_001,4,profil_simple,True,0,3452,4075,3,True,3,0,0,novembre-consolide-prolonge,,3452,0,2235,3452
+avec_imputation,SUP_00015,PLT_004,2,profil_simple,True,0,3522,3522,2,True,2,0,0,novembre-consolide-prolonge,,3522,0,2288,3522
+sans_imputation_tarifable,SUP_00015,PLT_004,2,profil_simple,True,0,3522,3522,2,True,2,0,0,novembre-consolide-prolonge,,3522,0,2288,3522
+avec_imputation,SUP_00154,PLT_003,13,wissam,True,0,3549,4487,3,True,3,0,0,novembre-consolide-prolonge,,3549,0,2123,2887
+sans_imputation_tarifable,SUP_00154,PLT_003,13,wissam,True,0,3549,4487,3,True,3,0,0,novembre-consolide-prolonge,,3549,0,2123,2887
+avec_imputation,SUP_00151,PLT_001,8,profil_simple,True,0,3665,5864,5,True,0,0,0,novembre-consolide-prolonge,,3665,0,1027,2932
+sans_imputation_tarifable,SUP_00151,PLT_001,8,profil_simple,True,0,3665,5864,5,True,0,0,0,novembre-consolide-prolonge,,3665,0,1027,2932
+avec_imputation,SUP_00144,PLT_002,6,profil_simple,True,0,3693,5884,3,True,0,0,0,novembre-consolide-prolonge,,3693,0,2096,3175
+sans_imputation_tarifable,SUP_00144,PLT_002,6,profil_simple,True,0,3693,5884,3,True,0,0,0,novembre-consolide-prolonge,,3693,0,2096,3175
+avec_imputation,SUP_00126,PLT_004,3,wissam,True,0,3794,5038,2,True,3,0,0,novembre-consolide-prolonge,,3794,0,2517,3481
+sans_imputation_tarifable,SUP_00126,PLT_004,3,wissam,True,0,3794,5038,2,True,3,0,0,novembre-consolide-prolonge,,3794,0,2517,3481
+avec_imputation,SUP_00080,PLT_003,5,profil_simple,True,0,3800,4378,4,True,2,0,0,novembre-consolide-prolonge,,3800,0,2096,3800
+sans_imputation_tarifable,SUP_00080,PLT_003,5,profil_simple,True,0,3800,4378,4,True,2,0,0,novembre-consolide-prolonge,,3800,0,2096,3800
+avec_imputation,SUP_00087,PLT_001,4,profil_simple,True,0,3929,4548,3,True,1,0,0,novembre-consolide-prolonge,,3929,0,2288,3521
+sans_imputation_tarifable,SUP_00087,PLT_001,4,profil_simple,True,0,3929,4548,3,True,1,0,0,novembre-consolide-prolonge,,3929,0,2288,3521
+avec_imputation,SUP_00060,PLT_003,3,profil_simple,True,0,3942,3942,3,True,1,0,0,novembre-consolide-prolonge,,3942,0,2496,3942
+sans_imputation_tarifable,SUP_00060,PLT_003,3,profil_simple,True,0,3942,3942,3,True,1,0,0,novembre-consolide-prolonge,,3942,0,2496,3942
+avec_imputation,SUP_00055,PLT_003,6,profil_simple,True,0,4065,4065,3,True,3,0,0,novembre-consolide-prolonge,,4065,0,2496,4065
+sans_imputation_tarifable,SUP_00055,PLT_003,6,profil_simple,True,0,4065,4065,3,True,3,0,0,novembre-consolide-prolonge,,4065,0,2496,4065
+avec_imputation,SUP_00066,PLT_001,10,profil_simple,True,0,4154,5857,3,True,1,0,0,novembre-consolide-prolonge,,4154,0,2567,3514
+sans_imputation_tarifable,SUP_00066,PLT_001,10,profil_simple,True,0,4154,5857,3,True,1,0,0,novembre-consolide-prolonge,,4154,0,2567,3514
+sans_imputation_tarifable,SUP_00001,PLT_004,6,profil_simple,True,0,4192,4192,2,True,2,0,0,novembre-consolide-prolonge,,4192,0,3005,4192
+avec_imputation,SUP_00143,PLT_001,5,wissam,True,0,4216,5719,3,True,2,0,0,novembre-consolide-prolonge,,4216,0,2567,3747
+sans_imputation_tarifable,SUP_00143,PLT_001,5,wissam,True,0,4216,5719,3,True,2,0,0,novembre-consolide-prolonge,,4216,0,2567,3747
+sans_imputation_tarifable,SUP_00087,PLT_002,6,wissam,True,0,4231,6392,2,True,4,0,0,novembre-consolide-prolonge,,4231,0,2796,4231
+avec_imputation,SUP_00148,PLT_002,4,wissam,True,0,4244,6869,2,True,4,0,0,novembre-consolide-prolonge,,4244,0,3552,3552
+sans_imputation_tarifable,SUP_00148,PLT_002,4,wissam,True,0,4244,6869,2,True,4,0,0,novembre-consolide-prolonge,,4244,0,3552,3552
+sans_imputation_tarifable,SUP_00107,PLT_002,35,prime_rg06,False,1,4328,9127,5,True,0 2 4,0,0,novembre-consolide-prolonge,,4328,0,2235,3106
+avec_imputation,SUP_00079,PLT_002,9,profil_simple,True,0,4560,6611,4,True,3,0,0,novembre-consolide-prolonge,,4560,0,2567,3487
+sans_imputation_tarifable,SUP_00079,PLT_002,9,profil_simple,True,0,4560,6611,4,True,3,0,0,novembre-consolide-prolonge,,4560,0,2567,3487
+avec_imputation,SUP_00028,PLT_002,30,wissam,False,0,4733,7894,1,True,4,0,0,novembre-consolide-prolonge,,4733,0,4733,4733
+sans_imputation_tarifable,SUP_00028,PLT_002,30,wissam,False,0,4733,7894,1,True,4,0,0,novembre-consolide-prolonge,,4733,0,4733,4733
+avec_imputation,SUP_00118,PLT_002,9,wissam,True,0,4924,7773,4,True,1,0,0,novembre-consolide-prolonge,,4924,0,2040,3897
+sans_imputation_tarifable,SUP_00118,PLT_002,9,wissam,True,0,4924,7773,4,True,1,0,0,novembre-consolide-prolonge,,4924,0,2040,3897
+sans_imputation_tarifable,SUP_00046,PLT_002,13,wissam,False,0,5024,7881,2,True,4,0,0,novembre-consolide-prolonge,,5024,0,4020,4557
+avec_imputation,SUP_00146,PLT_001,7,profil_simple,True,0,5038,6228,3,True,3,0,0,novembre-consolide-prolonge,,5038,0,2517,4671
+sans_imputation_tarifable,SUP_00146,PLT_001,7,profil_simple,True,0,5038,6228,3,True,3,0,0,novembre-consolide-prolonge,,5038,0,2517,4671
+avec_imputation,SUP_00071,PLT_002,2,profil_simple,True,0,5120,7243,1,True,0,0,0,novembre-consolide-prolonge,,5120,0,5120,5120
+sans_imputation_tarifable,SUP_00071,PLT_002,2,profil_simple,True,0,5120,7243,1,True,0,0,0,novembre-consolide-prolonge,,5120,0,5120,5120
+avec_imputation,SUP_00128,PLT_004,7,profil_simple,True,0,5181,7398,4,True,0,0,0,novembre-consolide-prolonge,,5181,0,2496,5181
+sans_imputation_tarifable,SUP_00128,PLT_004,7,profil_simple,True,0,5181,7398,4,True,0,0,0,novembre-consolide-prolonge,,5181,0,2496,5181
+avec_imputation,SUP_00128,PLT_002,16,borne_rechargee,False,1,5240,8949,4,True,0 4,1,1,novembre-consolide-prolonge,,5240,0,3552,3880
+sans_imputation_tarifable,SUP_00128,PLT_002,16,borne_rechargee,False,1,5240,8949,4,True,0 4,1,1,novembre-consolide-prolonge,,5240,0,3552,3880
+avec_imputation,SUP_00060,PLT_004,4,wissam,True,0,5256,5256,4,True,0 3,0,0,novembre-consolide-prolonge,,5256,0,2496,5256
+sans_imputation_tarifable,SUP_00060,PLT_004,4,wissam,True,0,5256,5256,4,True,0 3,0,0,novembre-consolide-prolonge,,5256,0,2496,5256
+avec_imputation,SUP_00081,PLT_001,3,profil_simple,True,0,5293,5794,2,True,4,0,0,novembre-consolide-prolonge,,5293,0,4101,5293
+sans_imputation_tarifable,SUP_00081,PLT_001,3,profil_simple,True,0,5293,5794,2,True,4,0,0,novembre-consolide-prolonge,,5293,0,4101,5293
+avec_imputation,SUP_00143,PLT_003,6,profil_simple,True,0,5325,6275,3,True,1,0,0,novembre-consolide-prolonge,,5325,0,3140,5325
+sans_imputation_tarifable,SUP_00143,PLT_003,6,profil_simple,True,0,5325,6275,3,True,1,0,0,novembre-consolide-prolonge,,5325,0,3140,5325
+avec_imputation,SUP_00024,PLT_002,20,wissam,False,0,5484,10116,2,True,4,0,0,novembre-consolide-prolonge,,5484,0,4170,4170
+sans_imputation_tarifable,SUP_00024,PLT_002,20,wissam,False,0,5484,10116,2,True,4,0,0,novembre-consolide-prolonge,,5484,0,4170,4170
+avec_imputation,SUP_00010,PLT_002,11,wissam,True,0,5600,8297,4,True,4,0,0,novembre-consolide-prolonge,,5600,0,3552,4244
+sans_imputation_tarifable,SUP_00010,PLT_002,11,wissam,True,0,5600,8297,4,True,4,0,0,novembre-consolide-prolonge,,5600,0,3552,4244
+avec_imputation,SUP_00100,PLT_004,2,profil_simple,True,0,5611,5611,2,True,3,0,0,novembre-consolide-prolonge,,5611,0,4170,5611
+sans_imputation_tarifable,SUP_00100,PLT_004,2,profil_simple,True,0,5611,5611,2,True,3,0,0,novembre-consolide-prolonge,,5611,0,4170,5611
+avec_imputation,SUP_00058,PLT_002,7,profil_simple,True,0,5754,7619,4,True,0,0,0,novembre-consolide-prolonge,,5754,0,3005,4244
+sans_imputation_tarifable,SUP_00058,PLT_002,7,profil_simple,True,0,5754,7619,4,True,0,0,0,novembre-consolide-prolonge,,5754,0,3005,4244
+avec_imputation,SUP_00008,PLT_002,4,profil_simple,True,0,5785,5785,3,True,3,0,0,novembre-consolide-prolonge,,5785,0,3140,5785
+sans_imputation_tarifable,SUP_00008,PLT_002,4,profil_simple,True,0,5785,5785,3,True,3,0,0,novembre-consolide-prolonge,,5785,0,3140,5785
+avec_imputation,SUP_00038,PLT_004,6,profil_simple,True,0,5826,7884,4,True,1,0,0,novembre-consolide-prolonge,,5826,0,2496,5826
+sans_imputation_tarifable,SUP_00038,PLT_004,6,profil_simple,True,0,5826,7884,4,True,1,0,0,novembre-consolide-prolonge,,5826,0,2496,5826
+sans_imputation_tarifable,SUP_00109,PLT_002,5,profil_simple,True,0,5945,6660,3,True,2,0,0,novembre-consolide-prolonge,,5945,0,3508,5185
+avec_imputation,SUP_00003,PLT_001,7,wissam,True,0,5984,8413,4,True,1 2,0,0,novembre-consolide-prolonge,,5984,0,2796,5250
+sans_imputation_tarifable,SUP_00003,PLT_001,7,wissam,True,0,5984,8413,4,True,1 2,0,0,novembre-consolide-prolonge,,5984,0,2796,5250
+avec_imputation,SUP_00154,PLT_001,5,wissam,True,0,6016,6842,3,True,3,0,0,novembre-consolide-prolonge,,6016,0,4101,6016
+sans_imputation_tarifable,SUP_00154,PLT_001,5,wissam,True,0,6016,6842,3,True,3,0,0,novembre-consolide-prolonge,,6016,0,4101,6016
+avec_imputation,SUP_00092,PLT_002,14,prime_rg06,True,0,6484,10845,4,True,1 4,1,2,novembre-consolide-prolonge,,6484,0,3552,4908
+sans_imputation_tarifable,SUP_00092,PLT_002,14,prime_rg06,True,0,6484,10845,4,True,1 4,1,2,novembre-consolide-prolonge,,6484,0,3552,4908
+avec_imputation,SUP_00038,PLT_001,57,camions_exacts,True,1,6809,19718,6,True,0 4,0,0,novembre-consolide-prolonge,,6809,0,2902,5163
+sans_imputation_tarifable,SUP_00038,PLT_001,57,camions_exacts,True,1,6809,19718,6,True,0 4,0,0,novembre-consolide-prolonge,,6809,0,2902,5163
+avec_imputation,SUP_00087,PLT_003,4,profil_simple,True,0,6997,6997,4,True,1,0,0,novembre-consolide-prolonge,,6997,0,4020,6997
+sans_imputation_tarifable,SUP_00087,PLT_003,4,profil_simple,True,0,6997,6997,4,True,1,0,0,novembre-consolide-prolonge,,6997,0,4020,6997
+avec_imputation,SUP_00096,PLT_002,5,profil_simple,True,0,7190,8173,4,True,2,0,0,novembre-consolide-prolonge,,7190,0,3516,5785
+sans_imputation_tarifable,SUP_00096,PLT_002,5,profil_simple,True,0,7190,8173,4,True,2,0,0,novembre-consolide-prolonge,,7190,0,3516,5785
+avec_imputation,SUP_00090,PLT_002,11,wissam,True,0,7200,11185,4,True,3,0,0,novembre-consolide-prolonge,,7200,0,4290,5465
+sans_imputation_tarifable,SUP_00090,PLT_002,11,wissam,True,0,7200,11185,4,True,3,0,0,novembre-consolide-prolonge,,7200,0,4290,5465
+avec_imputation,SUP_00152,PLT_004,5,profil_simple,True,0,7588,8326,4,True,3,0,0,novembre-consolide-prolonge,,7588,0,4170,7588
+sans_imputation_tarifable,SUP_00152,PLT_004,5,profil_simple,True,0,7588,8326,4,True,3,0,0,novembre-consolide-prolonge,,7588,0,4170,7588
+sans_imputation_tarifable,SUP_00019,PLT_002,30,incumbent_verifie,False,1,7819,11247,4,True,2 4,0,0,novembre-consolide-prolonge,,7819,0,4730,6459
+avec_imputation,SUP_00152,PLT_001,11,incumbent_verifie,True,0,7933,11193,4,True,3 4,0,0,novembre-consolide-prolonge,,7933,0,4170,6398
+sans_imputation_tarifable,SUP_00152,PLT_001,11,incumbent_verifie,True,0,7933,11193,4,True,3 4,0,0,novembre-consolide-prolonge,,7933,0,4170,6398
+avec_imputation,SUP_00095,PLT_001,8,incumbent_verifie,True,0,8157,10512,5,True,1 3,0,0,novembre-consolide-prolonge,,8157,0,3552,5785
+sans_imputation_tarifable,SUP_00095,PLT_001,8,incumbent_verifie,True,0,8157,10512,5,True,1 3,0,0,novembre-consolide-prolonge,,8157,0,3552,5785
+sans_imputation_tarifable,SUP_00102,PLT_003,12,prime_rg05_rg06,True,0,8442,15768,5,True,0 3,0,0,novembre-consolide-prolonge,,8442,0,4170,6438
+sans_imputation_tarifable,SUP_00032,PLT_002,12,profil_simple,False,0,8484,12726,2,True,3,0,0,novembre-consolide-prolonge,,8484,0,8484,8484
+avec_imputation,SUP_00127,PLT_002,2,profil_simple,True,0,8484,8484,2,True,4,0,0,novembre-consolide-prolonge,,8484,8484,8484,8484
+avec_imputation,SUP_00081,PLT_002,11,wissam,True,0,8598,12089,4,True,2 4,0,0,novembre-consolide-prolonge,,8598,0,5120,6217
+sans_imputation_tarifable,SUP_00081,PLT_002,11,wissam,True,0,8598,12089,4,True,2 4,0,0,novembre-consolide-prolonge,,8598,0,5120,6217
+sans_imputation_tarifable,SUP_00152,PLT_002,42,incumbent_verifie,False,1,8620,15950,5,True,0 1 4,0,0,novembre-consolide-prolonge,,8620,0,4170,5961
+avec_imputation,SUP_00152,PLT_002,42,incumbent_verifie,True,1,8620,15950,5,True,0 1 4,0,0,novembre-consolide-prolonge,,8620,0,4170,5961
+avec_imputation,SUP_00124,PLT_004,6,incumbent_verifie,True,0,8678,11058,4,True,0,0,0,novembre-consolide-prolonge,,8678,0,4733,7372
+sans_imputation_tarifable,SUP_00124,PLT_004,6,incumbent_verifie,True,0,8678,11058,4,True,0,0,0,novembre-consolide-prolonge,,8678,0,4733,7372
+avec_imputation,SUP_00011,PLT_002,9,wissam,True,0,8701,14051,4,True,0 1,0,0,novembre-consolide-prolonge,,8701,0,5120,6730
+sans_imputation_tarifable,SUP_00011,PLT_002,9,wissam,True,0,8701,14051,4,True,0 1,0,0,novembre-consolide-prolonge,,8701,0,5120,6730
+avec_imputation,SUP_00091,PLT_002,73,wissam,False,1,8788,19603,4,True,0 1,0,0,novembre-consolide-prolonge,,8788,0,4242,7052
+sans_imputation_tarifable,SUP_00091,PLT_002,73,wissam,False,1,8788,19603,4,True,0 1,0,0,novembre-consolide-prolonge,,8788,0,4242,7052
+avec_imputation,SUP_00136,PLT_003,12,wissam,True,0,8840,12141,4,True,3,0,0,novembre-consolide-prolonge,,8840,0,4733,6994
+sans_imputation_tarifable,SUP_00136,PLT_003,12,wissam,True,0,8840,12141,4,True,3,0,0,novembre-consolide-prolonge,,8840,0,4733,6994
+avec_imputation,SUP_00096,PLT_004,8,profil_simple,True,0,8864,11866,4,True,0,0,0,novembre-consolide-prolonge,,8864,0,4242,7389
+sans_imputation_tarifable,SUP_00096,PLT_004,8,profil_simple,True,0,8864,11866,4,True,0,0,0,novembre-consolide-prolonge,,8864,0,4242,7389
+avec_imputation,SUP_00038,PLT_003,22,wissam,False,0,8950,12889,3,True,1,0,0,novembre-consolide-prolonge,,8950,0,5258,8107
+sans_imputation_tarifable,SUP_00038,PLT_003,22,wissam,False,0,8950,12889,3,True,1,0,0,novembre-consolide-prolonge,,8950,0,5258,8107
+avec_imputation,SUP_00121,PLT_004,10,profil_simple,True,0,9024,13140,6,True,0,0,0,novembre-consolide-prolonge,,9024,0,3552,6855
+sans_imputation_tarifable,SUP_00121,PLT_004,10,profil_simple,True,0,9024,13140,6,True,0,0,0,novembre-consolide-prolonge,,9024,0,3552,6855
+sans_imputation_tarifable,SUP_00117,PLT_002,9,incumbent_verifie,True,0,9157,18188,3,True,4,0,0,novembre-consolide-prolonge,,9157,0,4242,8431
+avec_imputation,SUP_00014,PLT_001,38,wissam,False,1,9265,19633,5,True,0 3,0,0,novembre-consolide-prolonge,,9265,0,4733,7948
+sans_imputation_tarifable,SUP_00014,PLT_001,38,wissam,False,1,9265,19633,5,True,0 3,0,0,novembre-consolide-prolonge,,9265,0,4733,7948
+avec_imputation,SUP_00124,PLT_002,7,profil_simple,True,0,9331,12901,4,True,0,0,0,novembre-consolide-prolonge,,9331,0,4733,7891
+sans_imputation_tarifable,SUP_00124,PLT_002,7,profil_simple,True,0,9331,12901,4,True,0,0,0,novembre-consolide-prolonge,,9331,0,4733,7891
+avec_imputation,SUP_00080,PLT_001,28,wissam,False,1,9643,15672,5,True,1 3,0,0,novembre-consolide-prolonge,,9643,0,4290,7164
+sans_imputation_tarifable,SUP_00080,PLT_001,28,wissam,False,1,9643,15672,5,True,1 3,0,0,novembre-consolide-prolonge,,9643,0,4290,7164
+avec_imputation,SUP_00156,PLT_003,9,wissam,True,0,9777,11060,3,True,3,0,0,novembre-consolide-prolonge,,9777,0,5979,9020
+sans_imputation_tarifable,SUP_00156,PLT_003,9,wissam,True,0,9777,11060,3,True,3,0,0,novembre-consolide-prolonge,,9777,0,5979,9020
+avec_imputation,SUP_00060,PLT_002,78,wissam,False,0,9801,19593,3,True,0 4,0,0,novembre-consolide-prolonge,,9801,0,6428,7317
+sans_imputation_tarifable,SUP_00060,PLT_002,78,wissam,False,0,9801,19593,3,True,0 4,0,0,novembre-consolide-prolonge,,9801,0,6428,7317
+avec_imputation,SUP_00033,PLT_004,16,wissam,True,0,9929,17381,5,True,0 4,0,0,novembre-consolide-prolonge,,9929,0,4704,7718
+sans_imputation_tarifable,SUP_00033,PLT_004,16,wissam,True,0,9929,17381,5,True,0 4,0,0,novembre-consolide-prolonge,,9929,0,4704,7718
+avec_imputation,SUP_00073,PLT_002,12,wissam,False,0,9984,15495,2,True,4,0,0,novembre-consolide-prolonge,,9984,0,5280,9984
+sans_imputation_tarifable,SUP_00073,PLT_002,12,wissam,False,0,9984,15495,2,True,4,0,0,novembre-consolide-prolonge,,9984,0,5280,9984
+avec_imputation,SUP_00102,PLT_001,34,camions_exacts,True,0,10062,27462,6,True,0 4,0,0,novembre-consolide-prolonge,,10062,0,4733,6782
+sans_imputation_tarifable,SUP_00102,PLT_001,34,camions_exacts,True,0,10062,27462,6,True,0 4,0,0,novembre-consolide-prolonge,,10062,0,4733,6782
+avec_imputation,SUP_00109,PLT_002,6,profil_simple,True,0,10187,10902,4,True,2,0,0,novembre-consolide-prolonge,,10187,4242,7750,9427
+avec_imputation,SUP_00037,PLT_001,7,incumbent_verifie,True,0,10270,14696,4,True,2 4,0,0,novembre-consolide-prolonge,,10270,0,5755,7403
+sans_imputation_tarifable,SUP_00037,PLT_001,7,incumbent_verifie,True,0,10270,14696,4,True,2 4,0,0,novembre-consolide-prolonge,,10270,0,5755,7403
+avec_imputation,SUP_00058,PLT_001,18,wissam,True,0,10304,15340,4,True,0 3,0,0,novembre-consolide-prolonge,,10304,0,5280,8739
+sans_imputation_tarifable,SUP_00058,PLT_001,18,wissam,True,0,10304,15340,4,True,0 3,0,0,novembre-consolide-prolonge,,10304,0,5280,8739
+sans_imputation_tarifable,SUP_00085,PLT_003,16,wissam,True,0,10345,13949,3,True,1,0,0,novembre-consolide-prolonge,,10345,0,6021,8129
+avec_imputation,SUP_00032,PLT_004,12,wissam,True,0,10432,15319,5,True,2 4,0,0,novembre-consolide-prolonge,,10432,0,4242,8325
+sans_imputation_tarifable,SUP_00032,PLT_004,12,wissam,True,0,10432,15319,5,True,2 4,0,0,novembre-consolide-prolonge,,10432,0,4242,8325
+avec_imputation,SUP_00054,PLT_002,2,profil_simple,True,0,10560,10560,2,True,1,0,0,novembre-consolide-prolonge,,10560,10560,10560,10560
+avec_imputation,SUP_00108,PLT_001,2,profil_simple,True,0,10560,10560,2,True,3,0,0,novembre-consolide-prolonge,,10560,10560,10560,10560
+avec_imputation,SUP_00026,PLT_001,5,wissam,True,0,10636,14552,3,True,4,0,0,novembre-consolide-prolonge,,10636,0,5280,8542
+sans_imputation_tarifable,SUP_00026,PLT_001,5,wissam,True,0,10636,14552,3,True,4,0,0,novembre-consolide-prolonge,,10636,0,5280,8542
+sans_imputation_tarifable,SUP_00097,PLT_002,96,incumbent_verifie,False,0,10672,29058,3,True,4,0,0,novembre-consolide-prolonge,,10672,0,6428,10672
+avec_imputation,SUP_00045,PLT_002,19,camions_exacts,True,0,10757,15792,4,True,0 4,0,0,novembre-consolide-prolonge,,10757,0,5979,8099
+sans_imputation_tarifable,SUP_00045,PLT_002,19,camions_exacts,True,0,10757,15792,4,True,0 4,0,0,novembre-consolide-prolonge,,10757,0,5979,8099
+avec_imputation,SUP_00053,PLT_001,64,wissam,True,1,11020,22197,6,False,1 3,0,0,novembre-consolide-prolonge,,10572,0,4242,8883
+sans_imputation_tarifable,SUP_00053,PLT_001,64,wissam,True,1,11020,22197,6,False,1 3,0,0,novembre-consolide-prolonge,,10572,0,4242,8883
+avec_imputation,SUP_00019,PLT_004,12,wissam,True,0,11169,17220,6,True,2 4,0,0,novembre-consolide-prolonge,,11169,0,4730,7555
+sans_imputation_tarifable,SUP_00019,PLT_004,12,wissam,True,0,11169,17220,6,True,2 4,0,0,novembre-consolide-prolonge,,11169,0,4730,7555
+avec_imputation,SUP_00052,PLT_001,25,camions_exacts,True,0,11289,24152,6,True,0 3,0,0,novembre-consolide-prolonge,,11289,0,5120,7654
+sans_imputation_tarifable,SUP_00052,PLT_001,25,camions_exacts,True,0,11289,24152,6,True,0 3,0,0,novembre-consolide-prolonge,,11289,0,5120,7654
+avec_imputation,SUP_00035,PLT_001,37,wissam,True,1,11332,20163,4,True,1 4,0,0,novembre-consolide-prolonge,,11332,0,6547,9080
+sans_imputation_tarifable,SUP_00035,PLT_001,37,wissam,True,1,11332,20163,4,True,1 4,0,0,novembre-consolide-prolonge,,11332,0,6547,9080
+sans_imputation_tarifable,SUP_00091,PLT_001,110,camions_exacts,True,0,11712,22078,5,True,0 2,0,0,novembre-consolide-prolonge,,11712,0,4242,9215
+sans_imputation_tarifable,SUP_00005,PLT_001,4,profil_simple,True,0,11761,11761,3,True,0,0,0,novembre-consolide-prolonge,,11761,0,5280,11761
+avec_imputation,SUP_00035,PLT_002,64,camions_exacts,True,1,12171,23270,5,False,4,0,0,novembre-profils-paralleles,03 / 04 / 14 / 24 / 34 / 013 / 014 / 024 / 034 / 124 / 134 / 234 / 0134 / 1234,9506,0,6547,8347
+sans_imputation_tarifable,SUP_00035,PLT_002,64,camions_exacts,True,1,12171,23270,5,False,4,0,0,novembre-profils-paralleles,03 / 04 / 14 / 24 / 34 / 013 / 014 / 024 / 034 / 124 / 134 / 234 / 0134 / 1234,9506,0,6547,8347
+avec_imputation,SUP_00136,PLT_004,12,profil_simple,True,0,12639,15205,5,True,2,0,0,novembre-consolide-prolonge,,12639,0,5755,11305
+sans_imputation_tarifable,SUP_00136,PLT_004,12,profil_simple,True,0,12639,15205,5,True,2,0,0,novembre-consolide-prolonge,,12639,0,5755,11305
+avec_imputation,SUP_00018,PLT_002,3,profil_simple,True,0,12726,12726,3,True,4,0,0,novembre-consolide-prolonge,,12726,12726,12726,12726
+avec_imputation,SUP_00077,PLT_002,3,profil_simple,True,0,12726,12726,3,True,1,0,0,novembre-consolide-prolonge,,12726,12726,12726,12726
+avec_imputation,SUP_00091,PLT_004,59,camions_exacts,True,1,13186,28073,6,False,0 4,1,5,novembre-profils-paralleles,01 / 02 / 03 / 04 / 12 / 13 / 14 / 014 / 024 / 034 / 124 / 134 / 234 / 0124 / 0134 / 0234 / 1234 / 01234,11124,0,4242,8844
+sans_imputation_tarifable,SUP_00091,PLT_004,59,camions_exacts,True,1,13186,28073,6,False,0 4,1,5,novembre-profils-paralleles,01 / 02 / 03 / 04 / 12 / 13 / 14 / 014 / 024 / 034 / 124 / 134 / 234 / 0124 / 0134 / 0234 / 1234 / 01234,11124,0,4242,8844
+avec_imputation,SUP_00083,PLT_002,28,borne_rechargee,False,0,13201,27667,4,True,0 4,0,0,novembre-consolide-prolonge,,13201,0,4242,11837
+sans_imputation_tarifable,SUP_00083,PLT_002,28,borne_rechargee,False,0,13201,27667,4,True,0 4,0,0,novembre-consolide-prolonge,,13201,0,4242,11837
+avec_imputation,SUP_00010,PLT_004,33,camions_exacts,True,0,13207,21315,5,True,2 4,0,0,novembre-consolide-prolonge,,13207,0,6428,8703
+sans_imputation_tarifable,SUP_00010,PLT_004,33,camions_exacts,True,0,13207,21315,5,True,2 4,0,0,novembre-consolide-prolonge,,13207,0,6428,8703
+avec_imputation,SUP_00136,PLT_002,33,wissam,False,1,13801,30580,4,True,0 1,0,0,novembre-consolide-prolonge,,13801,0,6428,10781
+sans_imputation_tarifable,SUP_00136,PLT_002,33,wissam,False,1,13801,30580,4,True,0 1,0,0,novembre-consolide-prolonge,,13801,0,6428,10781
+avec_imputation,SUP_00062,PLT_001,2,profil_simple,True,0,13851,13851,2,True,2,0,0,novembre-consolide-prolonge,,13851,0,7304,13851
+sans_imputation_tarifable,SUP_00062,PLT_001,2,profil_simple,True,0,13851,13851,2,True,2,0,0,novembre-consolide-prolonge,,13851,0,7304,13851
+avec_imputation,SUP_00113,PLT_001,12,wissam,True,0,14039,20145,5,True,0 3,0,0,novembre-consolide-prolonge,,14039,0,5280,11369
+sans_imputation_tarifable,SUP_00113,PLT_001,12,wissam,True,0,14039,20145,5,True,0 3,0,0,novembre-consolide-prolonge,,14039,0,5280,11369
+avec_imputation,SUP_00038,PLT_002,181,wissam,False,1,14117,30440,5,True,0 4,0,0,novembre-consolide-prolonge,,14117,0,6428,11153
+sans_imputation_tarifable,SUP_00038,PLT_002,181,wissam,False,1,14117,30440,5,True,0 4,0,0,novembre-consolide-prolonge,,14117,0,6428,11153
+avec_imputation,SUP_00014,PLT_004,26,wissam,False,1,14526,23758,5,True,0,0,0,novembre-consolide-prolonge,,14526,0,6428,11837
+sans_imputation_tarifable,SUP_00014,PLT_004,26,wissam,False,1,14526,23758,5,True,0,0,0,novembre-consolide-prolonge,,14526,0,6428,11837
+avec_imputation,SUP_00107,PLT_003,131,incumbent_verifie,False,1,14573,24341,5,True,1 3,0,0,novembre-consolide-prolonge,,14573,0,4242,11790
+sans_imputation_tarifable,SUP_00107,PLT_003,131,incumbent_verifie,True,0,14573,24341,5,True,1 3,0,0,novembre-consolide-prolonge,,14573,0,4242,11790
+sans_imputation_tarifable,SUP_00135,PLT_004,5,wissam,True,0,14686,19614,3,True,0,0,0,novembre-consolide-prolonge,,14686,0,6428,11274
+avec_imputation,SUP_00094,PLT_003,10,wissam,True,0,14850,21155,3,True,3,0,0,novembre-consolide-prolonge,,14850,0,5280,13860
+sans_imputation_tarifable,SUP_00094,PLT_003,10,wissam,True,0,14850,21155,3,True,3,0,0,novembre-consolide-prolonge,,14850,0,5280,13860
+avec_imputation,SUP_00154,PLT_002,6,profil_simple,True,0,14901,18457,4,True,0,0,0,novembre-consolide-prolonge,,14901,0,7706,12092
+sans_imputation_tarifable,SUP_00154,PLT_002,6,profil_simple,True,0,14901,18457,4,True,0,0,0,novembre-consolide-prolonge,,14901,0,7706,12092
+avec_imputation,SUP_00022,PLT_004,29,wissam,False,1,15369,24917,5,True,0 2,0,0,novembre-consolide-prolonge,,15369,0,6428,11852
+sans_imputation_tarifable,SUP_00022,PLT_004,29,wissam,False,1,15369,24917,5,True,0 2,0,0,novembre-consolide-prolonge,,15369,0,6428,11852
+avec_imputation,SUP_00057,PLT_001,13,incumbent_verifie,True,0,15611,23482,5,True,0 3,0,0,novembre-consolide-prolonge,,15611,0,7947,12603
+sans_imputation_tarifable,SUP_00057,PLT_001,13,incumbent_verifie,True,0,15611,23482,5,True,0 3,0,0,novembre-consolide-prolonge,,15611,0,7947,12603
+avec_imputation,SUP_00091,PLT_001,111,camions_exacts,True,1,15954,26320,6,False,0 2,0,0,novembre-consolide-prolonge,,15626,4242,8484,13457
+avec_imputation,SUP_00107,PLT_001,190,camions_exacts,True,1,16212,36256,6,False,3,1,13,novembre-profils-paralleles,03 / 13 / 23 / 34 / 013 / 023 / 034 / 123 / 124 / 134 / 234 / 0123 / 0134 / 0234 / 1234 / 01234,15624,0,4242,10890
+sans_imputation_tarifable,SUP_00107,PLT_001,190,camions_exacts,True,1,16212,36256,6,False,3,1,13,novembre-profils-paralleles,03 / 13 / 23 / 34 / 013 / 023 / 034 / 123 / 124 / 134 / 234 / 0123 / 0134 / 0234 / 1234 / 01234,15624,0,4242,10890
+avec_imputation,SUP_00154,PLT_004,5,wissam,True,0,16219,20505,3,True,4,0,0,novembre-consolide-prolonge,,16219,0,9422,12303
+sans_imputation_tarifable,SUP_00154,PLT_004,5,wissam,True,0,16219,20505,3,True,4,0,0,novembre-consolide-prolonge,,16219,0,9422,12303
+avec_imputation,SUP_00097,PLT_002,97,borne_rechargee,False,0,17100,35486,4,True,0 4,1,1,novembre-consolide-prolonge,,17100,6428,12856,17100
+sans_imputation_tarifable,SUP_00080,PLT_002,101,wissam,False,1,17725,53691,5,True,0 1 4,0,0,novembre-consolide-prolonge,,17725,0,5280,15840
+sans_imputation_tarifable,SUP_00129,PLT_001,9,incumbent_verifie,True,0,17992,22387,4,True,2,0,0,novembre-consolide-prolonge,,17992,0,7304,17390
+avec_imputation,SUP_00041,PLT_004,42,camions_exacts,True,1,18320,38736,6,False,1 4,0,0,novembre-consolide-prolonge,,17268,0,5280,12359
+sans_imputation_tarifable,SUP_00041,PLT_004,42,camions_exacts,True,1,18320,38736,6,False,1 4,0,0,novembre-consolide-prolonge,,17268,0,5280,12359
+avec_imputation,SUP_00043,PLT_004,19,wissam,True,0,18397,34812,6,True,0 4,0,0,novembre-consolide-prolonge,,18397,0,7304,14300
+sans_imputation_tarifable,SUP_00043,PLT_004,19,incumbent_verifie,True,0,18397,34812,6,True,0 4,0,0,novembre-consolide-prolonge,,18397,0,7304,14300
+avec_imputation,SUP_00102,PLT_002,23,camions_exacts,True,0,18515,36916,4,True,1 4,2,8,novembre-consolide-prolonge,,18515,0,6428,16271
+sans_imputation_tarifable,SUP_00102,PLT_002,23,camions_exacts,True,0,18515,36916,4,True,1 4,2,8,novembre-consolide-prolonge,,18515,0,6428,16271
+avec_imputation,SUP_00085,PLT_003,17,incumbent_verifie,True,0,18525,22129,4,True,1,0,0,novembre-consolide-prolonge,,18525,8180,14201,16309
+avec_imputation,SUP_00024,PLT_003,28,wissam,False,0,19086,31532,3,True,1,0,0,novembre-consolide-prolonge,,19086,0,6428,17916
+sans_imputation_tarifable,SUP_00024,PLT_003,28,wissam,False,0,19086,31532,3,True,1,0,0,novembre-consolide-prolonge,,19086,0,6428,17916
+avec_imputation,SUP_00133,PLT_002,3,profil_simple,True,0,19284,19284,3,True,1,0,0,novembre-consolide-prolonge,,19284,19284,19284,19284
+avec_imputation,SUP_00094,PLT_004,60,incumbent_verifie,True,1,19352,42255,6,False,0 4,0,0,novembre-consolide-prolonge,,17364,0,5280,12988
+sans_imputation_tarifable,SUP_00094,PLT_004,60,incumbent_verifie,True,1,19352,42255,6,False,0 4,0,0,novembre-consolide-prolonge,,17364,0,5280,12988
+avec_imputation,SUP_00073,PLT_001,15,wissam,True,0,19513,36513,5,True,0 2,0,0,novembre-consolide-prolonge,,19513,0,5280,15048
+sans_imputation_tarifable,SUP_00073,PLT_001,15,wissam,True,0,19513,36513,5,True,0 2,0,0,novembre-consolide-prolonge,,19513,0,5280,15048
+avec_imputation,SUP_00051,PLT_001,26,camions_exacts,True,0,19750,42703,5,True,2 3,0,0,novembre-consolide-prolonge,,19750,0,8484,19008
+sans_imputation_tarifable,SUP_00051,PLT_001,26,camions_exacts,True,0,19750,42703,5,True,2 3,0,0,novembre-consolide-prolonge,,19750,0,8484,19008
+avec_imputation,SUP_00136,PLT_001,28,incumbent_verifie,False,1,19971,37434,4,True,2,0,0,novembre-consolide-prolonge,,19971,0,6428,16419
+sans_imputation_tarifable,SUP_00136,PLT_001,28,incumbent_verifie,False,1,19971,37434,4,True,2,0,0,novembre-consolide-prolonge,,19971,0,6428,16419
+avec_imputation,SUP_00055,PLT_001,28,wissam,True,0,20125,33839,5,True,0 3,0,0,novembre-consolide-prolonge,,20125,0,6428,15884
+sans_imputation_tarifable,SUP_00055,PLT_001,28,wissam,True,0,20125,33839,5,True,0 3,0,0,novembre-consolide-prolonge,,20125,0,6428,15884
+avec_imputation,SUP_00148,PLT_001,22,camions_exacts,True,0,20447,33264,6,True,1 2 4,1,4,novembre-consolide-prolonge,,20447,0,6428,14298
+sans_imputation_tarifable,SUP_00148,PLT_001,22,camions_exacts,True,0,20447,33264,6,True,1 2 4,1,4,novembre-consolide-prolonge,,20447,0,6428,14298
+avec_imputation,SUP_00060,PLT_001,30,camions_exacts,True,0,20595,46730,6,True,1 3,0,0,novembre-consolide-prolonge,,20595,0,6428,13636
+sans_imputation_tarifable,SUP_00060,PLT_001,30,incumbent_verifie,True,0,20595,46730,6,True,1 3,0,0,novembre-consolide-prolonge,,20595,0,6428,13636
+avec_imputation,SUP_00118,PLT_004,35,wissam,False,1,20679,35814,5,True,4,0,0,novembre-consolide-prolonge,,20679,0,7304,16378
+sans_imputation_tarifable,SUP_00118,PLT_004,35,wissam,False,1,20679,35814,5,True,4,0,0,novembre-consolide-prolonge,,20679,0,7304,16378
+sans_imputation_tarifable,SUP_00145,PLT_002,78,wissam,True,1,20796,44481,6,True,0 1 4,0,0,novembre-consolide-prolonge,,20796,0,6428,15331
+avec_imputation,SUP_00032,PLT_002,15,profil_simple,False,1,21210,25452,5,True,3,0,0,novembre-consolide-prolonge,,21210,12726,21210,21210
+avec_imputation,SUP_00102,PLT_003,14,wissam,True,0,21298,28624,7,True,0 2 4,0,0,novembre-consolide-prolonge,,21298,12856,17026,19294
+avec_imputation,SUP_00019,PLT_002,32,borne_rechargee,False,0,22102,25855,5,True,2 4,0,0,novembre-consolide-prolonge,,22102,14608,19338,21067
+avec_imputation,SUP_00080,PLT_002,102,borne_rechargee,False,0,22855,58971,5,True,0 1,0,0,novembre-consolide-prolonge,,22855,5280,10560,21120
+avec_imputation,SUP_00149,PLT_004,100,incumbent_verifie,True,1,23033,62126,8,False,1 2 4,1,13,novembre-consolide-prolonge,,20903,0,6809,16018
+sans_imputation_tarifable,SUP_00149,PLT_004,100,incumbent_verifie,True,1,23033,62126,8,False,1 2 4,1,13,novembre-consolide-prolonge,,20903,0,6809,16018
+avec_imputation,SUP_00144,PLT_004,18,camions_exacts,True,0,23076,40574,6,True,1 4,1,4,novembre-consolide-prolonge,,23076,0,5280,14944
+sans_imputation_tarifable,SUP_00144,PLT_004,18,camions_exacts,True,0,23076,40574,6,True,1 4,1,4,novembre-consolide-prolonge,,23076,0,5280,14944
+avec_imputation,SUP_00107,PLT_002,40,camions_exacts,True,0,25153,30337,9,True,0 1 3,1,1,novembre-consolide-prolonge,,25153,21210,23445,24316
+avec_imputation,SUP_00087,PLT_002,9,wissam,True,0,26143,28304,5,True,4,0,0,novembre-consolide-prolonge,,26143,21912,24708,26143
+avec_imputation,SUP_00148,PLT_003,38,borne_rechargee,False,1,26404,57451,5,True,1 3,0,0,novembre-consolide-prolonge,,26404,0,12856,24542
+sans_imputation_tarifable,SUP_00148,PLT_003,38,borne_rechargee,False,1,26404,57451,5,True,1 3,0,0,novembre-consolide-prolonge,,26404,0,12856,24542
+avec_imputation,SUP_00024,PLT_001,22,incumbent_verifie,True,0,26646,59458,6,True,0 4,0,0,novembre-consolide-prolonge,,26646,0,12856,22836
+sans_imputation_tarifable,SUP_00024,PLT_001,22,incumbent_verifie,True,0,26646,59458,6,True,0 4,0,0,novembre-consolide-prolonge,,26646,0,12856,22836
+sans_imputation_tarifable,SUP_00144,PLT_001,66,borne_rechargee,False,0,27194,79989,6,True,0 2 4,1,14,novembre-consolide-prolonge,,27194,0,15840,24596
+avec_imputation,SUP_00135,PLT_004,7,incumbent_verifie,True,0,27542,32470,5,True,0,0,0,novembre-consolide-prolonge,,27542,12856,19284,24130
+avec_imputation,SUP_00005,PLT_001,7,profil_simple,True,0,27601,27601,6,True,0,0,0,novembre-consolide-prolonge,,27601,15840,21120,27601
+sans_imputation_tarifable,SUP_00112,PLT_004,9,incumbent_verifie,True,0,27863,39788,5,True,0 3,0,0,novembre-consolide-prolonge,,27863,0,6428,23108
+avec_imputation,SUP_00146,PLT_002,146,wissam,False,1,28412,114811,5,True,0 1,0,0,novembre-consolide-prolonge,,28412,0,23698,24540
+sans_imputation_tarifable,SUP_00146,PLT_002,146,wissam,False,1,28412,114811,5,True,0 1,0,0,novembre-consolide-prolonge,,28412,0,23698,24540
+avec_imputation,SUP_00080,PLT_004,114,wissam,True,1,29124,73788,6,False,0 4,0,0,novembre-consolide-prolonge,,21914,0,9984,19262
+sans_imputation_tarifable,SUP_00080,PLT_004,114,wissam,True,1,29124,73788,6,False,0 4,0,0,novembre-consolide-prolonge,,21914,0,9984,19262
+avec_imputation,SUP_00045,PLT_001,54,camions_exacts,True,1,30907,61274,7,False,1 2,0,0,novembre-consolide-prolonge,,28922,0,7304,21241
+sans_imputation_tarifable,SUP_00045,PLT_001,54,camions_exacts,True,1,30907,61274,7,False,1 2,0,0,novembre-consolide-prolonge,,28922,0,7304,21241
+avec_imputation,SUP_00011,PLT_004,76,incumbent_verifie,True,1,31579,70630,6,False,0 4,0,0,novembre-consolide-prolonge,,30678,0,9422,20677
+sans_imputation_tarifable,SUP_00011,PLT_004,76,incumbent_verifie,True,1,31579,70630,6,False,0 4,0,0,novembre-consolide-prolonge,,30678,0,9422,20677
+avec_imputation,SUP_00144,PLT_001,67,borne_rechargee,False,0,31680,85269,6,True,0 2 4,0,0,novembre-consolide-prolonge,,31680,5280,21120,29876
+avec_imputation,SUP_00024,PLT_004,69,camions_exacts,True,1,31941,70898,6,True,1 4,1,14,novembre-consolide-prolonge,,31941,0,6428,23058
+sans_imputation_tarifable,SUP_00024,PLT_004,69,camions_exacts,True,1,31941,70898,6,True,1 4,1,14,novembre-consolide-prolonge,,31941,0,6428,23058
+avec_imputation,SUP_00145,PLT_004,84,incumbent_verifie,True,1,33476,74887,6,False,0 4,0,0,novembre-consolide-prolonge,,32153,0,6428,23671
+sans_imputation_tarifable,SUP_00145,PLT_004,84,incumbent_verifie,True,1,33476,74887,6,False,0 4,0,0,novembre-consolide-prolonge,,32153,0,6428,23671
+sans_imputation_tarifable,SUP_00129,PLT_003,45,borne_rechargee,False,1,33584,75082,6,True,0 2,0,0,novembre-consolide-prolonge,,33584,0,7304,23743
+avec_imputation,SUP_00087,PLT_004,80,incumbent_verifie,True,1,33957,73948,6,False,0 4,0,0,novembre-consolide-prolonge,,29651,0,7304,22601
+sans_imputation_tarifable,SUP_00087,PLT_004,80,incumbent_verifie,True,1,33957,73948,6,False,0 4,0,0,novembre-consolide-prolonge,,29651,0,7304,22601
+avec_imputation,SUP_00112,PLT_004,10,wissam,True,0,34291,46216,6,True,0 1 3,0,0,novembre-consolide-prolonge,,34291,6428,12856,29536
+avec_imputation,SUP_00118,PLT_001,112,camions_exacts,True,1,35067,79244,6,False,0 4,0,0,novembre-profils-paralleles,04 / 014 / 023 / 024 / 034 / 124 / 134 / 234 / 0123 / 0124 / 0134 / 0234 / 1234 / 01234,29192,0,7304,22465
+sans_imputation_tarifable,SUP_00118,PLT_001,112,camions_exacts,True,1,35067,79244,6,False,0 4,0,0,novembre-profils-paralleles,04 / 014 / 023 / 024 / 034 / 124 / 134 / 234 / 0123 / 0124 / 0134 / 0234 / 1234 / 01234,29192,0,7304,22465
+sans_imputation_tarifable,SUP_00074,PLT_003,25,incumbent_verifie,True,0,37676,69542,5,True,1 3,0,0,novembre-consolide-prolonge,,37676,0,28009,29830
+avec_imputation,SUP_00117,PLT_004,87,prime_rg05_rg06,False,1,38178,58896,9,True,0 3 4,0,0,novembre-consolide-prolonge,,38178,0,38178,38178
+sans_imputation_tarifable,SUP_00117,PLT_004,87,prime_rg05_rg06,False,1,38178,58896,9,True,0 3 4,0,0,novembre-consolide-prolonge,,38178,0,38178,38178
+avec_imputation,SUP_00059,PLT_003,25,wissam,True,0,39186,95635,5,True,2,0,0,novembre-consolide-prolonge,,39186,0,8180,27315
+sans_imputation_tarifable,SUP_00059,PLT_003,25,wissam,True,0,39186,95635,5,True,2,0,0,novembre-consolide-prolonge,,39186,0,8180,27315
+avec_imputation,SUP_00037,PLT_002,42,borne_rechargee,False,1,41064,65574,7,False,0 3,0,0,novembre-profils-paralleles,03 / 12 / 13 / 14 / 24 / 34 / 012 / 013 / 014 / 023 / 024 / 034 / 123 / 124 / 134 / 234 / 0123 / 0124 / 0134 / 0234 / 1234 / 01234,40627,0,32140,38932
+sans_imputation_tarifable,SUP_00037,PLT_002,42,borne_rechargee,False,1,41064,65574,7,False,0 3,0,0,novembre-profils-paralleles,03 / 12 / 13 / 14 / 24 / 34 / 012 / 013 / 014 / 023 / 024 / 034 / 123 / 124 / 134 / 234 / 0123 / 0124 / 0134 / 0234 / 1234 / 01234,40627,0,32140,38932
+avec_imputation,SUP_00085,PLT_004,205,incumbent_verifie,True,1,45296,183372,9,False,0 1 2 3 4,0,0,novembre-consolide-prolonge,,41290,0,24540,40667
+sans_imputation_tarifable,SUP_00085,PLT_004,205,incumbent_verifie,True,1,45296,183372,9,False,0 1 2 3 4,0,0,novembre-consolide-prolonge,,41290,0,24540,40667
+avec_imputation,SUP_00074,PLT_003,26,incumbent_verifie,True,0,45394,78964,5,True,1 3,0,0,novembre-consolide-prolonge,,45394,9422,37431,39252
+avec_imputation,SUP_00046,PLT_002,19,incumbent_verifie,False,0,48848,51705,8,True,1 2 3 4,0,0,novembre-consolide-prolonge,,48848,43824,47844,48381
+avec_imputation,SUP_00145,PLT_002,83,camions_exacts,True,1,52650,76621,10,False,1 4,2,14,novembre-profils-paralleles,014 / 024 / 034 / 134 / 234 / 0123 / 0124 / 0134 / 0234 / 1234 / 01234,48559,32140,38568,47471
+avec_imputation,SUP_00046,PLT_004,41,wissam,False,1,58432,71113,8,True,2,0,0,novembre-consolide-prolonge,,58432,0,51128,58432
+sans_imputation_tarifable,SUP_00046,PLT_004,41,wissam,False,1,58432,71113,8,True,2,0,0,novembre-consolide-prolonge,,58432,0,51128,58432
+avec_imputation,SUP_00117,PLT_002,21,wissam,True,0,60061,69092,15,True,1 2 4,0,0,novembre-consolide-prolonge,,60061,50904,55146,59335
+avec_imputation,SUP_00153,PLT_004,11,profil_simple,True,0,80344,80344,11,True,4,0,0,novembre-consolide-prolonge,,80344,80344,80344,80344
+avec_imputation,SUP_00001,PLT_004,22,prime_rg06,True,0,88672,88672,18,True,0 1 2 3 4,0,0,novembre-consolide-prolonge,,88672,84480,87485,88672
+avec_imputation,SUP_00129,PLT_001,26,prime_rg06,True,0,142160,146555,21,True,1 2 3 4,0,0,novembre-consolide-prolonge,,142160,124168,131472,141558
+avec_imputation,SUP_00129,PLT_003,69,wissam,False,1,207160,250378,29,True,0 1 2,0,0,novembre-consolide-prolonge,,207160,175296,182600,199039
