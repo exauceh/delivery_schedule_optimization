@@ -1,4 +1,4 @@
-"""FastAPI application: import a planning, run the optimisation in the background, read and download the results."""
+"""FastAPI application: the API under /api (import, run in the background, results) and the web interface on /."""
 
 from __future__ import annotations
 
@@ -6,16 +6,20 @@ import logging
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 from datetime import UTC, datetime
+from pathlib import Path
 
 from fastapi import FastAPI, Request, status
 from fastapi.responses import JSONResponse
+from fastapi.staticfiles import StaticFiles
 
 from ..service import app_version
 from ..settings import Settings, get_settings
 from ..storage.base import RunNotFoundError, RunRepository, RunStatus
 from ..storage.filesystem import FileRunRepository
 from .jobs import JobRunner, ProcessJobRunner
-from .routes import health, results, runs
+from .routes import health, results, runs, views
+
+WEB_DIR = Path(__file__).resolve().parent.parent / "web"  # the interface: HTML, CSS, JS, logo, fonts
 
 logger = logging.getLogger(__name__)
 
@@ -56,7 +60,10 @@ def create_app(settings: Settings | None = None, repository: RunRepository | Non
     async def run_not_found(_: Request, exc: RunNotFoundError) -> JSONResponse:
         return JSONResponse(status_code=status.HTTP_404_NOT_FOUND, content={"detail": f"run not found: {exc}"})
 
-    app.include_router(health.router)
-    app.include_router(runs.router)
-    app.include_router(results.router)
+    for router in (health.router, runs.router, results.router, views.router):
+        app.include_router(router, prefix="/api")
+    if WEB_DIR.is_dir():  # mounted last: every path that is not an API route serves the interface
+        app.mount("/", StaticFiles(directory=WEB_DIR, html=True), name="web")
+    else:
+        logger.warning("Web interface not found in %s: API only", WEB_DIR)
     return app

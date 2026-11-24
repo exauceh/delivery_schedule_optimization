@@ -28,6 +28,8 @@ class RunManifest(BaseModel):
     """Traceability of one run: inputs (SHA-256), parameters used, status, timings and main results."""
 
     run_id: str
+    label: str = "Scénario"  # name given by the user (scenario), shown by the web interface
+    source_run_id: str | None = None  # run whose input files were reused (rerun with other parameters)
     status: RunStatus = RunStatus.QUEUED
     created_at: datetime
     started_at: datetime | None = None
@@ -40,6 +42,7 @@ class RunManifest(BaseModel):
     accuracy: dict[str, float] = Field(default_factory=dict)
     rate_sheet: dict[str, str | float | None] = Field(default_factory=dict, description="validity, margin and diesel surcharge read from the PDF rate sheet")
     checks_passed: bool | None = None
+    plant_peaks: dict[str, int] = Field(default_factory=dict, description="plant -> most trucks received in one day")
     error: str | None = None
 
 
@@ -50,7 +53,8 @@ class RunNotFoundError(LookupError):
 class RunRepository(Protocol):
     """Where the runs live: their input files, output files, manifest and log."""
 
-    def create(self, inputs: Mapping[InputName, bytes], parameters: dict[str, JsonValue], app_version: str) -> RunManifest: ...
+    def create(self, inputs: Mapping[InputName, bytes], parameters: dict[str, JsonValue], app_version: str,
+               label: str = "Scénario", source_run_id: str | None = None) -> RunManifest: ...
 
     def get(self, run_id: str) -> RunManifest: ...
 
@@ -65,3 +69,5 @@ class RunRepository(Protocol):
     def log_path(self, run_id: str) -> Path: ...
 
     def archive(self, run_id: str) -> Path: ...
+
+    def delete(self, run_id: str) -> None: ...

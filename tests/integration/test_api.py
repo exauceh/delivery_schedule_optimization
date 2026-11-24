@@ -31,57 +31,57 @@ def _files(inputs: dict[InputName, bytes]) -> dict[str, tuple[str, bytes, str]]:
 
 
 def test_health_and_default_parameters(client: TestClient) -> None:
-    assert client.get("/health").json()["status"] == "ok"
-    assert client.get("/config/defaults").json()["planner"]["max_advance_days"] == 7
+    assert client.get("/api/health").json()["status"] == "ok"
+    assert client.get("/api/config/defaults").json()["planner"]["max_advance_days"] == 7
 
 
 def test_import_run_and_read_the_results(client: TestClient, small_inputs: dict[InputName, bytes]) -> None:
-    response = client.post("/runs", files=_files(small_inputs), data={"parameters": json.dumps({"planner": {"smoothing_budget": 0.005}})})
+    response = client.post("/api/runs", files=_files(small_inputs), data={"parameters": json.dumps({"planner": {"smoothing_budget": 0.005}})})
     assert response.status_code == 202, response.text
     run = response.json()
     assert run["status"] == "succeeded" and run["checks_passed"] is True
     assert run["parameters"]["planner"]["smoothing_budget"] == 0.005 and set(run["inputs"]) == {str(n) for n in InputName}
 
-    assert client.get(f"/runs/{run['run_id']}").json()["kpis"]["saving"] >= 0
-    assert [r["run_id"] for r in client.get("/runs").json()] == [run["run_id"]]
-    assert "sortie1_profils" in client.get(f"/runs/{run['run_id']}/tables").json()
+    assert client.get(f"/api/runs/{run['run_id']}").json()["kpis"]["saving"] >= 0
+    assert [r["run_id"] for r in client.get("/api/runs").json()] == [run["run_id"]]
+    assert "sortie1_profils" in client.get(f"/api/runs/{run['run_id']}/tables").json()
 
-    page = client.get(f"/runs/{run['run_id']}/tables/sortie2_camions", params={"limit": 5}).json()
+    page = client.get(f"/api/runs/{run['run_id']}/tables/sortie2_camions", params={"limit": 5}).json()
     assert page["total"] >= 1 and len(page["rows"]) <= 5 and "truck_id" in page["columns"]
 
-    archive = client.get(f"/runs/{run['run_id']}/download")
+    archive = client.get(f"/api/runs/{run['run_id']}/download")
     names = zipfile.ZipFile(io.BytesIO(archive.content)).namelist()
     assert {"sortie1_profils.csv", "sortie2_contenu_camions.csv", "sortie3_saving.csv"} <= set(names)
-    assert "Run" in client.get(f"/runs/{run['run_id']}/log").text
+    assert "Run" in client.get(f"/api/runs/{run['run_id']}/log").text
 
 
 def test_rate_sheet_terms_are_recorded(client: TestClient, small_inputs: dict[InputName, bytes]) -> None:
     """Margin and diesel surcharge come from the PDF and are recorded in the manifest; they are not parameters."""
-    run = client.post("/runs", files=_files(small_inputs)).json()
+    run = client.post("/api/runs", files=_files(small_inputs)).json()
     assert run["rate_sheet"] == {"valid_from": "01.08.2026", "margin": 2.3923, "diesel_surcharge": 1.1943}
     assert "margin" not in run["parameters"]["planner"]
-    refused = client.post("/runs", files=_files(small_inputs), data={"parameters": '{"planner": {"margin": 3.0}}'})
+    refused = client.post("/api/runs", files=_files(small_inputs), data={"parameters": '{"planner": {"margin": 3.0}}'})
     assert refused.status_code == 422 and "margin" in refused.json()["detail"]
 
 
 def test_csv_rate_sheet_is_refused(client: TestClient, small_inputs: dict[InputName, bytes]) -> None:
     csv = (Path(__file__).resolve().parents[2] / "docs" / "rate_sheet.csv").read_bytes()
-    response = client.post("/runs", files=_files({**small_inputs, InputName.RATE_SHEET: csv}))
+    response = client.post("/api/runs", files=_files({**small_inputs, InputName.RATE_SHEET: csv}))
     assert response.status_code == 422 and "PDF" in response.json()["detail"]
 
 
 def test_file_with_a_missing_column_is_refused_at_once(client: TestClient, small_inputs: dict[InputName, bytes]) -> None:
     files = _files({**small_inputs, InputName.DISTANCES: b"supplier,km\nA,10\n"})
-    response = client.post("/runs", files=files)
+    response = client.post("/api/runs", files=files)
     assert response.status_code == 422 and "distances" in response.json()["detail"]
-    assert client.get("/runs").json() == []
+    assert client.get("/api/runs").json() == []
 
 
 def test_unknown_parameter_is_refused(client: TestClient, small_inputs: dict[InputName, bytes]) -> None:
-    response = client.post("/runs", files=_files(small_inputs), data={"parameters": '{"planner": {"speed": 3}}'})
+    response = client.post("/api/runs", files=_files(small_inputs), data={"parameters": '{"planner": {"speed": 3}}'})
     assert response.status_code == 422 and "speed" in response.json()["detail"]
 
 
 def test_unknown_run_is_not_found(client: TestClient) -> None:
-    assert client.get("/runs/20260101-000000-abcdef").status_code == 404
-    assert client.get("/runs/../../etc").status_code == 404
+    assert client.get("/api/runs/20260101-000000-abcdef").status_code == 404
+    assert client.get("/api/runs/../../etc").status_code == 404

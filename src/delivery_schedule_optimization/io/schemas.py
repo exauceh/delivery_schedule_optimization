@@ -59,6 +59,9 @@ NUMERIC_COLUMNS: dict[InputName, list[str]] = {
 }
 
 
+WORKBOOK_NAME = "resultats_consolidation.xlsx"  # Excel report of a run, next to the CSV tables
+
+
 class OutputName(StrEnum):
     """Files produced by a run (CSV), in the format of the project brief."""
 
@@ -70,5 +73,8 @@ class OutputName(StrEnum):
     ALLOCATIONS = "sortie2_affectations"
     SAVING = "sortie3_saving"
     CURRENT_DELIVERIES = "situation_actuelle_livraisons"
+    CURRENT_TRUCKS = "situation_actuelle_camions"
+    SMOOTHING_PLANTS = "lissage_usines"
+    SMOOTHING_COUPLES = "lissage_couples"
     CHECKS = "controles"
     OUTPUT_TESTS = "tests_sorties"

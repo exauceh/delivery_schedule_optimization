@@ -1,20 +1,22 @@
-"""Runs: import a planning and launch the optimisation, follow its progress."""
+"""Runs: import a planning and launch the optimisation, relaunch it with other parameters, follow it, delete it."""
 
 from __future__ import annotations
 
 import json
 import logging
+from collections.abc import Mapping
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile, status
+from fastapi import APIRouter, Depends, File, Form, HTTPException, Response, UploadFile, status
 from fastapi.responses import PlainTextResponse
+from pydantic import JsonValue
 
 from ...domain.parameters import ParameterError, dump_parameters, parse_parameters
 from ...io.readers import read_distances, read_rate_sheet, read_schedule
 from ...io.schemas import InputError, InputName
 from ...service import app_version
 from ...settings import Settings
-from ...storage.base import RunManifest, RunRepository
+from ...storage.base import RunManifest, RunRepository, RunStatus
 from ..dependencies import get_repository, get_runner, get_settings_from_app
 from ..jobs import JobRunner
 
@@ -23,17 +25,41 @@ logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/runs", tags=["runs"])
 
 READERS = {InputName.SCHEDULE: read_schedule, InputName.DISTANCES: read_distances, InputName.RATE_SHEET: read_rate_sheet}
+LabelForm = Annotated[str, Form(min_length=1, max_length=60, description="Name of the scenario, shown by the interface")]
+ParametersForm = Annotated[str | None, Form(description='Optional JSON overrides, e.g. {"planner": {"smoothing_budget": 0.005}}')]
+
+
+def _checked(content: bytes, name: InputName) -> bytes:
+    try:
+        READERS[name](content)  # check the columns now: the user gets the error at once, not after the queue
+    except InputError as exc:
+        raise HTTPException(status.HTTP_422_UNPROCESSABLE_CONTENT, str(exc)) from exc
+    return content
 
 
 async def _content(upload: UploadFile, name: InputName, max_bytes: int) -> bytes:
     content = await upload.read(max_bytes + 1)
     if len(content) > max_bytes:
         raise HTTPException(status.HTTP_413_CONTENT_TOO_LARGE, f"{name}: file larger than {max_bytes // 1_000_000} MB")
+    return _checked(content, name)
+
+
+def _parameters(parameters: str | None) -> dict[str, JsonValue]:
     try:
-        READERS[name](content)  # check the columns now: the user gets the error at once, not after the queue
-    except InputError as exc:
-        raise HTTPException(status.HTTP_422_UNPROCESSABLE_CONTENT, str(exc)) from exc
-    return content
+        overrides = json.loads(parameters) if parameters else {}
+        if not isinstance(overrides, dict):
+            raise ParameterError("parameters must be a JSON object")
+        planner, preparation = parse_parameters(overrides)
+    except (json.JSONDecodeError, ParameterError) as exc:
+        raise HTTPException(status.HTTP_422_UNPROCESSABLE_CONTENT, f"parameters: {exc}") from exc
+    return dump_parameters(planner, preparation)
+
+
+def _launch(repository: RunRepository, runner: JobRunner, contents: Mapping[InputName, bytes], parameters: str | None, label: str,
+            source_run_id: str | None = None) -> RunManifest:
+    manifest = repository.create(contents, _parameters(parameters), app_version(), label=label.strip(), source_run_id=source_run_id)
+    runner.submit(manifest.run_id)
+    return repository.get(manifest.run_id)
 
 
 @router.post("", status_code=status.HTTP_202_ACCEPTED)
@@ -44,7 +70,8 @@ async def create_run(
     repository: Annotated[RunRepository, Depends(get_repository)],
     runner: Annotated[JobRunner, Depends(get_runner)],
     settings: Annotated[Settings, Depends(get_settings_from_app)],
-    parameters: Annotated[str | None, Form(description='Optional JSON overrides, e.g. {"planner": {"smoothing_budget": 0.005}}')] = None,
+    parameters: ParametersForm = None,
+    label: LabelForm = "Scénario",
 ) -> RunManifest:
     """Import the three input files and launch the optimisation in the background; follow it with `GET /runs/{run_id}`."""
     max_bytes = settings.max_upload_mb * 1_000_000
@@ -53,16 +80,42 @@ async def create_run(
         InputName.DISTANCES: await _content(distances, InputName.DISTANCES, max_bytes),
         InputName.RATE_SHEET: await _content(rate_sheet, InputName.RATE_SHEET, max_bytes),
     }
+    return _launch(repository, runner, contents, parameters, label)
+
+
+@router.post("/example", status_code=status.HTTP_202_ACCEPTED)
+def create_example_run(
+    repository: Annotated[RunRepository, Depends(get_repository)],
+    runner: Annotated[JobRunner, Depends(get_runner)],
+    settings: Annotated[Settings, Depends(get_settings_from_app)],
+    parameters: ParametersForm = None,
+    label: LabelForm = "Exemple",
+) -> RunManifest:
+    """Launch the optimisation on the files of the project (November 2026 planning, distances, rate sheet PDF)."""
+    paths = {InputName.SCHEDULE: settings.example_schedule, InputName.DISTANCES: settings.example_distances,
+             InputName.RATE_SHEET: settings.example_rate_sheet}
+    missing = [str(path) for path in paths.values() if not path.is_file()]
+    if missing:
+        logger.error("Example files not found: %s", missing)
+        raise HTTPException(status.HTTP_404_NOT_FOUND, f"example files not found on the server: {', '.join(missing)}")
+    return _launch(repository, runner, {name: path.read_bytes() for name, path in paths.items()}, parameters, label)
+
+
+@router.post("/{run_id}/rerun", status_code=status.HTTP_202_ACCEPTED)
+def rerun(
+    run_id: str,
+    repository: Annotated[RunRepository, Depends(get_repository)],
+    runner: Annotated[JobRunner, Depends(get_runner)],
+    parameters: ParametersForm = None,
+    label: LabelForm = "Scénario",
+) -> RunManifest:
+    """Launch a new run on the input files of `run_id`, with other parameters: a new scenario of the same planning."""
+    repository.get(run_id)
     try:
-        overrides = json.loads(parameters) if parameters else {}
-        if not isinstance(overrides, dict):
-            raise ParameterError("parameters must be a JSON object")
-        planner, preparation = parse_parameters(overrides)
-    except (json.JSONDecodeError, ParameterError) as exc:
-        raise HTTPException(status.HTTP_422_UNPROCESSABLE_CONTENT, f"parameters: {exc}") from exc
-    manifest = repository.create(contents, dump_parameters(planner, preparation), app_version())
-    runner.submit(manifest.run_id)
-    return repository.get(manifest.run_id)
+        contents = {name: repository.input_path(run_id, name).read_bytes() for name in InputName}
+    except FileNotFoundError as exc:
+        raise HTTPException(status.HTTP_409_CONFLICT, f"run {run_id} has no input files to reuse: {exc}") from exc
+    return _launch(repository, runner, contents, parameters, label, source_run_id=run_id)
 
 
 @router.get("")
@@ -75,6 +128,16 @@ def list_runs(repository: Annotated[RunRepository, Depends(get_repository)]) -> 
 def get_run(run_id: str, repository: Annotated[RunRepository, Depends(get_repository)]) -> RunManifest:
     """Status, parameters, input fingerprints, timings and main results of a run."""
     return repository.get(run_id)
+
+
+@router.delete("/{run_id}", status_code=status.HTTP_204_NO_CONTENT)
+def delete_run(run_id: str, repository: Annotated[RunRepository, Depends(get_repository)]) -> Response:
+    """Delete a finished run (succeeded or failed) and its files."""
+    manifest = repository.get(run_id)
+    if manifest.status in (RunStatus.QUEUED, RunStatus.RUNNING):
+        raise HTTPException(status.HTTP_409_CONFLICT, f"run {run_id} is {manifest.status}: wait for its end before deleting it")
+    repository.delete(run_id)
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 
 @router.get("/{run_id}/log", response_class=PlainTextResponse)

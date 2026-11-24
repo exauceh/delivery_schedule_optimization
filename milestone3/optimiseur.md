@@ -30,8 +30,8 @@ dataset consolidé
 | :--- | :--- | :--- | :--- |
 | 1a | [`optimal_plan`](../src/delivery_schedule_optimization/engine/graph.py#L43-L150) | programmation dynamique (plus court chemin) | optimal pour un ensemble de jours, avec RG06 stricte |
 | 1b | [`reassign`](../src/delivery_schedule_optimization/engine/reassign.py#L20-L140) | recherche locale | améliore le plan, sans garantie d'optimum |
-| 2 | [`choose_profiles`](../src/delivery_schedule_optimization/engine/selection.py#L18-L20) | tri des candidats | le moins cher parmi les candidats |
-| 3 | [`smooth`](../src/delivery_schedule_optimization/engine/smoothing.py#L103-L132) | MILP par usine (HiGHS) + partage du budget | optimal à chaque niveau de lissage |
+| 2 | [`choose_profiles`](../src/delivery_schedule_optimization/engine/selection.py#L19-L21) | tri des candidats | le moins cher parmi les candidats |
+| 3 | [`smooth`](../src/delivery_schedule_optimization/engine/smoothing.py#L105-L135) | MILP par usine (HiGHS) + partage du budget | optimal à chaque niveau de lissage |
 
 ---
 
@@ -154,13 +154,14 @@ Un mouvement qui viderait un départ n'est accepté que si la règle des mêmes 
 
 ## 2. Le choix du plan de chaque couple (RG07)
 
-[`choose_profiles`](../src/delivery_schedule_optimization/engine/selection.py#L18-L20) prend, pour chaque couple, le candidat le plus petit selon [`selection_key`](../src/delivery_schedule_optimization/engine/selection.py#L9-L15) :
+[`choose_profiles`](../src/delivery_schedule_optimization/engine/selection.py#L19-L21) prend, pour chaque couple, le candidat le plus petit selon [`selection_key`](../src/delivery_schedule_optimization/engine/selection.py#L9-L16) :
 
 1. le moins de départs en débordement (seulement si `overflow_first`) ;
 2. **le coût le plus bas** ;
-3. puis le moins de camions, le moins d'avance, le profil le plus bas, et les jours les plus tôt dans la semaine.
+3. **le profil le plus bas** : entre des plans de même coût, celui qui livre le moins de fois par semaine ;
+4. puis le moins de camions, le moins d'avance, et les jours les plus tôt dans la semaine.
 
-Avec les réglages par défaut, c'est donc **le plan le moins cher** du couple. Le profil n'est pas imposé : c'est le résultat du meilleur plan.
+Avec les réglages par défaut, c'est donc **le plan le moins cher** du couple et, à coût égal, celui qui a le moins de livraisons par semaine. Sur le planning de novembre, 128 couples sont en profil 1, 47 en profil 2 et 5 en profil 3. Ce profil est ensuite gardé par le lissage.
 
 ---
 
@@ -170,11 +171,11 @@ Chaque couple a souvent **plusieurs plans au même coût** (par exemple lundi, v
 
 ### Le menu de chaque couple
 
-[`smoothing_options`](../src/delivery_schedule_optimization/engine/smoothing.py#L21-L28) donne les plans que chaque couple peut prendre. Avec les réglages par défaut, **tous ses candidats** sont permis : un couple peut changer de jours, et même de profil, si c'est intéressant.
+[`smoothing_options`](../src/delivery_schedule_optimization/engine/smoothing.py#L21-L30) donne les plans que chaque couple peut prendre : **ses candidats du même profil** que son choix de l'étape 2 (et, avec `overflow_first`, avec autant de départs en débordement). Un couple en profil 1 livré le lundi peut passer au mercredi, mais pas à deux livraisons par semaine : le lissage change les jours, jamais le nombre de livraisons. Le contrôle « RG07 - profil » le vérifie.
 
 ### L'indicateur de lissage
 
-[`smoothing_indicator`](../src/delivery_schedule_optimization/engine/smoothing.py#L31-L42) mesure la répartition des camions d'une usine :
+[`smoothing_indicator`](../src/delivery_schedule_optimization/engine/smoothing.py#L33-L44) mesure la répartition des camions d'une usine :
 
 ```
 indicateur = Σ (camions du jour le plus chargé de chaque semaine) + camions du jour le plus chargé de la période
@@ -184,7 +185,7 @@ Plus il est bas, mieux les camions sont répartis. Il additionne les pics **de c
 
 ### Le modèle d'une usine
 
-[`plant_frontier`](../src/delivery_schedule_optimization/engine/smoothing.py#L45-L100) écrit un programme linéaire en nombres entiers et le résout avec HiGHS (`scipy.optimize.milp`) :
+[`plant_frontier`](../src/delivery_schedule_optimization/engine/smoothing.py#L47-L102) écrit un programme linéaire en nombres entiers et le résout avec HiGHS (`scipy.optimize.milp`) :
 
 | | Définition |
 | :--- | :--- |
@@ -200,23 +201,23 @@ M_s et M ne sont pas des données mais des variables **auxiliaires** : elles ser
 
 ### La frontière : resserrer L pas à pas
 
-Le modèle minimise le coût sous la contrainte « indicateur ≤ L ». La boucle ([L91-L100](../src/delivery_schedule_optimization/engine/smoothing.py#L91-L100)) fait varier L :
+Le modèle minimise le coût sous la contrainte « indicateur ≤ L ». La boucle ([L93-L102](../src/delivery_schedule_optimization/engine/smoothing.py#L93-L102)) fait varier L :
 
-1. **sans L** ([`cheapest(None)`](../src/delivery_schedule_optimization/engine/smoothing.py#L72-L89)) : le plan le moins cher de l'usine, et son indicateur I ;
+1. **sans L** ([`cheapest(None)`](../src/delivery_schedule_optimization/engine/smoothing.py#L74-L91)) : le plan le moins cher de l'usine, et son indicateur I ;
 2. on impose **L = I − 1** et on relance : le plan le moins cher au moins un cran mieux lissé ;
 3. on recommence tant que le coût reste dans le budget ;
 4. on s'arrête quand le budget est dépassé ou qu'aucun plan n'atteint L.
 
 On obtient la **frontière** de l'usine : pour chaque niveau de lissage, le coût minimal pour l'atteindre. C'est la méthode ε-contrainte. Chaque niveau est résolu à l'optimum (gap 0, limite de 60 s).
 
-Exemple réel (PLT_002, 64 couples, 679 plans) : l'indicateur passe de **163 à 117 sans surcoût** (on choisit seulement entre des plans de même coût), puis chaque cran devient payant, jusqu'à 61 pour +491 €.
+Exemple réel (PLT_002, 64 couples, 376 plans du bon profil) : l'indicateur passe de **153 à 126 sans surcoût** (on choisit seulement entre des plans de même coût), puis chaque cran devient payant, jusqu'à 65 pour +496 €.
 
 ### Le partage du budget entre les usines
 
-[`smooth`](../src/delivery_schedule_optimization/engine/smoothing.py#L103-L132) calcule la frontière de chaque usine, puis les combine. Le budget (`smoothing_budget` × coût sans lissage) est **commun aux 4 usines** ([L117](../src/delivery_schedule_optimization/engine/smoothing.py#L117)) :
+[`smooth`](../src/delivery_schedule_optimization/engine/smoothing.py#L105-L135) calcule la frontière de chaque usine, puis les combine. Le budget (`smoothing_budget` × coût sans lissage) est **commun aux 4 usines** ([L120](../src/delivery_schedule_optimization/engine/smoothing.py#L120)) :
 
-- les frontières sont fusionnées usine par usine en gardant les combinaisons non dominées (aucune autre n'est à la fois moins chère et mieux lissée) ([L120-L129](../src/delivery_schedule_optimization/engine/smoothing.py#L120-L129)) ;
-- on prend la combinaison dont l'indicateur total est le plus bas sans dépasser le budget, puis la moins chère ([L130-L132](../src/delivery_schedule_optimization/engine/smoothing.py#L130-L132)).
+- les frontières sont fusionnées usine par usine en gardant les combinaisons non dominées (aucune autre n'est à la fois moins chère et mieux lissée) ([L123-L132](../src/delivery_schedule_optimization/engine/smoothing.py#L123-L132)) ;
+- on prend la combinaison dont l'indicateur total est le plus bas sans dépasser le budget, puis la moins chère ([L133-L135](../src/delivery_schedule_optimization/engine/smoothing.py#L133-L135)).
 
 Le budget va donc là où un cran de lissage coûte le moins cher.
 
@@ -224,7 +225,7 @@ Le budget va donc là où un cran de lissage coûte le moins cher.
 | :--- | :--- | :--- |
 | B0 - sans lissage | `smoothing=False` | chaque couple garde son plan le moins cher |
 | **B1 - lissage gratuit (retenu)** | 0 | on choisit seulement entre des plans de même coût |
-| B2 - petit lissage | 0,5 % | +534 € sur 6 semaines ; jour le plus chargé (toutes usines) : 36 → 13 camions |
+| B2 - petit lissage | 0,5 % | +539 € sur 6 semaines ; jour le plus chargé (toutes usines) : 37 → 14 camions |
 
 ---
 
@@ -233,7 +234,7 @@ Le budget va donc là où un cran de lissage coûte le moins cher.
 - **Sortie 1 (profils)** : [`couple_summary`](../src/delivery_schedule_optimization/reporting/outputs.py#L72-L123), une ligne par couple (profil, jours, coût avant et après, saving).
 - **Sortie 2 (camions et affectations)** : [`export`](../src/delivery_schedule_optimization/reporting/outputs.py#L24-L57) donne une ligne par camion et une ligne par besoin (camion, jour de livraison, avance, règle appliquée : jour du profil ou férié avancé) ; [`truck_contents`](../src/delivery_schedule_optimization/reporting/outputs.py#L60-L69) regroupe le contenu de chaque camion par material et quai.
 - **Sortie 3 (saving)** : calculée dans le notebook à partir de la référence et du plan.
-- **Contrôles** : [`check`](../src/delivery_schedule_optimization/validation/checks.py#L26-L105) revérifie chaque règle sur le plan terminé, **indépendamment de la façon dont il a été construit** : RG01 (un couple par camion), RG02 (jamais de retard), RG03 (7 jours au plus), RG04 (capacité recalculée depuis les lignes), RG05 et la règle des mêmes jours, RG06 (assouplie ou stricte), RG07 (coût dans le budget de lissage), RG08 (chaque ligne livrée une seule fois, quantités conservées par usine et material), RG10 (ni week-end ni jour férié), le début du plan (rien avant le 02/11) et RG11 (totaux et prix de chaque camion recalculés).
+- **Contrôles** : [`check`](../src/delivery_schedule_optimization/validation/checks.py#L36-L119) revérifie chaque règle sur le plan terminé, **indépendamment de la façon dont il a été construit** : RG01 (un couple par camion), RG02 (jamais de retard), RG03 (7 jours au plus), RG04 (capacité recalculée depuis les lignes), RG05 et la règle des mêmes jours, RG06 (assouplie ou stricte), RG07 (profil le plus bas parmi les plans les moins chers, coût dans le budget de lissage), RG08 (chaque ligne livrée une seule fois, quantités conservées par usine et material), RG10 (ni week-end ni jour férié), le début du plan (rien avant le 02/11) et RG11 (totaux et prix de chaque camion recalculés).
 
 ### Résultat (6 semaines)
 
@@ -241,7 +242,7 @@ Le budget va donc là où un cran de lissage coûte le moins cher.
 | :--- | ---: | ---: | ---: |
 | Coût | 176,7 k€ | 110,5 k€ | **−66 267 € (−37,5 %)** |
 | Camions | 1 741 | 757 | −56,5 % |
-| Livraisons | 1 665 | 655 | −60,7 % |
+| Livraisons | 1 665 | 644 | −61,3 % |
 
 Aucun couple ne paie plus cher qu'aujourd'hui.
 

@@ -36,3 +36,33 @@ def plan_kpis(lines: pd.DataFrame, deliveries_before: pd.DataFrame, trucks_after
         "peak_trucks_per_plant_day_after": float(plant_day_load(trucks_after).max().max()),
         "mean_advance_days": float(allocations["advance_days"].mean()),
     }
+
+
+KPI_LABELS = {
+    "couples": "Couples fournisseur × usine",
+    "lines": "Lignes de besoin planifiées",
+    "deliveries_before": "Livraisons avant",
+    "deliveries_after": "Livraisons après",
+    "trucks_before": "Camions avant",
+    "trucks_after": "Camions après",
+    "cost_before": "Coût avant (EUR)",
+    "cost_after": "Coût après (EUR)",
+    "saving": "Saving (EUR)",
+    "saving_pct": "Saving (%)",
+    "mean_truck_weight_before_kg": "Poids moyen d'un camion avant (kg)",
+    "mean_truck_weight_after_kg": "Poids moyen d'un camion après (kg)",
+    "peak_trucks_per_plant_day_before": "Pic avant (camions / usine / jour)",
+    "peak_trucks_per_plant_day_after": "Pic après (camions / usine / jour)",
+    "mean_advance_days": "Avance moyenne d'une ligne (jours)",
+}
+
+
+def summary_table(kpis: dict[str, float], rate_sheet: dict[str, str | float | None], checks_passed: bool,
+                  runtime_s: float) -> pd.DataFrame:
+    """Summary sheet of the Excel report: indicators, terms of the rate sheet, checks and computing time."""
+    rows: list[tuple[str, object]] = [(KPI_LABELS.get(key, key), round(value, 2)) for key, value in kpis.items()]
+    rows += [("Grille tarifaire valable depuis", rate_sheet.get("valid_from")), ("Marge (RG11)", rate_sheet.get("margin")),
+             ("Surcharge diesel (RG11)", rate_sheet.get("diesel_surcharge")),
+             ("Règles et tests de sortie", "tous respectés" if checks_passed else "au moins un échec"),
+             ("Temps de calcul (s)", round(runtime_s, 1))]
+    return pd.DataFrame(rows, columns=["indicateur", "valeur"])

@@ -19,10 +19,12 @@ FrontierPoint = tuple[int, float, Plans]  # (smoothing indicator, cost, one plan
 
 
 def smoothing_options(candidates: Candidates, chosen: Plans, config: PlannerConfig = PlannerConfig()) -> Candidates:
-    """Plans a couple may take when smoothing: with `overflow_first`, same number of overflowing departures
-    as its RG07 choice, so that RG07 stays respected."""
+    """Plans a couple may take when smoothing: same profile as its RG07 choice (smoothing moves the days, never the
+    number of deliveries per week) and, with `overflow_first`, the same number of overflowing departures, so that
+    RG07 stays respected."""
     return {
-        key: sorted([p for p in plans if not config.overflow_first or p.overflow_departures == chosen[key].overflow_departures],
+        key: sorted([p for p in plans if p.frequency == chosen[key].frequency
+                     and (not config.overflow_first or p.overflow_departures == chosen[key].overflow_departures)],
                     key=lambda p: selection_key(p, config))
         for key, plans in candidates.items()
     }
@@ -103,7 +105,8 @@ def plant_frontier(options: Candidates, budget: float, config: PlannerConfig) ->
 def smooth(candidates: Candidates, config: PlannerConfig) -> Plans:
     """RG09: spread the delivery days of the couples of each plant, at the lowest cost (exact).
 
-    A couple only moves between plans with the same overflow as its RG07 choice (RG07 kept).
+    A couple only moves between plans with the same profile (and, with `overflow_first`, the same overflow) as its
+    RG07 choice: RG07 is kept.
     1. per plant, exact frontier: cheapest plan for each level of the smoothing indicator;
     2. the budget (`smoothing_budget` x cost of the RG07 choice) is shared between the plants so that the
        sum of the indicators is the lowest, then the cost (exhaustive over the frontiers).

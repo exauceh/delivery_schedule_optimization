@@ -60,6 +60,7 @@ class PipelineResult:
     accuracy: dict[str, float]
     checks_passed: bool
     timings: dict[str, float]
+    plant_peaks: dict[str, int]  # most trucks received by each plant in one day
 
 
 class StageTimer:
@@ -89,7 +90,7 @@ def run_pipeline(inputs: RawInputs, config: RunConfig) -> PipelineResult:
         tariff = Tariff(rate_grid(inputs.rate_sheet.table), inputs.rate_sheet.price_factor)  # RG11: terms of the rate sheet
         holidays = public_holidays(lines, planner)
     with timer.stage("current_situation"):
-        deliveries_before, _ = current_deliveries(lines, tariff, planner)
+        deliveries_before, trucks_before = current_deliveries(lines, tariff, planner)
     with timer.stage("candidate_plans"):
         candidates = candidate_plans(lines, holidays, tariff, planner)
         logger.info("%d candidate plans for %d couples", sum(map(len, candidates.values())), len(candidates))
@@ -116,15 +117,18 @@ def run_pipeline(inputs: RawInputs, config: RunConfig) -> PipelineResult:
         OutputName.CONSOLIDATED: prepared.consolidated,
         OutputName.ANOMALIES: prepared.anomalies,
         OutputName.CURRENT_DELIVERIES: deliveries_before,
+        OutputName.CURRENT_TRUCKS: trucks_before,
         OutputName.PROFILES: outputs.profiles,
         OutputName.TRUCK_CONTENTS: outputs.truck_contents,
         OutputName.TRUCKS: outputs.trucks,
         OutputName.ALLOCATIONS: outputs.allocations,
         OutputName.SAVING: outputs.saving,
+        OutputName.SMOOTHING_PLANTS: outputs.smoothing_plants,
+        OutputName.SMOOTHING_COUPLES: outputs.smoothing_couples,
         OutputName.CHECKS: checks,
         OutputName.OUTPUT_TESTS: output_tests,
     }
     rate_sheet: dict[str, str | float | None] = {"valid_from": inputs.rate_sheet.valid_from, "margin": inputs.rate_sheet.margin,
                                                  "diesel_surcharge": inputs.rate_sheet.diesel_surcharge}
     return PipelineResult(planner=planner, rate_sheet=rate_sheet, tables=tables, kpis=kpis, accuracy=prepared.accuracy,
-                          checks_passed=checks_passed, timings=timer.timings)
+                          checks_passed=checks_passed, timings=timer.timings, plant_peaks=outputs.plant_peaks)

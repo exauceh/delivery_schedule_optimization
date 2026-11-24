@@ -14,9 +14,10 @@ from pathlib import Path
 from .domain.parameters import dump_parameters, parse_parameters
 from .io.readers import read_distances, read_rate_sheet, read_schedule
 from .io.schemas import InputName
-from .io.writers import write_tables
+from .io.writers import write_tables, write_workbook
 from .logging_config import run_log_file, setup_logging
 from .pipeline import RawInputs, RunConfig, run_pipeline
+from .reporting.kpis import summary_table
 from .storage.base import RunManifest, RunRepository, RunStatus
 from .storage.filesystem import FileRunRepository
 
@@ -48,6 +49,8 @@ def execute_run(repository: RunRepository, run_id: str, workers: int | None = No
             )
             result = run_pipeline(inputs, RunConfig(planner=planner, preparation=preparation))
             write_tables(result.tables, repository.output_dir(run_id))
+            write_workbook(result.tables, summary_table(result.kpis, result.rate_sheet, result.checks_passed,
+                                                        sum(result.timings.values())), repository.output_dir(run_id))
         except Exception as exc:  # the run fails, the service keeps running: the error is recorded in the manifest
             logger.exception("Run %s failed", run_id)
             manifest = manifest.model_copy(update={"status": RunStatus.FAILED, "finished_at": datetime.now(UTC), "error": f"{type(exc).__name__}: {exc}"})
@@ -56,6 +59,7 @@ def execute_run(repository: RunRepository, run_id: str, workers: int | None = No
                 "status": RunStatus.SUCCEEDED, "finished_at": datetime.now(UTC), "timings": result.timings,
                 "kpis": result.kpis, "accuracy": result.accuracy, "checks_passed": result.checks_passed,
                 "parameters": dump_parameters(result.planner, preparation), "rate_sheet": result.rate_sheet,
+                "plant_peaks": result.plant_peaks,
             })
             logger.info("Run %s succeeded in %.1f s", run_id, sum(result.timings.values()))
     repository.save(manifest)

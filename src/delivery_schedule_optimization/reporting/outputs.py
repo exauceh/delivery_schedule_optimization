@@ -13,6 +13,7 @@ from ..domain.calendar import horizon_weeks, monday, plan_start
 from ..domain.config import COUPLE, DAY_NAMES, PlannerConfig
 from ..domain.models import Candidates, Plans
 from ..engine.selection import selection_key
+from ..engine.smoothing import smoothing_indicator
 from ..pricing.tariff import Tariff
 
 
@@ -123,6 +124,39 @@ def couple_summary(lines: pd.DataFrame, baseline: pd.DataFrame, plans_B: Plans, 
     return out.sort_values("saving", ascending=False).reset_index(drop=True)
 
 
+def plant_peaks(plans: Plans) -> dict[str, int]:
+    """Most trucks received by each plant in one day."""
+    load: dict[tuple[str, np.datetime64], int] = {}
+    for (_, plant), plan in plans.items():
+        for day, n in plan.trucks_per_date.items():
+            load[plant, day] = load.get((plant, day), 0) + n
+    peaks: dict[str, int] = {}
+    for (plant, _), n in load.items():
+        peaks[plant] = max(peaks.get(plant, 0), n)
+    return dict(sorted(peaks.items()))
+
+
+def smoothing_tables(plans: Plans, unsmoothed: Plans) -> tuple[pd.DataFrame, pd.DataFrame]:
+    """Effect of the smoothing (RG09): per plant (peak day, indicator, cost) and per couple (profile before / after)."""
+    def days(profile: tuple[int, ...]) -> str:
+        return " + ".join(DAY_NAMES[d] for d in profile)
+
+    before, after = plant_peaks(unsmoothed), plant_peaks(plans)
+    plants = []
+    for plant in sorted(after):
+        old = [p for k, p in unsmoothed.items() if k[1] == plant]
+        new = [p for k, p in plans.items() if k[1] == plant]
+        plants.append({"plant": plant, "peak_before_smoothing": before.get(plant, 0), "peak_after_smoothing": after[plant],
+                       "indicator_before_smoothing": smoothing_indicator(old), "indicator_after_smoothing": smoothing_indicator(new),
+                       "cost_before_smoothing": sum(p.cost for p in old), "cost_after_smoothing": sum(p.cost for p in new)})
+    couples = [{"supplier_id": key[0], "plant": key[1],
+                "profile_before_smoothing": unsmoothed[key].frequency, "profile_days_before_smoothing": days(unsmoothed[key].profile),
+                "profile": plan.frequency, "profile_days": days(plan.profile),
+                "cost_before_smoothing": unsmoothed[key].cost, "cost_after_smoothing": plan.cost}
+               for key, plan in sorted(plans.items())]
+    return pd.DataFrame(plants), pd.DataFrame(couples)
+
+
 PROFILE_COLUMNS = ["supplier_id", "plant", "distance", "current_profile", "current_weekly_pattern", "profile", "profile_days",
                    "weekly_pattern", "trucks_per_active_week", "mean_fill_weight_pct", "mean_advance_days", "reason"]
 SAVING_COLUMNS = ["supplier_id", "plant", "distance", "deliveries_before", "deliveries_after", "trucks_before", "trucks_after",
@@ -138,6 +172,9 @@ class PlanOutputs:
     trucks: pd.DataFrame
     allocations: pd.DataFrame
     saving: pd.DataFrame
+    smoothing_plants: pd.DataFrame
+    smoothing_couples: pd.DataFrame
+    plant_peaks: dict[str, int]
 
 
 def build_outputs(lines: pd.DataFrame, deliveries_before: pd.DataFrame, plans: Plans, unsmoothed: Plans, candidates: Candidates,
@@ -149,4 +186,6 @@ def build_outputs(lines: pd.DataFrame, deliveries_before: pd.DataFrame, plans: P
     saving = summary[SAVING_COLUMNS]
     if not np.isclose(saving["saving"].sum(), deliveries_before["cost"].sum() - trucks["cost"].sum()):
         raise ValueError("output 3: the savings per couple do not add up to the total saving")
-    return PlanOutputs(profiles=profiles, truck_contents=truck_contents(allocations), trucks=trucks, allocations=allocations, saving=saving)
+    smoothing_plants, smoothing_couples = smoothing_tables(plans, unsmoothed)
+    return PlanOutputs(profiles=profiles, truck_contents=truck_contents(allocations), trucks=trucks, allocations=allocations, saving=saving,
+                       smoothing_plants=smoothing_plants, smoothing_couples=smoothing_couples, plant_peaks=plant_peaks(plans))

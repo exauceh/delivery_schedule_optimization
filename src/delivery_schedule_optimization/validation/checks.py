@@ -9,7 +9,7 @@ import pandas as pd
 
 from ..domain.calendar import first_working_day, is_working_day, plan_start
 from ..domain.config import COUPLE, PlannerConfig
-from ..domain.models import Candidates, Plans
+from ..domain.models import Candidates, CouplePlan, Plans
 from ..pricing.tariff import Tariff
 
 
@@ -21,6 +21,16 @@ def rg06_coverage(allocations: pd.DataFrame) -> bool:
         if (latest != group["delivery_date"].to_numpy()).any():
             return False
     return True
+
+
+def rg07_profile(plans: list[CouplePlan], config: PlannerConfig) -> int:
+    """RG07: lowest profile among the cheapest plans of a couple (after the fewest overflows with `overflow_first`)."""
+    pool = plans
+    if config.overflow_first:
+        fewest = min(p.overflow_departures for p in pool)
+        pool = [p for p in pool if p.overflow_departures == fewest]
+    cheapest = min(round(p.cost, 6) for p in pool)
+    return min(p.frequency for p in pool if round(p.cost, 6) == cheapest)
 
 
 def check(lines: pd.DataFrame, plans: Plans, trucks: pd.DataFrame, allocations: pd.DataFrame,
@@ -72,6 +82,10 @@ def check(lines: pd.DataFrame, plans: Plans, trucks: pd.DataFrame, allocations: 
          bool(((alloc["need_date"] - alloc["delivery_date"]).dt.days.between(0, config.max_advance_days)).all())),
     ]
     if candidates is not None:
+        rows.append(("RG07 - profil", "Le profil de chaque couple est le plus bas parmi ses plans les moins chers"
+                                      + (" (après le moins de départs dépassant un camion)" if config.overflow_first else "")
+                                      + " : le lissage ne change pas le profil",
+                     all(plans[k].frequency == rg07_profile(candidates[k], config) for k in plans)))
         if config.overflow_first:
             rows.append(("RG07", "Aucun autre plan du couple n'a moins de départs dépassant un camion "
                                  "(le client préfère ajouter des jours plutôt que des camions)",

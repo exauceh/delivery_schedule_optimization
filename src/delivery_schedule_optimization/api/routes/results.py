@@ -1,4 +1,4 @@
-"""Results of a finished run: tables as JSON (for the future front end), CSV files and zip archive."""
+"""Results of a finished run: tables as JSON, CSV files, Excel report and zip archive."""
 
 from __future__ import annotations
 
@@ -10,7 +10,7 @@ from fastapi import APIRouter, Depends, HTTPException, Query, status
 from fastapi.responses import FileResponse
 from pydantic import JsonValue, TypeAdapter
 
-from ...io.schemas import OutputName
+from ...io.schemas import WORKBOOK_NAME, OutputName
 from ...storage.base import RunRepository, RunStatus
 from ..dependencies import get_repository
 from ..schemas import TablePage
@@ -54,6 +54,16 @@ def download_table(run_id: str, name: OutputName, repository: Annotated[RunRepos
     """One output table as a CSV file."""
     _finished(repository, run_id)
     return FileResponse(repository.output_dir(run_id) / f"{name}.csv", media_type="text/csv", filename=f"{name}.csv")
+
+
+@router.get("/excel")
+def download_workbook(run_id: str, repository: Annotated[RunRepository, Depends(get_repository)]) -> FileResponse:
+    """Excel report of the run: a summary sheet, then the outputs, the checks and the output tests."""
+    _finished(repository, run_id)
+    path = repository.output_dir(run_id) / WORKBOOK_NAME
+    if not path.is_file():
+        raise HTTPException(status.HTTP_404_NOT_FOUND, f"run {run_id} has no Excel report (made before the report existed)")
+    return FileResponse(path, media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", filename=WORKBOOK_NAME)
 
 
 @router.get("/download")

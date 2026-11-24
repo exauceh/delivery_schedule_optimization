@@ -25,8 +25,9 @@ Optimisation (exact):
   linear programme solved to optimality (HiGHS), like the choice of visit-day combinations in periodic
   routing or of delivery patterns in retail (Sternbeck & Kuhn 2014).
 
-Choice of the profile (RG07 + client answer "add delivery days rather than trucks"): the lowest
-profile whose departures each fit in one truck; a truck holding a single line completed with a full
-truck (unknown weight) is not counted as an overflow, since no profile can avoid it. If even 5 days
-overflow, the profile with the fewest overflowing departures is kept and trucks are added.
+Choice of the plan and of the profile (RG07): the cheapest plan of the couple; among plans of the same cost, the
+lowest profile (fewest deliveries per week). Smoothing (RG09) then only moves the days, within that profile.
+With `overflow_first` (client answer "add delivery days rather than trucks"), the fewest departures that need
+more than one truck come first; a truck holding a single line completed with a full truck (unknown weight) is not
+counted as an overflow, since no profile can avoid it.
 """

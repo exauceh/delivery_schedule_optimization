@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Gilbert &amp; Co · Planification des livraisons</title>
+<link rel="icon" type="image/svg+xml" href="brand/gilbert-mark.svg">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<nav class="sidenav" id="sidenav" aria-label="Navigation">
+  <div class="nav-head">
+    <a class="nav-logo" href="#accueil" data-view="accueil">
+      <img class="logo-full" src="brand/gilbert-logo.svg" alt="Gilbert &amp; Co">
+      <img class="logo-mark" src="brand/gilbert-mark.svg" alt="Gilbert &amp; Co">
+    </a>
+    <button class="nav-toggle" id="navToggle" aria-expanded="true" title="Replier ou déplier le menu">
+      <svg viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></svg><span class="sr-only">Replier le menu</span></button>
+  </div>
+  <p class="nav-group">Espace de travail</p>
+  <button data-view="accueil" title="Nouveau calcul"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg><span>Nouveau calcul</span></button>
+  <p class="nav-group">Résultats</p>
+  <button data-view="apercu" class="needs-run" title="Résultats"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="8" height="10" rx="2"/><rect x="13" y="3" width="8" height="6" rx="2"/><rect x="13" y="11" width="8" height="10" rx="2"/><rect x="3" y="15" width="8" height="6" rx="2"/></svg><span>Synthèse</span></button>
+  <button data-view="calendrier" class="needs-run" title="Planning"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M3 10h18M8 3v4M16 3v4"/></svg><span>Planning</span></button>
+  <button data-view="profils" class="needs-run" title="Profils"><svg viewBox="0 0 24 24"><circle cx="6" cy="7" r="2.5"/><circle cx="18" cy="7" r="2.5"/><circle cx="12" cy="17" r="2.5"/><path d="M8.5 7h7M7.5 9l3 6M16.5 9l-3 6"/></svg><span>Profils</span></button>
+  <button data-view="camions" class="needs-run" title="Camions"><svg viewBox="0 0 24 24"><path d="M2 6h11v10H2zM13 9h4l4 4v3h-8z"/><circle cx="6" cy="18" r="2"/><circle cx="17" cy="18" r="2"/></svg><span>Camions</span></button>
+  <button data-view="fournisseurs" class="needs-run" title="Fournisseurs"><svg viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg><span>Fournisseurs</span></button>
+  <button data-view="scenarios" class="needs-run" title="Scénarios"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="7" height="16" rx="2"/><rect x="14" y="8" width="7" height="12" rx="2"/></svg><span>Scénarios</span></button>
+  <div class="nav-scenario" id="navScenario" hidden><b id="navScenarioName"></b><span id="navScenarioMeta"></span></div>
+</nav>
+
+<header class="topbar">
+  <nav class="crumbs" aria-label="Fil d'Ariane"><span>Espace de travail</span><span class="sep" aria-hidden="true">/</span><b id="crumbCurrent" aria-current="page">Nouveau calcul</b></nav>
+  <div class="topbar-right">
+    <label class="scenario-switch" id="scenarioSwitch" hidden>
+      <select id="scenarioSelect" aria-label="Scénario affiché"></select>
+    </label>  </div>
+</header>
+
+<main id="app">
+  <!-- ======================================================== NEW CALCULATION -->
+  <section class="view" id="view-accueil">
+    <div class="view-head"><div><p class="kicker">Nouveau calcul</p><h2>Importer un planning</h2>
+      <p class="meta">Déposez le planning, les distances et la grille tarifaire du transporteur (PDF), puis lancez : les résultats arrivent en moins d'une minute.</p></div></div>
+    <div class="home-grid">
+      <div class="launch-card">
+        <div class="lc-body">
+          <div id="sourceBox"></div>
+          <div class="namefield">
+            <label for="f-label">Nom du scénario</label>
+            <input id="f-label" type="text" maxlength="60" value="Plan de référence">
+          </div>
+          <details class="fold" id="tuning">
+            <summary><span>Réglages détaillés</span><span class="t-sum" id="tuningSum"></span></summary>
+            <div class="fiches">
+            <div class="fiche" data-field="anticipation"><p class="f-lab">Anticipation maximale</p>
+              <div class="stepper"><button type="button" data-step="-1" aria-label="Un jour de moins">−</button>
+                <span><b id="antVal">7</b> jours</span><button type="button" data-step="1" aria-label="Un jour de plus">+</button></div></div>
+            <div class="fiche" data-field="smoothing"><p class="f-lab">Surcoût accepté pour lisser</p>
+              <div class="chips"><button type="button" data-v="0">aucun</button><button type="button" data-v="0.005">0,5&nbsp;%</button><button type="button" data-v="0.01">1&nbsp;%</button><button type="button" data-v="0.02">2&nbsp;%</button></div></div>
+            <div class="fiche" data-field="frequency"><p class="f-lab">Livraisons par semaine, au plus</p>
+              <div class="chips"><button type="button" data-v="1">1</button><button type="button" data-v="2">2</button><button type="button" data-v="3">3</button><button type="button" data-v="4">4</button><button type="button" data-v="5">5</button></div></div>
+          </div>
+            <p class="fold-warn" id="tuningWarn" hidden></p>
+          </details>
+        </div>
+        <div class="lc-foot">
+          <button class="compose" id="composeBtn">
+            <span>Lancer le calcul</span>
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h12m-5-6 6 6-6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+          <div class="lc-go">
+            <p class="lc-title" id="goTitle">Importer et lancer l'optimisation</p>
+            <p class="lc-note" id="goNote">Déposez le planning et les distances pour commencer.</p>
+            <button class="link light" id="exampleBtn">Essayer avec un exemple</button>
+          </div>
+        </div>
+      </div>
+      <div class="panel history">
+        <div class="history-head"><h3>Calculs précédents</h3><span class="muted" id="historyCount"></span></div>
+        <div id="importList" class="import-list"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ======================================================== RUNNING -->
+  <section class="view" id="view-running">
+    <div class="running">
+      <div class="gather" id="gather" aria-hidden="true"></div>
+      <div class="running-text">
+        <p class="kicker light" id="runLabel">Scénario</p>
+        <p class="timer" id="runTimer">0 s</p>
+        <p class="phrase" id="runPhrase">On lit les besoins de chaque fournisseur…</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ======================================================== OVERVIEW -->
+  <section class="view ed" id="view-apercu">
+    <div class="ed-head">
+      <div>
+        <p class="ed-eyebrow">Performance logistique</p>
+        <h1 class="ed-title">Synthèse du plan optimisé</h1>
+        <p class="ed-sub" id="ov-sub"></p>
+      </div>
+      <div class="ed-actions">
+        <button class="ed-btn" data-view="scenarios">Comparer les scénarios</button>
+        <div class="ed-export">
+          <button class="ed-btn primary" id="exportBtn" aria-haspopup="true" aria-expanded="false" aria-controls="downloads">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v12m-5-5 5 5 5-5"/></svg>Exporter le rapport</button>
+          <div class="ed-menu" id="downloads" hidden></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="ed-row ed-two">
+      <div class="ed-hero" id="tile-saving"></div>
+      <div class="ed-card ed-cost" id="costCard"></div>
+    </div>
+    <div class="ed-row ed-three" id="kpiRow"></div>
+
+    <div class="ed-card ed-load">
+      <div class="ed-card-head">
+        <div><h2>Charge quotidienne des usines</h2><p>Répartition des camions sur l'horizon de livraison</p></div>
+        <button class="ed-btn small" data-view="calendrier">Voir le planning complet
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 16 16 8M9 8h7v7"/></svg></button>
+      </div>
+      <div class="ed-cal" id="loadCal"></div>
+      <div class="ed-legend" id="loadLegend"></div>
+    </div>
+
+    <div class="ed-row ed-split">
+      <div class="ed-card" id="plantCard"></div>
+      <div class="ed-card" id="complianceCard"></div>
+    </div>
+
+    <h3 class="ed-section">Analyses détaillées</h3>
+    <details class="fold panel"><summary><span>Coût de transport par usine</span><span class="t-sum" id="plantsSum"></span></summary><div id="plantsBody"></div></details>
+    <details class="fold panel"><summary><span>Lissage des réceptions</span><span class="t-sum" id="smoothSum"></span></summary><div id="smoothBody"></div></details>
+    <div id="situationBlock">
+      <details class="fold panel sit-panel"><summary><span id="sitPanelTitle">Grille tarifaire de la situation actuelle</span><span class="t-sum">distance × poids chargé</span></summary>
+        <p class="meta small" id="sitCaption"></p>
+        <div id="sitBody"></div>
+      </details>
+      <details class="fold panel"><summary><span>Règles appliquées aux données</span><span class="t-sum" id="foldRulesSum"></span></summary><ol id="rulesList" class="rules-list"></ol></details>
+      <details class="fold panel"><summary><span>Registre des anomalies</span><span class="t-sum" id="anomalyCount"></span></summary><div class="table-wrap" id="anomalyTable"></div></details>
+    </div>
+    <details class="fold panel"><summary><span>Contrôles du plan et journal du calcul</span><span class="t-sum" id="controlsSum"></span></summary>
+      <div class="split"><div><div id="controlsList"></div></div><div><h3>Préparation et calcul</h3><div class="table-wrap" id="journal"></div></div></div></details>
+  </section>
+
+  <!-- ======================================================== CALENDAR -->
+  <section class="view" id="view-calendrier">
+    <div class="view-head"><div><p class="kicker">Planning</p><h2>Les camions reçus par usine, jour par jour</h2>
+      <p class="meta">Chaque case est une usine un jour donné. Le jour le plus chargé de chaque usine ressort en orange.</p></div></div>
+    <div class="panel"><div id="calendarBig"></div></div>
+    <div class="peaks" id="peaks"></div>
+  </section>
+
+  <!-- ======================================================== PROFILES -->
+  <section class="view" id="view-profils">
+    <div class="view-head"><div><p class="kicker">Jours de livraison par fournisseur</p><h2>À quelle fréquence livrer chaque fournisseur&nbsp;?</h2></div></div>
+    <div class="split">
+      <div class="panel"><h3>Livraisons par semaine</h3><div id="dumbbell"></div></div>
+      <div class="panel">
+        <div class="filters">
+          <select id="pf-plant"><option value="">Toutes les usines</option></select>
+          <input id="pf-q" type="search" placeholder="Chercher un fournisseur">
+          <label class="check"><input type="checkbox" id="pf-changed"> profil changé au lissage</label>
+        </div>
+        <div class="table-wrap" id="profilesTable"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ======================================================== TRUCKS -->
+  <section class="view" id="view-camions">
+    <div class="view-head"><div><p class="kicker">Détail des camions</p><h2>Ce que contient chaque camion</h2></div></div>
+    <div class="split trucks-split">
+      <div class="panel">
+        <div class="filters">
+          <select id="tf-plant"><option value="">Toutes les usines</option></select>
+          <select id="tf-supplier"><option value="">Tous les fournisseurs</option></select>
+          <select id="tf-day"><option value="">Tous les jours</option></select>
+        </div>
+        <div class="table-wrap" id="trucksTable"></div>
+        <div class="pager" id="trucksPager"></div>
+      </div>
+      <div class="ticket-holder" id="ticket"><div class="ticket empty"><p>Choisissez un camion dans la liste pour ouvrir son bon de livraison.</p></div></div>
+    </div>
+  </section>
+
+  <!-- ======================================================== SUPPLIERS -->
+  <section class="view" id="view-fournisseurs">
+    <div class="view-head"><div><p class="kicker">Économies par fournisseur</p><h2>Où se font les économies</h2></div></div>
+    <div class="split">
+      <div class="panel"><h3>Les 15 plus grosses économies</h3><div id="lollipop"></div></div>
+      <div class="panel">
+        <div class="filters"><input id="sf-q" type="search" placeholder="Chercher un fournisseur ou une usine"></div>
+        <div class="table-wrap" id="suppliersTable"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ======================================================== SCENARIOS -->
+  <section class="view" id="view-scenarios">
+    <div class="view-head"><div><p class="kicker">Scénarios</p><h2>Comparer les calculs</h2>
+      <p class="meta">Changez un réglage dans « Nouveau calcul » et relancez : chaque calcul se range ici.</p></div></div>
+    <div class="panel" id="scenarioChart"></div>
+    <div class="cards" id="scenarioCards"></div>
+  </section>
+</main>
+
+
+
+<div class="tooltip" id="tooltip" role="tooltip"></div>
+<div class="toast" id="toast" role="status"></div>
+<script src="app.js"></script>
+</body>
+</html>

@@ -1,6 +1,6 @@
 # Consolidation du planning de livraisons
 
-Backend du projet de consolidation des livraisons. À partir du planning publié par les
+Application **Gilbert & Co** du projet de consolidation des livraisons : une interface web et l'API qui la sert. À partir du planning publié par les
 usines, le moteur choisit pour chaque couple fournisseur × usine un **profil de livraison** (des jours de livraison
 fixes), regroupe les besoins dans des **camions**, répartit les livraisons sur la semaine pour chaque usine et
 **chiffre les économies** par rapport à la situation actuelle, sans jamais livrer en retard ni surcharger un camion.
@@ -16,11 +16,11 @@ uv sync                                   # environnement : application + tests 
 # Une exécution en ligne de commande (sans serveur)
 uv run main.py run --schedule docs/released_schedule.csv --distances docs/distances.csv --rate-sheet courses/rate_sheet.pdf
 
-# L'API (documentation interactive sur http://127.0.0.1:8000/docs)
+# L'application : interface web sur http://127.0.0.1:8000, API sous /api (documentation interactive sur /docs)
 uv run main.py serve
 ```
 
-Avec Docker (API sur le port 8000, exécutions conservées dans un volume) :
+Avec Docker (interface et API sur le port 8000, exécutions conservées dans un volume) :
 
 ```bash
 docker compose up --build
@@ -81,23 +81,55 @@ Chaque exécution écrit dans `runs/<run_id>/output/` :
 | `situation_actuelle_livraisons.csv` | Situation actuelle : une livraison par couple et par jour de besoin, avec ses camions et son coût |
 | `controles.csv` | Chaque règle métier (RG01 à RG11) vérifiée sur le plan final |
 | `tests_sorties.csv` | Les suites de tests du Milestone 4 rejouées sur les sorties : contraintes recalculées depuis les lignes, données manquantes (H05, H06), exhaustivité, absence de rupture, cohérence du saving |
+| `situation_actuelle_camions.csv` | Situation actuelle camion par camion (poids, remplissage, prix) : la grille tarifaire de l'interface |
+| `lissage_usines.csv`, `lissage_couples.csv` | Effet du lissage : pic et coût de chaque usine, profil de chaque couple, avant et après lissage |
+| `resultats_consolidation.xlsx` | Rapport Excel : une feuille de synthèse, puis les sorties, le lissage, les anomalies, les contrôles et les tests |
 
 `runs/<run_id>/manifest.json` enregistre l'empreinte SHA-256 des entrées, tous les paramètres utilisés (valeurs par
 défaut comprises), la durée de chaque étape, les principaux indicateurs et le résultat des contrôles et des tests de
 sortie (`checks_passed`, faux si un seul échoue) : les mêmes entrées et les mêmes paramètres donnent toujours les mêmes
 résultats.
 
+## Interface web
+
+L'interface de Wissam (dossier `src/delivery_schedule_optimization/web/` : HTML, CSS et JavaScript sans compilation,
+graphiques SVG faits main, logo et polices hébergés avec l'application) est servie par FastAPI sur `/`. Elle ne calcule
+rien : tous ses chiffres viennent des tables de sortie d'une exécution, par les routes `/api/runs/{run_id}/views/...`
+(`reporting/dashboard.py`).
+
+- **Nouveau calcul** : on dépose les trois fichiers d'un coup (reconnus automatiquement), on nomme le scénario et on
+  ajuste les réglages détaillés (avance maximale, surcoût accepté pour lisser, livraisons par semaine au plus), puis on
+  lance. « Essayer avec un exemple » utilise les fichiers du projet. Les calculs précédents se rouvrent, se relancent sur
+  les mêmes fichiers avec d'autres réglages, ou se suppriment.
+- **Synthèse** : économie, coût, camions, livraisons et remplissage avant / après, charge quotidienne des usines,
+  conformité, puis en détail le coût par usine, le lissage, la situation actuelle sur la grille tarifaire, les règles
+  appliquées aux données, le registre des anomalies, les contrôles, les tests de sortie et le journal du calcul.
+  « Exporter le rapport » donne le rapport Excel, les sorties en CSV ou le zip de toutes les tables.
+- **Planning, Profils, Camions, Fournisseurs** : le détail des sorties 1 à 3, avec filtres et le bon de livraison de
+  chaque camion.
+- **Scénarios** : tous les calculs côte à côte (économie, camions, pics par usine, réglages, durée).
+
+Un lissage avec surcoût est beaucoup plus long que le lissage gratuit : environ 6 minutes pour 0,5 % sur le planning du
+projet, contre une quinzaine de secondes. L'interface le signale quand on choisit ce réglage.
+
 ## API
+
+Toutes les routes sont sous `/api`.
 
 | Méthode | Route | Rôle |
 | :--- | :--- | :--- |
-| `GET` | `/health` | État du service |
-| `GET` | `/config/defaults` | Tous les paramètres d'une exécution avec leur valeur par défaut |
-| `POST` | `/runs` | Importer les trois fichiers (+ un JSON `parameters` facultatif) et lancer l'exécution en arrière-plan → `202` avec le `run_id` |
-| `GET` | `/runs`, `/runs/{run_id}` | Liste des exécutions, statut et résultats d'une exécution |
-| `GET` | `/runs/{run_id}/log` | Journal de l'exécution |
-| `GET` | `/runs/{run_id}/tables`, `/runs/{run_id}/tables/{name}` | Tables de sortie en JSON, paginées (pour le front) |
-| `GET` | `/runs/{run_id}/files/{name}`, `/runs/{run_id}/download` | Une table en CSV, ou toutes les sorties dans un zip |
+| `GET` | `/api/health` | État du service |
+| `GET` | `/api/config/defaults` | Tous les paramètres d'une exécution avec leur valeur par défaut |
+| `POST` | `/api/runs` | Importer les trois fichiers (+ `label` et un JSON `parameters` facultatifs) et lancer l'exécution en arrière-plan → `202` avec le `run_id` |
+| `POST` | `/api/runs/example` | Même chose avec les fichiers du projet (`DSO_EXAMPLE_*`) |
+| `POST` | `/api/runs/{run_id}/rerun` | Nouvelle exécution sur les fichiers de `run_id`, avec d'autres paramètres (`source_run_id` dans le manifeste) |
+| `GET` | `/api/runs`, `/api/runs/{run_id}` | Liste des exécutions, statut et résultats d'une exécution |
+| `DELETE` | `/api/runs/{run_id}` | Supprimer une exécution terminée et ses fichiers |
+| `GET` | `/api/runs/{run_id}/log` | Journal de l'exécution |
+| `GET` | `/api/runs/{run_id}/tables`, `/api/runs/{run_id}/tables/{name}` | Tables de sortie en JSON, paginées |
+| `GET` | `/api/runs/{run_id}/files/{name}`, `/api/runs/{run_id}/download` | Une table en CSV, ou toutes les sorties dans un zip |
+| `GET` | `/api/runs/{run_id}/excel` | Le rapport Excel |
+| `GET` | `/api/runs/{run_id}/views/summary`, `situation`, `trucks`, `trucks/{truck_id}`, `profiles`, `suppliers` | Les données des écrans de l'interface |
 
 Un fichier auquel il manque une colonne, ou un paramètre inconnu, est refusé immédiatement (`422`). Les exécutions
 passent une par une, chacune dans un processus séparé (le moteur utilise déjà tous les cœurs) ; une exécution
@@ -142,25 +174,27 @@ src/delivery_schedule_optimization/
 │   ├── candidates.py   un plan par ensemble de jours de la semaine (31) et par couple, en parallèle
 │   ├── selection.py    choix du profil (RG07)
 │   └── smoothing.py    répartition des livraisons par usine (RG09, programme linéaire en nombres entiers, HiGHS)
-├── reporting/     sorties 1, 2, 3 et indicateurs
+├── reporting/     sorties 1, 2, 3, lissage, indicateurs, synthèse Excel et données des écrans (dashboard.py)
 ├── validation/    contrôles des règles métier (checks.py), tests du Milestone 4 sur les sorties d'une exécution
 │                  (output_tests.py) et cas unitaires du moteur (engine_cases.py)
 ├── pipeline.py    flux principal : préparation → situation actuelle → plans → sorties → contrôles (ni fichier, ni API)
 ├── service.py     exécute une exécution enregistrée : entrées → pipeline → sorties → manifeste
 ├── storage/       exécutions sur disque (runs/<run_id>/) ; une base de données peut s'ajouter derrière la même interface
-├── api/           application FastAPI, exécution en arrière-plan, routes
+├── api/           application FastAPI, exécution en arrière-plan, routes (dont views.py pour l'interface)
+├── web/           interface Gilbert & Co : index.html, styles.css, app.js, logo (brand/) et polices (fonts/)
 ├── cli.py         ligne de commande
 ├── settings.py    réglages techniques (DSO_*)
 └── planner.py     ancien module unique, réexporte le moteur pour les notebooks des milestones
 tests/
 ├── unit/          calendrier, chargement, tarification, préparation, entrées et paramètres, cas du moteur (Milestone 4)
-├── integration/   pipeline sur un petit planning, tests de sortie (et sorties cassées exprès), API, ligne de commande
+├── integration/   pipeline sur un petit planning, tests de sortie (et sorties cassées exprès), API, routes de
+│                  l'interface (écrans, exemple, relance, suppression, Excel), ligne de commande
 └── regression/    le vrai planning donne exactement les sorties du notebook milestone 3 (marqué slow)
 milestone1/ … milestone4/   notebooks des milestones (analyses, rapports ; milestone4 : tests et analyse avant / après)
 ```
 
 Le moteur et les objets métier ne connaissent ni les fichiers, ni l'API, ni le stockage : la ligne de commande,
-l'API et les tests passent tous par `pipeline.run_pipeline`. Un front (Streamlit ou React) n'aura qu'à appeler l'API.
+l'API et les tests passent tous par `pipeline.run_pipeline`. L'interface web ne parle qu'à l'API.
 
 Le fonctionnement de l'optimiseur (graphe des jours de départ, recherche locale, lissage par usine) est expliqué
 pas à pas, avec des liens vers le code, dans [`milestone3/optimiseur.md`](milestone3/optimiseur.md).

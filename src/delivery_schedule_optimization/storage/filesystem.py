@@ -5,6 +5,7 @@ from __future__ import annotations
 import hashlib
 import logging
 import re
+import shutil
 import uuid
 from collections.abc import Mapping
 from datetime import UTC, datetime
@@ -33,7 +34,8 @@ class FileRunRepository:
             raise RunNotFoundError(run_id)
         return self.root / run_id
 
-    def create(self, inputs: Mapping[InputName, bytes], parameters: dict[str, JsonValue], app_version: str) -> RunManifest:
+    def create(self, inputs: Mapping[InputName, bytes], parameters: dict[str, JsonValue], app_version: str,
+               label: str = "Scénario", source_run_id: str | None = None) -> RunManifest:
         run_id = f"{datetime.now(UTC):%Y%m%d-%H%M%S}-{uuid.uuid4().hex[:6]}"
         folder = self._dir(run_id)
         (folder / "input").mkdir(parents=True)
@@ -41,7 +43,8 @@ class FileRunRepository:
         for name, content in inputs.items():
             (folder / "input" / f"{name}{file_suffix(content)}").write_bytes(content)
             hashes[str(name)] = hashlib.sha256(content).hexdigest()
-        manifest = RunManifest(run_id=run_id, created_at=datetime.now(UTC), app_version=app_version, parameters=parameters, inputs=hashes)
+        manifest = RunManifest(run_id=run_id, label=label, source_run_id=source_run_id, created_at=datetime.now(UTC),
+                               app_version=app_version, parameters=parameters, inputs=hashes)
         self.save(manifest)
         logger.info("Run %s created (inputs: %s)", run_id, {k: v[:12] for k, v in hashes.items()})
         return manifest
@@ -81,3 +84,11 @@ class FileRunRepository:
         if not path.is_file():
             zip_directory(self.output_dir(run_id), path)
         return path
+
+    def delete(self, run_id: str) -> None:
+        """Remove the folder of a run: inputs, outputs, manifest and log."""
+        folder = self._dir(run_id)
+        if not (folder / "manifest.json").is_file():
+            raise RunNotFoundError(run_id)
+        shutil.rmtree(folder)
+        logger.info("Run %s deleted", run_id)

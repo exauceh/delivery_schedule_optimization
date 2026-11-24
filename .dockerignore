@@ -13,6 +13,11 @@ courses
 milestone1
 milestone2
 milestone3
+milestone4
 test
 tests
 *.zip
+# example of the interface ("Essayer avec un exemple"): the three input files of the project
+!docs/released_schedule.csv
+!docs/distances.csv
+!courses/rate_sheet.pdf
