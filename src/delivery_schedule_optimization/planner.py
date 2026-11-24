@@ -68,6 +68,9 @@ class PlannerConfig:
     # Profile = largest number of deliveries in one week ("3 2 1 1 2 1" = profile 3). True = also prefer the
     # lowest profile before the cost (former RG07 reading); False = the profile is the result of the best plan.
     lowest_profile_first: bool = False
+    # True = at equal cost, the lowest profile wins (choice of a couple), and smoothing never raises the profile
+    # of the RG07 choice (it moves the days, not their number). False = smoothing may take any plan of the couple.
+    lowest_profile_at_equal_cost: bool = True
     # RG06 (coverage). False (default) = a need may leave with ANY planned departure of its couple within its
     # window [date - max_advance_days, date]; True = only with the latest departure on or before its date.
     strict_coverage: bool = False
@@ -79,9 +82,12 @@ class PlannerConfig:
     improvement_passes: int = 20  # greedy reference planner (`plan_couple`) only
     # First possible delivery day: nothing ships before the schedule is released. None = date of the first need.
     plan_start: str | None = None
-    # Needs with no profile day on or after plan_start in their window: "need_day" = delivered on their own
-    # date (as today), "first_day" = grouped on the first day of the plan.
-    startup_delivery: str = "need_day"
+    # Needs with no profile day on or after plan_start in their window (first week of the plan):
+    # "profile_day" = no exception, every delivery falls on a day of the profile, so the profile must hold a day
+    # on or before each of these needs (a need on the first Monday forces Monday into the profile);
+    # "need_day" = start-up delivery on their own date (as today), off the profile;
+    # "first_day" = start-up delivery grouped on the first day of the plan, off the profile.
+    startup_delivery: str = "profile_day"
 
     @property
     def price_factor(self) -> float:
@@ -186,7 +192,7 @@ def delivery_options(day: date, days: tuple[int, ...], holidays: set[date], max_
             continue
         seen.add(delivery)
         options.append((slot, delivery))
-    if not options and first_day and first_day <= day < first_day + timedelta(days=7):
+    if not options and startup != "profile_day" and first_day and first_day <= day < first_day + timedelta(days=7):
         options.append((None, day if startup == "need_day" else first_day))
     return options
 
@@ -348,14 +354,14 @@ def plan_couple(lines: pd.DataFrame, days: tuple[int, ...], holidays: set[date],
 
 
 # --------------------------------------------------------------------------- exact plan of one couple
-def departure_nodes(due: list[date], days: tuple[int, ...], holidays: set[date], first_day: date
-                    ) -> list[tuple[date | None, date]]:
+def departure_nodes(due: list[date], days: tuple[int, ...], holidays: set[date], first_day: date,
+                    startup: bool = True) -> list[tuple[date | None, date]]:
     """Possible departures of a couple on a set of days: (profile day, delivery date), by date.
 
     - every day of the set from the first day of the plan to the last need (RG05), a public holiday being
       delivered on the previous working day (RG10);
     - before the first profile day of the plan, any working day (start-up departure, profile day None):
-      the needs dated before it have no profile day in their window.
+      the needs dated before it have no profile day in their window. Not with `startup=False`.
     """
     last = max(due)
     nodes: dict[date, tuple[date | None, date]] = {}
@@ -370,7 +376,7 @@ def departure_nodes(due: list[date], days: tuple[int, ...], holidays: set[date],
         day += timedelta(days=1)
     first_profile = min(nodes, default=last + timedelta(days=1))
     day = first_day
-    while day < first_profile and day <= last:
+    while startup and day < first_profile and day <= last:
         if is_working_day(day, holidays):
             nodes.setdefault(day, (None, day))
         day += timedelta(days=1)
@@ -396,9 +402,9 @@ def optimal_plan(lines: pd.DataFrame, days: tuple[int, ...], holidays: set[date]
     """
     first_day = first_working_day(start, holidays)
     due_dates = lines["date"].dt.date.to_numpy()
-    nodes = departure_nodes(list(due_dates), days, holidays, first_day)
+    nodes = departure_nodes(list(due_dates), days, holidays, first_day, config.startup_delivery != "profile_day")
     if not nodes or nodes[0][1] > min(due_dates):
-        return None
+        return None  # a need dated before the first possible departure (with "profile_day": before the first profile day)
     weight, volume = lines["weight"].to_numpy(float), lines["volume"].to_numpy(float)
     imputed = lines["imputed_full_truck"].to_numpy(bool)
     distance = float(lines["distance"].iloc[0])
@@ -665,7 +671,7 @@ def couple_candidates(job: tuple) -> list[CouplePlan]:
     plans = {}
     for size in sorted(config.allowed_frequencies):
         for days in itertools.combinations(range(5), size):
-            for need_day in (False, True):
+            for need_day in ((False,) if config.startup_delivery == "profile_day" else (False, True)):
                 plan = optimal_plan(group, days, holidays, tariff, config, start, need_day)
                 if plan is not None and not config.strict_coverage:
                     plan = reassign(group, plan, holidays, tariff, config, start)
@@ -692,10 +698,12 @@ def lower_bound(lines: pd.DataFrame, holidays: set[date], tariff: Tariff, config
 def selection_key(plan: CouplePlan, config: PlannerConfig = PlannerConfig()) -> tuple:
     """Choice of the plan of a couple (RG07 + client answer "add delivery days rather than trucks"):
     fewest overflowing departures first; then, with `lowest_profile_first`, the lowest profile; then the
-    objective (cheapest or fewest trucks); then least advance, then earliest days of the week.
+    objective (cheapest or fewest trucks), with `lowest_profile_at_equal_cost` the lowest profile right after it;
+    then least advance, then earliest days of the week.
     The profile itself is always the largest number of deliveries made in one week."""
     cost, trucks = round(plan.cost, 6), plan.n_trucks
-    main = (trucks, cost) if config.objective == "trucks" else (cost, trucks)
+    tie = (plan.frequency,) if config.lowest_profile_at_equal_cost else ()
+    main = (trucks, cost, *tie) if config.objective == "trucks" else (cost, *tie, trucks)
     lowest = (plan.frequency,) if config.lowest_profile_first else ()
     overflow = (plan.overflow_departures,) if config.overflow_first else ()
     return (*overflow, *lowest, *main, plan.overflow_departures, plan.total_advance, plan.frequency, plan.profile)
@@ -708,10 +716,12 @@ def choose_profiles(candidates: dict, config: PlannerConfig = PlannerConfig()) -
 
 def smoothing_options(candidates: dict, chosen: dict, config: PlannerConfig = PlannerConfig()) -> dict:
     """Plans a couple may take when smoothing: same number of overflowing departures as its RG07 choice
-    (and the same profile with `lowest_profile_first`), so that RG07 stays respected."""
+    (and the same profile with `lowest_profile_first`), so that RG07 stays respected; with
+    `lowest_profile_at_equal_cost`, no profile higher than the RG07 choice."""
     return {
         key: sorted([p for p in plans if (not config.overflow_first or p.overflow_departures == chosen[key].overflow_departures)
-                     and (not config.lowest_profile_first or p.frequency == chosen[key].frequency)],
+                     and (not config.lowest_profile_first or p.frequency == chosen[key].frequency)
+                     and (not config.lowest_profile_at_equal_cost or p.frequency <= chosen[key].frequency)],
                     key=lambda p: selection_key(p, config))
         for key, plans in candidates.items()
     }
@@ -1054,13 +1064,15 @@ def check(lines: pd.DataFrame, plans: dict, trucks: pd.DataFrame, allocations: p
              for k in days_used.index)),
         ("RG05 - profil", "Le profil de chaque couple fait partie des profils autorisés",
          all(p.frequency in config.allowed_frequencies for p in plans.values())),
-        ("RG05 - jours", "Chaque livraison tombe un jour du profil du couple, sauf démarrage (première semaine) "
-                         "ou jour férié avancé",
+        ("RG05 - jours", "Chaque livraison tombe un jour du profil du couple, sauf jour férié avancé "
+                         + ("(aucune exception de démarrage)" if config.startup_delivery == "profile_day"
+                            else "ou démarrage (première semaine)"),
          (served.loc[served["delivery_rule"].eq("jour du profil"), "delivery_date"]
           == served.loc[served["delivery_rule"].eq("jour du profil"), "profile_day"]).all()
          and all(d.weekday() in plans[(s, p)].profile
                  for d, s, p in served[["profile_day", "supplier_id", "plant"]].itertuples(index=False))
-         and (alloc.loc[alloc["delivery_rule"].eq("démarrage"), "delivery_date"] < start + pd.Timedelta(days=7)).all()),
+         and (alloc.loc[alloc["delivery_rule"].eq("démarrage"), "delivery_date"] < start + pd.Timedelta(days=7)).all()
+         and (config.startup_delivery != "profile_day" or not alloc["delivery_rule"].eq("démarrage").any())),
         ("RG06", "Chaque besoin part avec le dernier départ de son couple à sa date ou avant : un jour de "
                  "livraison couvre les besoins jusqu'au jour de livraison suivant, exclu",
          rg06_coverage(allocations))
