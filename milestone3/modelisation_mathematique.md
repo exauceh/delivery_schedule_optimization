@@ -57,6 +57,18 @@ Le moteur renforce la borne sur des intervalles de dates. Les lignes qui doivent
 
 Pour un couple, $L$ est la meilleure borne inférieure et $U$ le coût du meilleur plan vérifié. Le coût optimal $C^*$ satisfait $L\le C^*\le U$. Une recherche exhaustive qui prouve impossible tout plan d’un coût au plus $U-1$ centime de grille certifie le coût $U$. Après une recherche divisée par profils, la borne du couple est le minimum des bornes de ses 31 profils. On peut ensuite retenir la plus forte borne fournie par les exécutions compatibles.
 
-Les coûts et les bornes des couples s’additionnent, car aucun plafond quotidien de camions ou autre contrainte de ressources communes ne relie les couples dans ce modèle. La marge d’amélioration maximale est $U-L$. L’économie calculée est la différence entre le coût de la référence reconstruite aux dates de besoin et $U$, dans le même périmètre.
+Dans la génération indépendante des plans, les coûts et les bornes des couples s’additionnent. La marge d’amélioration maximale est $U-L$. L’économie calculée est la différence entre le coût de la référence reconstruite aux dates de besoin et $U$, dans le même périmètre.
+
+## 5. Sélection des plans avec plafonds de réception
+
+Le lissage utilise un catalogue de plans complets. Pour un couple $g$, $\mathcal P_g$ contient uniquement les plans qui couvrent ses lignes, respectent les capacités et partent tous sur les jours du profil. Soit $z_{gp}\in\{0,1\}$ le choix du plan $p$, $c_{gp}$ son coût et $n_{gpd}$ son nombre de camions le jour $d$. Le plafond $M_f$ est le pic quotidien de l’usine $f$ dans le plan de référence d’Arianne.
+
+$$
+\sum_{p\in\mathcal P_g} z_{gp}=1,\qquad
+\sum_{g:\,\mathrm{usine}(g)=f}\ \sum_{p\in\mathcal P_g} n_{gpd}\,z_{gp}\le M_f
+\quad\forall f,d.
+$$
+
+Le solveur minimise d’abord $\sum_{g,p} c_{gp}z_{gp}$. Il fixe ce coût minimal puis minimise un entier $H$ tel que $\sum_{g,p}n_{gpd}z_{gp}\le H$ pour chaque jour. Enfin, à coût et pic fixés, il minimise le nombre total de camions. Les trois preuves d’optimalité portent sur les plans validés du catalogue. Le calcul conserve l’origine de chaque plan de couple dans l’export.
 
 [Notebook moteur](moteur_optimisation.ipynb) · [Code du solveur](../src/delivery_schedule_optimization/optimisation_cout.py) · [Bilan vérifié](../milestone4/bilan_avant_apres.ipynb)

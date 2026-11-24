@@ -1,0 +1,33 @@
+{
+  "scope": "avec_imputation",
+  "lines": 4389,
+  "couples": 180,
+  "trucks": 755,
+  "cost_eur": 109365.68,
+  "reference_eur": 176724.61,
+  "savings_eur": 67358.93,
+  "extra_vs_prime_eur": 19.89,
+  "global_peak": 43,
+  "plant_peaks": {
+    "PLT_001": 8,
+    "PLT_002": 31,
+    "PLT_003": 9,
+    "PLT_004": 13
+  },
+  "plant_limits": {
+    "PLT_001": 8,
+    "PLT_002": 31,
+    "PLT_003": 9,
+    "PLT_004": 13
+  },
+  "eligible_plans": 1205,
+  "source_commits": {
+    "prime": "b492f6cdfb06c9e88ce164f6b54c1b36fe8aa479",
+    "Arianne": "1ee10abcee724e74c4689a6f3124d15498dcb9fb",
+    "Gilbert 3.1": "8d8f5e4874aa89757e81d5d137aa3a496bf9858e",
+    "presentation": "f69b088706e654332df69fa8039b82b42c0c1910",
+    "main": "13a8ab9ccc9e4a2a1caff98e9a5231222af773c7",
+    "Wissam": "4c78cdbc2aebe6d1d79432874141c64ea4553ade",
+    "Gilbert 3": "1542dc7c83c511aeee9081b1d4ce56a45cd113b2"
+  }
+}

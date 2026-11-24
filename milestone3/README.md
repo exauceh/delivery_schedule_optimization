@@ -1,6 +1,6 @@
 # Jalon 3 · Moteur d’optimisation
 
-Le [notebook moteur](moteur_optimisation.ipynb) lance le solveur sur les données du projet et affiche les profils, les camions et les coûts calculés. La première cellule choisit le mode pilote ou complet. Le [guide du projet](../README.md) décrit la méthode et les fichiers de sortie. Le [jalon 4](../milestone4/) contrôle les plans et chiffre les gains.
+Le [notebook moteur](moteur_optimisation.ipynb) reproduit par défaut le plan lissé à profils stricts. La première cellule permet aussi de relancer le solveur de coût en mode pilote ou complet. Le [guide du projet](../README.md) décrit la méthode et les fichiers de sortie. Le [jalon 4](../milestone4/) contrôle les plans et chiffre les gains.
 
 L’[annexe mathématique](modelisation_mathematique.md) détaille la fonction objectif, les contraintes et le calcul des bornes. Le [solveur](../src/delivery_schedule_optimization/optimisation_cout.py) et la [consolidation des plans](../src/delivery_schedule_optimization/retenir_meilleurs_couts.py) sont dans `src/`.
 

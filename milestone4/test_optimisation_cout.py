@@ -3,7 +3,10 @@ from datetime import date
 from itertools import product
 import unittest
 
+import pandas as pd
+
 from delivery_schedule_optimization.fast_plan import Line
+from delivery_schedule_optimization.lissage_publie import Plan as PublishedPlan, select_plans, strict_profile
 from delivery_schedule_optimization.optimisation_cout import PROFILES, combine_profiles, solve_pair, solve_profile_partition
 from delivery_schedule_optimization.partition_hall import Departure, Need, allocate_witness, solve_profile
 
@@ -159,6 +162,27 @@ class TestPartition(unittest.TestCase):
         del branches[(1, 4)]
         with self.assertRaisesRegex(ValueError, "Some weekday profiles"):
             combine_profiles(branches)
+
+
+class TestPublishedSmoothing(unittest.TestCase):
+    def test_strict_profile_requires_all_departures_and_one_witness_week(self):
+        monday = "2026-11-09"
+        tuesday = "2026-11-10"
+        self.assertTrue(strict_profile(pd.Series(pd.to_datetime([monday, tuesday])), (0, 1)))
+        self.assertFalse(strict_profile(pd.Series(pd.to_datetime([monday, tuesday])), (0,)))
+        self.assertFalse(strict_profile(pd.Series(pd.to_datetime([monday, "2026-11-17"])), (0, 1)))
+
+    def test_selection_preserves_cost_priority_before_global_peak(self):
+        def plan(name, date, cents):
+            return PublishedPlan(name, (0,), pd.DataFrame(), pd.DataFrame({"date": [date], "cents": [cents]}))
+
+        selected = select_plans({
+            ("A", "P"): [plan("same-day", "2026-11-09", 10), plan("shifted", "2026-11-10", 12)],
+            ("B", "P"): [plan("cheap", "2026-11-09", 11), plan("expensive", "2026-11-11", 17)],
+            ("C", "Q"): [plan("overlap", "2026-11-09", 13), plan("separate", "2026-11-11", 13)],
+        }, {"P": 1, "Q": 1})
+        self.assertEqual([p.source for p in selected.values()], ["shifted", "cheap", "separate"])
+        self.assertEqual(sum(p.cost for p in selected.values()), 36)
 
 
 if __name__ == "__main__":
