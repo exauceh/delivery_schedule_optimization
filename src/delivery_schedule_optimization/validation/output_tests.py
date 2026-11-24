@@ -151,6 +151,19 @@ def test_contents_match_allocations(contents: pd.DataFrame, allocations: pd.Data
     return same, f"{len(expected)} lignes de contenu comparées"
 
 
+def test_weekly_patterns_add_up(profiles: pd.DataFrame, saving: pd.DataFrame) -> TestOutcome:
+    """Sortie 1 - la somme du rythme hebdomadaire (avant et après) = le nombre de livraisons du couple (sortie 3)"""
+    merged = profiles.merge(saving[[*COUPLE, "deliveries_before", "deliveries_after"]], on=COUPLE, validate="1:1")
+
+    def total(pattern: pd.Series) -> pd.Series:
+        return pattern.astype(str).str.split().map(lambda weeks: sum(int(n) for n in weeks))
+
+    wrong = ((total(merged["weekly_pattern"]) != merged["deliveries_after"])
+             | (total(merged["current_weekly_pattern"]) != merged["deliveries_before"]))
+    examples = ", ".join(f"{r.supplier_id} × {r.plant}" for r in merged[wrong].head(3).itertuples(index=False))
+    return not bool(wrong.any()), f"{int(wrong.sum())} couple(s) dont le rythme ne compte pas toutes les livraisons {examples}".strip()
+
+
 # --------------------------------------------------------------------------- A3. missing-data assumptions
 def test_h05_imputed_line_alone(allocations: pd.DataFrame) -> TestOutcome:
     """H05 - une ligne imputée « camion plein » voyage seule dans son camion"""
@@ -260,6 +273,7 @@ def output_tests(run: RunTables, holidays: set[date], tariff: Tariff,
         ("A2 - contraintes", test_every_delivery_on_a_profile_day, (a, holidays)),
         ("A2 - contraintes", test_plan_start, (run.trucks, run.lines, holidays, config)),
         ("A2 - contraintes", test_contents_match_allocations, (run.contents, a)),
+        ("A2 - contraintes", test_weekly_patterns_add_up, (run.profiles, run.saving)),
         ("A3 - données manquantes", test_h05_imputed_line_alone, (a,)),
         ("A3 - données manquantes", test_h06_imputed_distance, (run.lines, run.trucks, run.distances)),
         ("A4 - exhaustivité", test_each_line_delivered_once, (a,)),

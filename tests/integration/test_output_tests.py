@@ -34,7 +34,7 @@ def tariff(small_inputs: dict[InputName, bytes]) -> Tariff:
 
 def test_every_output_test_passes_on_a_run(result: PipelineResult) -> None:
     tests = result.tables[OutputName.OUTPUT_TESTS]
-    assert len(tests) == 23 and set(tests.columns) == set(ot.RESULT_COLUMNS)
+    assert len(tests) == 24 and set(tests.columns) == set(ot.RESULT_COLUMNS)
     failed = tests.loc[~tests["respecté"], ["fonction", "détail"]]
     assert failed.empty, failed.to_dict("records")
     assert result.checks_passed
@@ -90,6 +90,9 @@ def test_each_constraint_test_detects_a_broken_output(result: PipelineResult, ta
         "contenu": not ot.test_contents_match_allocations(_broken(contents, lambda f: f.__setitem__("quantity", f["quantity"] + 1)),
                                                           alloc)[0],
         "rupture": not ot.test_no_stock_out(_broken(alloc, all_late))[0],
+        "rythme hebdomadaire": not ot.test_weekly_patterns_add_up(
+            _broken(result.tables[OutputName.PROFILES], lambda f: f.__setitem__("weekly_pattern", f["weekly_pattern"].astype(str) + " 1")),
+            result.tables[OutputName.SAVING])[0],
     }
     assert all(detected.values()), [name for name, ok in detected.items() if not ok]
 

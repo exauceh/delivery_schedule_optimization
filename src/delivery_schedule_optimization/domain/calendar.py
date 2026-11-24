@@ -43,6 +43,7 @@ def monday(day: date) -> date:
     return day - timedelta(days=day.weekday())
 
 
-def horizon_weeks(lines: pd.DataFrame) -> list[date]:
-    first = monday(lines["date"].min().date())
+def horizon_weeks(lines: pd.DataFrame, start: date | None = None) -> list[date]:
+    """Mondays of every week from the first need, or from `start` if earlier (start of the plan), to the last need."""
+    first = monday(min(cast(date, lines["date"].min().date()), start or date.max))
     return [first + timedelta(weeks=w) for w in range((monday(lines["date"].max().date()) - first).days // 7 + 1)]

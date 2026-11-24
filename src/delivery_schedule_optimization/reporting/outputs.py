@@ -9,7 +9,7 @@ from typing import cast
 import numpy as np
 import pandas as pd
 
-from ..domain.calendar import horizon_weeks, monday
+from ..domain.calendar import horizon_weeks, monday, plan_start
 from ..domain.config import COUPLE, DAY_NAMES, PlannerConfig
 from ..domain.models import Candidates, Plans
 from ..engine.selection import selection_key
@@ -75,7 +75,7 @@ def couple_summary(lines: pd.DataFrame, baseline: pd.DataFrame, plans_B: Plans, 
 
     `baseline` = reference A of Milestone 2, one row per current delivery.
     """
-    weeks = horizon_weeks(lines)
+    weeks = horizon_weeks(lines, plan_start(lines, config))  # the plan may deliver the week before the first need
     imputed = lines.groupby(COUPLE)["imputed_full_truck"].sum()
     current = dict(tuple(baseline.groupby(COUPLE, sort=True)))
     def days(profile: tuple[int, ...]) -> str:
