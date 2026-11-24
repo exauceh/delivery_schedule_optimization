@@ -15,8 +15,9 @@ DOCS = ROOT / "docs"
 
 @pytest.fixture(scope="session")
 def input_paths() -> dict[InputName, Path]:
-    """The three real input files of the project (November 2026 planning)."""
-    return {InputName.SCHEDULE: DOCS / "released_schedule.csv", InputName.DISTANCES: DOCS / "distances.csv", InputName.RATE_SHEET: DOCS / "rate_sheet.csv"}
+    """The three real input files of the project: November 2026 planning, distances and the carrier's rate sheet (PDF)."""
+    return {InputName.SCHEDULE: DOCS / "released_schedule.csv", InputName.DISTANCES: DOCS / "distances.csv",
+            InputName.RATE_SHEET: ROOT / "courses" / "rate_sheet.pdf"}
 
 
 @pytest.fixture(scope="session")

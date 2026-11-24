@@ -29,23 +29,27 @@ PDF_MAGIC = b"%PDF"
 
 
 def file_suffix(content: bytes) -> str:
-    """Extension under which an uploaded input is stored: .pdf for a PDF (rate sheet), .csv otherwise."""
+    """Extension under which an uploaded input is stored: .pdf for the rate sheet, .csv for the two others."""
     return ".pdf" if content.startswith(PDF_MAGIC) else ".csv"
 
 
 @dataclass(frozen=True)
 class RateSheet:
-    """The rate sheet read from a CSV or a PDF.
+    """The carrier's rate sheet, read from its PDF: price grid and terms (RG11).
 
-    `table` is the price grid in the wide CSV format (`km_up_to`, then one column per weight bracket). A PDF also gives
-    the freight margin, the diesel surcharge and the validity date of the grid; a CSV does not (None).
+    `table` is the price grid in a wide format: `km_up_to` (distance bracket label, "30" ... ">650"), then one column per
+    weight bracket ("50" ... ">4000") with the freight cost of one shipment. The price of a truck is that cost
+    x (1 + margin) x diesel surcharge.
     """
 
     table: pd.DataFrame
-    file_format: str
-    margin: float | None = None
-    diesel_surcharge: float | None = None
+    margin: float  # freight value margin: 2.3923 for 239.23 %
+    diesel_surcharge: float
     valid_from: str | None = None
+
+    @property
+    def price_factor(self) -> float:
+        return (1 + self.margin) * self.diesel_surcharge
 
 
 NUMERIC_COLUMNS: dict[InputName, list[str]] = {

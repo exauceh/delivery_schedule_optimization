@@ -55,15 +55,19 @@ def test_import_run_and_read_the_results(client: TestClient, small_inputs: dict[
     assert "Run" in client.get(f"/runs/{run['run_id']}/log").text
 
 
-def test_rate_sheet_in_pdf(client: TestClient, small_inputs: dict[InputName, bytes]) -> None:
-    """The carrier's PDF is accepted as is: same results as the CSV, margin and surcharge taken from the PDF."""
-    pdf = (Path(__file__).resolve().parents[2] / "courses" / "rate_sheet.pdf").read_bytes()
-    with_csv = client.post("/runs", files=_files(small_inputs)).json()
-    with_pdf = client.post("/runs", files=_files({**small_inputs, InputName.RATE_SHEET: pdf})).json()
-    assert with_pdf["status"] == "succeeded", with_pdf["error"]
-    assert with_pdf["rate_sheet"] == {"format": "pdf", "valid_from": "01.08.2026", "margin": 2.3923, "diesel_surcharge": 1.1943}
-    assert with_csv["rate_sheet"]["format"] == "csv"
-    assert with_pdf["kpis"] == with_csv["kpis"]
+def test_rate_sheet_terms_are_recorded(client: TestClient, small_inputs: dict[InputName, bytes]) -> None:
+    """Margin and diesel surcharge come from the PDF and are recorded in the manifest; they are not parameters."""
+    run = client.post("/runs", files=_files(small_inputs)).json()
+    assert run["rate_sheet"] == {"valid_from": "01.08.2026", "margin": 2.3923, "diesel_surcharge": 1.1943}
+    assert "margin" not in run["parameters"]["planner"]
+    refused = client.post("/runs", files=_files(small_inputs), data={"parameters": '{"planner": {"margin": 3.0}}'})
+    assert refused.status_code == 422 and "margin" in refused.json()["detail"]
+
+
+def test_csv_rate_sheet_is_refused(client: TestClient, small_inputs: dict[InputName, bytes]) -> None:
+    csv = (Path(__file__).resolve().parents[2] / "docs" / "rate_sheet.csv").read_bytes()
+    response = client.post("/runs", files=_files({**small_inputs, InputName.RATE_SHEET: csv}))
+    assert response.status_code == 422 and "PDF" in response.json()["detail"]
 
 
 def test_file_with_a_missing_column_is_refused_at_once(client: TestClient, small_inputs: dict[InputName, bytes]) -> None:

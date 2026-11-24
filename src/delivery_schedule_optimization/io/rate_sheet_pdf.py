@@ -156,4 +156,4 @@ def read_rate_sheet_pdf(content: bytes) -> RateSheet:
     valid_from = _search(r"valid from:\s*([\d./-]+)", text)
     logger.info("%s: PDF grid %d distance x %d weight brackets, margin %.2f %%, diesel %.4f, valid from %s",
                 NAME, len(grid), len(grid.columns) - 1, 100 * margin, diesel, valid_from)
-    return RateSheet(table=grid, file_format="pdf", margin=margin, diesel_surcharge=diesel, valid_from=valid_from)
+    return RateSheet(table=grid, margin=margin, diesel_surcharge=diesel, valid_from=valid_from)

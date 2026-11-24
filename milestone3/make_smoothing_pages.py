@@ -71,7 +71,8 @@ def frontiers() -> tuple[list[PlantFrontier], float]:
     """Run the planner on the project data and return the frontier of every plant and the cost without smoothing."""
     cfg = pl.PlannerConfig()
     lines = pl.load_lines(ROOT / "data/consolidated_dataset.csv", cfg)
-    tariff = pl.Tariff(pl.load_rate_grid(ROOT / "docs/rate_sheet.csv"), cfg)
+    sheet = pl.read_rate_sheet(ROOT / "courses/rate_sheet.pdf")  # price grid, margin and diesel surcharge
+    tariff = pl.Tariff(pl.rate_grid(sheet.table), sheet.price_factor)
     candidates = pl.candidate_plans(lines, pl.public_holidays(lines, cfg), tariff, cfg)
     chosen = pl.choose_profiles(candidates, cfg)
     options = pl.smoothing_options(candidates, chosen, cfg)
@@ -105,7 +106,8 @@ def starting_point() -> StartingPoint:
     """Current situation (reference A, loaded truck by truck) and imputation counts, from the raw and consolidated files."""
     cfg = pl.PlannerConfig()
     lines = pl.load_lines(ROOT / "data/consolidated_dataset.csv", cfg)
-    tariff = pl.Tariff(pl.load_rate_grid(ROOT / "docs/rate_sheet.csv"), cfg)
+    sheet = pl.read_rate_sheet(ROOT / "courses/rate_sheet.pdf")  # price grid, margin and diesel surcharge
+    tariff = pl.Tariff(pl.rate_grid(sheet.table), sheet.price_factor)
     baseline, _ = pl.current_situation(lines, pl.load_baseline(ROOT / "data/baseline_deliveries.csv", lines), tariff, cfg)
     raw = pd.read_csv(ROOT / "docs/released_schedule.csv")
     kept = raw[(raw["schedule_quantity"] > 0) & (raw["date"] < "2027-01-01") & ~(raw["weight"] > cfg.truck_kg)]

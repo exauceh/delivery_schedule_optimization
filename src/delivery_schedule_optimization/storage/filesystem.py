@@ -63,7 +63,7 @@ class FileRunRepository:
         tmp.replace(path)  # atomic: a reader never sees a half-written manifest
 
     def input_path(self, run_id: str, name: InputName) -> Path:
-        """The stored input file (.csv, or .pdf for a rate sheet in PDF)."""
+        """The stored input file (.csv, or .pdf for the rate sheet)."""
         matches = sorted((self._dir(run_id) / "input").glob(f"{name}.*"))
         if not matches:
             raise FileNotFoundError(f"run {run_id}: input {name} not found")

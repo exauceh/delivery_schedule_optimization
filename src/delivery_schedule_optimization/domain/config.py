@@ -12,12 +12,14 @@ COUPLE = ["supplier_id", "plant"]
 
 @dataclass(frozen=True)
 class PlannerConfig:
-    """All tunable parameters of the planner (EF12)."""
+    """All tunable parameters of the planner (EF12).
+
+    The freight margin and the diesel surcharge (RG11) are not parameters: they are terms of the carrier's rate sheet
+    and are always read from its PDF, with the price grid (`io.schemas.RateSheet`).
+    """
 
     truck_kg: float = 24_500.0  # RG04
     truck_m3: float = 110.4  # RG04
-    margin: float = 2.3923  # RG11: freight value margin (239.23 %)
-    diesel_surcharge: float = 1.1943  # RG11
     max_advance_days: int = 7  # RG03: calendar days
     allowed_frequencies: tuple[int, ...] = (1, 2, 3, 4, 5)  # RG05: profile = deliveries per week (max); 4 allowed
     holiday_country: str = "DE"  # RG10: no reception on public holidays
@@ -45,10 +47,6 @@ class PlannerConfig:
     # Needs with no profile day on or after plan_start in their window: "need_day" = delivered on their own
     # date (as today), "first_day" = grouped on the first day of the plan.
     startup_delivery: str = "need_day"
-
-    @property
-    def price_factor(self) -> float:
-        return (1 + self.margin) * self.diesel_surcharge
 
 
 @dataclass(frozen=True)

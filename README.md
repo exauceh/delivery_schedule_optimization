@@ -37,13 +37,37 @@ Une exécution prend toujours les trois mêmes fichiers ; l'application ne stock
 | :--- | :--- |
 | `released_schedule.csv` | Une ligne par besoin : `date`, `supplier_id`, `material`, `plant`, `unloading_point`, `schedule_quantity`, `weight`, `volume` |
 | `distances.csv` | `supplier_id`, `distance` (km) |
-| `rate_sheet.pdf` (ou `.csv`) | La grille du transporteur, telle quelle en PDF, ou retranscrite en CSV (`km_up_to` et une colonne par tranche de poids) |
+| `rate_sheet.pdf` | La grille du transporteur, telle qu'il l'envoie (PDF) : prix par tranche de distance et de poids, marge, surcharge diesel, date de validité |
 
-**Grille en PDF.** L'application lit la grille de prix d'après la position des mots sur la page, ainsi que la marge,
-la surcharge diesel et la date de validité. Elle recalcule ensuite l'exemple imprimé dans le PDF (300 km, 1 000 kg :
-82,77 € → 335,34 €) : si la grille ou les coefficients lus ne le retrouvent pas, le fichier est refusé. La marge et
-la surcharge du PDF sont celles utilisées par l'exécution (elles remplacent les paramètres) et sont enregistrées dans
-le manifeste. Avec une grille en CSV, ce sont les paramètres `margin` et `diesel_surcharge` qui s'appliquent.
+La marge et la surcharge diesel ne sont pas des paramètres : elles viennent toujours du PDF, avec la grille, et le
+manifeste de l'exécution les enregistre. Une grille dans un autre format (CSV) est refusée.
+
+### Comment la grille est extraite du PDF
+
+Le code est dans `src/delivery_schedule_optimization/io/rate_sheet_pdf.py`.
+
+1. **Lecture des mots avec leur position.** La première page est lue avec `pdfplumber`, qui donne chaque mot avec
+   ses coordonnées sur la page. Le texte brut n'est pas utilisé pour la grille : dans ce PDF, il donne une ligne de
+   prix sans distance (7,33 … 73,04) et une étiquette `>650` sans prix, et une lecture ligne par ligne décalerait
+   tous les prix d'une tranche de distance à partir de 100 km.
+2. **Regroupement en lignes.** Les mots dont le haut est à moins de 2 points d'écart forment une même ligne.
+3. **En-tête.** La ligne qui contient `km` et `kg` est l'en-tête. Les tranches de poids sont les mots à droite de
+   `kg` (`50` … `4000`, `>4000`) ; la position horizontale de chacune définit une colonne.
+4. **Lignes de prix.** Chaque ligne suivante qui commence, à gauche de la première colonne, par une étiquette de
+   distance (`30` … `650`, `>650`) est une ligne de la grille. Chacun de ses prix est rangé dans la colonne dont le
+   centre est le plus proche. La lecture est refusée si un prix est loin de toute colonne, si une colonne reçoit deux
+   prix ou si une ligne a un prix manquant. La grille s'arrête à la première ligne qui n'a plus d'étiquette.
+5. **Termes du contrat.** Dans le texte de la page : « Freight value margin: 239.23% » donne la marge (2,3923),
+   « Diesel surcharge: 1.1943 » la surcharge, « Valid from: 01.08.2026 » la date de validité. Les nombres sont lus à
+   l'anglaise, comme tout le PDF : « 1,000 » vaut mille.
+6. **Contrôle par l'exemple du PDF.** Le PDF imprime un exemple de calcul (300 km, 1 000 kg : coût 82,77 €, prix final
+   335,34 €). L'application relit ce coût dans la grille extraite, avec la même règle « jusqu'à » que le moteur, puis
+   recalcule 82,77 × (1 + 2,3923) × 1,1943. Si l'un des deux résultats ne correspond pas, le fichier est refusé avec un
+   message clair. Une étiquette décalée ou une marge mal lue est ainsi détectée avant tout calcul.
+
+Résultat sur `courses/rate_sheet.pdf` : 14 tranches de distance × 15 tranches de poids. Les 210 prix sont identiques
+à la grille saisie à la main au Milestone 1 (`docs/rate_sheet.csv`) et à ceux qu'extrait un autre outil
+(`pdftotext`). Les tests le vérifient (`tests/unit/test_rate_sheet_pdf.py`).
 
 Chaque exécution écrit dans `runs/<run_id>/output/` :
 
@@ -93,7 +117,8 @@ uv run main.py run ... --parameters parameters.json
 
 Les principaux : `max_advance_days` (RG03), `allowed_frequencies` (RG05), `smoothing` et `smoothing_budget` (RG09),
 `objective` (`cost` ou `trucks`), `strict_coverage` (RG06), `holiday_country` (RG10) et `tail_date` (dernière date
-du planning qui cumule les besoins, détectée automatiquement). Les réglages techniques (dossier des exécutions,
+du planning qui cumule les besoins, détectée automatiquement). La marge et la surcharge diesel (RG11) n'en font pas
+partie : elles sont lues dans la grille du transporteur. Les réglages techniques (dossier des exécutions,
 niveau de log, nombre de processus, hôte et port) viennent de l'environnement avec le préfixe `DSO_` (voir
 `.env.example`).
 
@@ -103,7 +128,7 @@ niveau de log, nombre de processus, hôte et port) viennent de l'environnement a
 main.py                          point d'entrée : run | serve | parameters
 src/delivery_schedule_optimization/
 ├── domain/        objets métier, sans I/O : paramètres (config.py), calendrier (RG10), plan d'un couple (models.py)
-├── io/            contrats des fichiers d'entrée et de sortie, lecture (avec contrôles) et écriture
+├── io/            contrats des fichiers d'entrée et de sortie, lecture (avec contrôles, PDF de la grille) et écriture
 ├── preparation/   nettoyage du Milestone 1 : DQ01–DQ07, imputation camion plein, dataset consolidé, lignes du moteur
 ├── pricing/       grille tarifaire et prix d'un camion (RG11)
 ├── baseline/      situation actuelle (référence A) : une livraison par couple et par jour de besoin, chargée comme le plan

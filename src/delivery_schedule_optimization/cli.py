@@ -80,7 +80,7 @@ def build_parser() -> argparse.ArgumentParser:
     run = sub.add_parser("run", help="optimise one planning and write the outputs in runs/<run_id>/output")
     run.add_argument("--schedule", required=True, type=Path, help="released schedule (CSV)")
     run.add_argument("--distances", required=True, type=Path, help="supplier distances (CSV)")
-    run.add_argument("--rate-sheet", required=True, type=Path, help="rate sheet of the carrier: rate_sheet.pdf or a CSV")
+    run.add_argument("--rate-sheet", required=True, type=Path, help="rate sheet of the carrier (rate_sheet.pdf)")
     run.add_argument("--parameters", type=Path, help='JSON overrides, e.g. {"planner": {"smoothing_budget": 0.005}}')
     run.add_argument("--runs-dir", type=Path, help="folder of the runs (default: DSO_RUNS_DIR or ./runs)")
     run.set_defaults(handler=_run)

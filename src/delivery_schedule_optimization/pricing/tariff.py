@@ -2,13 +2,9 @@
 
 from __future__ import annotations
 
-from pathlib import Path
-
 import numpy as np
 import numpy.typing as npt
 import pandas as pd
-
-from ..domain.config import PlannerConfig
 
 
 def _bound(text: object) -> float:
@@ -29,18 +25,16 @@ def rate_grid(raw: pd.DataFrame) -> pd.DataFrame:
     return grid.sort_index().sort_index(axis=1)
 
 
-def load_rate_grid(path: Path) -> pd.DataFrame:
-    """Read the wide rate sheet (docs/rate_sheet.csv) and convert it with `rate_grid`."""
-    return rate_grid(pd.read_csv(path, dtype={"km_up_to": str}))
-
-
 class Tariff:
-    """Price of ONE truck: grid(distance bracket, truck weight bracket) x (1 + margin) x diesel (RG11)."""
+    """Price of ONE truck: grid(distance bracket, truck weight bracket) x price factor (RG11).
 
-    def __init__(self, grid: pd.DataFrame, config: PlannerConfig) -> None:
+    `price_factor` = (1 + margin) x diesel surcharge, both read from the rate sheet (`RateSheet.price_factor`).
+    """
+
+    def __init__(self, grid: pd.DataFrame, price_factor: float) -> None:
         self.km: npt.NDArray[np.float64] = grid.index.to_numpy(dtype=float)
         self.kg: npt.NDArray[np.float64] = grid.columns.to_numpy(dtype=float)
-        self.prices: npt.NDArray[np.float64] = grid.to_numpy(dtype=float) * config.price_factor
+        self.prices: npt.NDArray[np.float64] = grid.to_numpy(dtype=float) * price_factor
 
     def __call__(self, distance_km: npt.ArrayLike, weight_kg: npt.ArrayLike) -> npt.NDArray[np.float64]:
         row = np.searchsorted(self.km, np.asarray(distance_km, dtype=float), side="left")

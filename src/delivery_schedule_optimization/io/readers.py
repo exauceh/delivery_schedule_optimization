@@ -53,11 +53,8 @@ def read_distances(source: Source) -> pd.DataFrame:
 
 
 def read_rate_sheet(source: Source) -> RateSheet:
-    """The carrier's rate sheet, as a PDF (`rate_sheet.pdf`, read with its margin and diesel surcharge) or as a CSV.
-
-    CSV format: one row per distance bracket (`km_up_to`), one column per weight bracket.
-    """
+    """The carrier's rate sheet, always its PDF (`rate_sheet.pdf`): price grid, margin, diesel surcharge, validity."""
     content = source if isinstance(source, bytes) else source.read_bytes()
-    if content.startswith(PDF_MAGIC):
-        return read_rate_sheet_pdf(content)
-    return RateSheet(table=_read_csv(content, InputName.RATE_SHEET, dtype={"km_up_to": str}), file_format="csv")
+    if not content.startswith(PDF_MAGIC):
+        raise InputError(f"{InputName.RATE_SHEET}: the carrier's rate sheet is expected as a PDF (rate_sheet.pdf)")
+    return read_rate_sheet_pdf(content)
