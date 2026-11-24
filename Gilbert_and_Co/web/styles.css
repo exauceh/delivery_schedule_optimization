@@ -821,7 +821,7 @@ body:not([data-view="apercu"]) #scenarioSwitch { display: none !important; }
 
 /* écran d'attente : camions et besoins en SVG, avec un moment « graphe » de temps en temps */
 .gather svg { width: 100%; height: 100%; display: block; overflow: visible; }
-.gather .g-body { fill: #0C4E3E; stroke: rgba(255, 255, 255, .9); stroke-width: 2; stroke-linejoin: round; }
+.gather .g-body { fill: none; stroke: rgba(255, 255, 255, .9); stroke-width: 2; stroke-linejoin: round; }
 .gather .g-wheel { fill: #0E5241; stroke: rgba(255, 255, 255, .8); stroke-width: 3.5; }
 .gather .g-hub { fill: var(--orange); }
 .gather .g-link { stroke: rgba(255, 255, 255, .3); stroke-width: 1.2; }

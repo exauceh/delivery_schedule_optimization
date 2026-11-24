@@ -438,7 +438,7 @@ const GRAPH_PHRASE = "On relie les besoins et on cherche le meilleur chemin…";
 function buildGather() {
   const box = $("#gather"); box.innerHTML = "";
   // the scene covers the whole loading panel (pixels): the needs scatter everywhere, the trucks stay on the left
-  const NS = "http://www.w3.org/2000/svg", W = Math.max(320, box.clientWidth || 1000), H = Math.max(300, box.clientHeight || 520), N = 44, MOVE = 2.0;   // slower moves
+  const NS = "http://www.w3.org/2000/svg", W = Math.max(320, box.clientWidth || 1000), H = Math.max(300, box.clientHeight || 520), N = 44, MOVE = 1.3;
   const svgEl = document.createElementNS(NS, "svg");
   svgEl.setAttribute("viewBox", `0 0 ${W} ${H}`); box.appendChild(svgEl);
   const el = (tag, attrs = {}, parent = svgEl) => { const n = document.createElementNS(NS, tag); for (const k in attrs) n.setAttribute(k, attrs[k]); parent.appendChild(n); return n; };
@@ -468,7 +468,7 @@ function buildGather() {
   let k = 0, prev = Array.from({ length: N }, () => [W / 2, H / 2]), seg = null;
   const nextSeg = (start) => {
     const isScatter = k % 2 === 0, graphy = isScatter;   // a graph between the needs at every interval between the trucks
-    const s = { start, dur: graphy ? 5.6 : 3.0, scatter: isScatter, graphy, from: prev, pos: isScatter ? scatter() : Array.from({ length: N }, (_, i) => slot(i)) };
+    const s = { start, dur: graphy ? 4.9 : 1.9, scatter: isScatter, graphy, from: prev, pos: isScatter ? scatter() : Array.from({ length: N }, (_, i) => slot(i)) };
     graph.innerHTML = ""; pathLayer.innerHTML = "";
     if (graphy) {   // links to the two nearest neighbours, and a path from left to right
       const P = s.pos, keys = new Set();
@@ -478,8 +478,8 @@ function buildGather() {
         return el("line", { x1: P[i][0], y1: P[i][1], x2: P[j][0], y2: P[j][1], class: "g-link", opacity: 0 }, graph); });
       let cur = P.map((p, i) => [i, p[0]]).sort((u, v) => u[1] - v[1])[0][0];
       s.route = [cur];
-      while (s.route.length < 9) {
-        const nx = P.map((b, j) => [j, b[0] > P[cur][0] + 15 ? (P[cur][0] - b[0]) ** 2 + (P[cur][1] - b[1]) ** 2 : Infinity]).sort((u, v) => u[1] - v[1])[0];
+      while (s.route.length < 22) {   // a long path: it crosses the whole panel through many needs
+        const nx = P.map((b, j) => [j, b[0] > P[cur][0] + 4 && !s.route.includes(j) ? (P[cur][0] - b[0]) ** 2 + (P[cur][1] - b[1]) ** 2 : Infinity]).sort((u, v) => u[1] - v[1])[0];
         if (!isFinite(nx[1])) break;
         cur = nx[0]; s.route.push(cur);
       }
@@ -501,13 +501,13 @@ function buildGather() {
       d.setAttribute("r", 6); d.setAttribute("fill", COLORS[i % 5]);
     });
     // as in the original screen: the trucks fade out (0.6 s) when the needs leave them, and fade back in when they come back
-    const fade = ease(local / 0.9), first = seg.start === 0;
+    const fade = ease(local / 0.6), first = seg.start === 0;
     truckEls.forEach((g) => g.setAttribute("opacity", (first ? 0 : seg.scatter ? 1 - fade : fade).toFixed(3)));
     graphMoment = seg.graphy && local > MOVE && local < seg.dur - 0.6;
     if (seg.graphy) {
-      const links = ease((local - (MOVE + 0.1)) / 0.7) * (1 - ease((local - 4.8) / 0.6));
+      const links = ease((local - 1.2) / 0.6) * (1 - ease((local - 4.3) / 0.5));
       seg.lines.forEach((l) => l.setAttribute("opacity", links.toFixed(3)));
-      const draw = ease((local - (MOVE + 0.8)) / 1.6), fade = 1 - ease((local - 4.8) / 0.6);
+      const draw = Math.min(1, Math.max(0, (local - 1.9) / 2.2)), fade = 1 - ease((local - 4.3) / 0.5);   // the path is walked slowly, at an even pace
       seg.path.setAttribute("stroke-dashoffset", (seg.len * (1 - draw)).toFixed(1));
       seg.path.setAttribute("opacity", fade.toFixed(3));
       seg.route.forEach((i, n) => { if (draw * (seg.route.length - 1) >= n - 0.01 && fade > 0.05) { dots[i].setAttribute("r", 8); dots[i].setAttribute("fill", "#E8772E"); } });
