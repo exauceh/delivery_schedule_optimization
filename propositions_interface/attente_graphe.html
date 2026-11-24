@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Gilbert &amp; Co · Proposition d'écran d'attente</title>
+<style>
+  /* Proposition : écran d'attente inspiré de l'algorithme (graphe des jours de départ + plus court chemin), camions conservés. */
+  @font-face { font-family: 'Plus Jakarta Sans'; font-weight: 800; src: url('../Gilbert_and_Co/web/fonts/plus-jakarta-sans-latin-800-normal.woff2') format('woff2'); }
+  @font-face { font-family: 'Plus Jakarta Sans'; font-weight: 700; src: url('../Gilbert_and_Co/web/fonts/plus-jakarta-sans-latin-700-normal.woff2') format('woff2'); }
+  @font-face { font-family: 'Manrope'; font-weight: 500; src: url('../Gilbert_and_Co/web/fonts/manrope-latin-500-normal.woff2') format('woff2'); }
+  @font-face { font-family: 'Manrope'; font-weight: 600; src: url('../Gilbert_and_Co/web/fonts/manrope-latin-600-normal.woff2') format('woff2'); }
+  @font-face { font-family: 'Manrope'; font-weight: 700; src: url('../Gilbert_and_Co/web/fonts/manrope-latin-700-normal.woff2') format('woff2'); }
+  :root { --bg: #F3F6F4; --emerald: #105B48; --emerald-2: #0C4E3E; --mint: #CFE6D8; --orange: #E8772E; --gold: #F6C28B; --ink: #192D25; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); font-family: 'Manrope', system-ui, sans-serif; color: var(--ink); padding: 40px; }
+  .running {
+    position: relative; overflow: hidden; display: grid; grid-template-columns: minmax(0, 1.75fr) minmax(280px, 1fr); gap: 2.4rem; align-items: center;
+    max-width: 1180px; margin: 0 auto; min-height: 560px; padding: 2.4rem 2.6rem; border-radius: 14px; color: #fff;
+    background: radial-gradient(120% 120% at 100% 0%, #156b55 0%, #105B48 45%, #0C4E3E 100%);
+  }
+  .running::after { content: ""; position: absolute; left: 0; bottom: 0; height: 3px; width: 28%; background: var(--orange); animation: sweep 1.8s ease-in-out infinite; }
+  @keyframes sweep { from { left: -28%; } to { left: 100%; } }
+  svg { width: 100%; height: auto; display: block; overflow: visible; }
+  .label { font-size: .72rem; font-weight: 700; letter-spacing: .18em; text-transform: uppercase; color: rgba(255,255,255,.7); margin: 0; }
+  .name { font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 700; font-size: 1.15rem; margin: .4rem 0 0; }
+  .timer { font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 800; font-size: 4.6rem; line-height: 1; letter-spacing: -.04em; margin: .9rem 0 1.4rem; }
+  .steps { list-style: none; padding: 0; margin: 0 0 1.6rem; display: grid; gap: .55rem; }
+  .steps li { display: flex; align-items: center; gap: .75rem; font-size: .95rem; color: rgba(255,255,255,.55); transition: color .3s; }
+  .steps li i { width: 20px; height: 20px; border-radius: 50%; border: 1.5px solid rgba(255,255,255,.35); display: grid; place-items: center; flex: none; transition: all .3s; }
+  .steps li.done { color: rgba(255,255,255,.8); }
+  .steps li.done i { background: rgba(255,255,255,.18); border-color: transparent; }
+  .steps li.done i::after { content: ""; width: 8px; height: 5px; border-left: 2px solid #fff; border-bottom: 2px solid #fff; transform: rotate(-45deg) translate(1px, -1px); }
+  .steps li.on { color: #fff; font-weight: 700; }
+  .steps li.on i { border-color: var(--orange); background: var(--orange); box-shadow: 0 0 0 5px rgba(232,119,46,.25); }
+  .stop { display: inline-flex; align-items: center; gap: .5rem; height: 40px; padding: 0 1.1rem; border-radius: 10px; border: 1px solid rgba(255,255,255,.45);
+    background: rgba(255,255,255,.08); color: #fff; font: 600 .9rem 'Manrope', sans-serif; cursor: pointer; }
+  .stop svg { width: 14px; height: 14px; }
+  .note { max-width: 1180px; margin: 1.2rem auto 0; color: #708579; font-size: .9rem; }
+  /* svg */
+  .axis { stroke: rgba(255,255,255,.22); stroke-width: 1.2; }
+  .day { font: 600 11px 'Manrope', sans-serif; fill: rgba(255,255,255,.6); text-anchor: middle; }
+  .week { font: 700 11px 'Manrope', sans-serif; fill: rgba(255,255,255,.8); letter-spacing: .08em; }
+  .cap { font: 700 10.5px 'Manrope', sans-serif; fill: rgba(255,255,255,.55); letter-spacing: .16em; }
+  .truck rect, .truck path { fill: none; stroke: rgba(255,255,255,.7); stroke-width: 1.6; }
+  .wheel { fill: #0C4E3E; stroke: rgba(255,255,255,.85); stroke-width: 2.2; }
+  .hub { fill: var(--orange); }
+</style>
+</head>
+<body>
+<section class="running">
+  <svg id="scene" viewBox="0 0 720 440" role="img" aria-label="Animation : le moteur explore le graphe des jours de départ, trouve le plus court chemin et charge les camions"></svg>
+  <div class="side">
+    <p class="label">Calcul en cours</p>
+    <p class="name">Plan de référence</p>
+    <p class="timer" id="timer">0 s</p>
+    <ol class="steps" id="steps">
+      <li><i></i>Lecture des besoins</li>
+      <li><i></i>Graphe des départs possibles</li>
+      <li><i></i>Plus court chemin par couple</li>
+      <li><i></i>Chargement des camions</li>
+      <li><i></i>Contrôle des règles</li>
+    </ol>
+    <button class="stop" type="button"><svg viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12" rx="2" fill="currentColor"/></svg>Arrêter le calcul</button>
+  </div>
+</section>
+<p class="note">Proposition : les besoins tombent sur la frise des jours, le moteur trace les départs possibles (arcs), retient le plus court chemin (orange),
+regroupe les besoins sur les jours retenus, puis les charge dans les camions. La boucle recommence avec un autre couple fournisseur × usine.</p>
+
+<script>
+"use strict";
+const NS = "http://www.w3.org/2000/svg";
+const svg = document.getElementById("scene");
+const el = (tag, attrs = {}, parent = svg) => { const n = document.createElementNS(NS, tag); for (const k in attrs) n.setAttribute(k, attrs[k]); parent.appendChild(n); return n; };
+
+// ---- static frame: two weeks of working days on an axis
+const DAYS = ["L", "M", "M", "J", "V", "L", "M", "M", "J", "V"];
+const X0 = 50, STEP = 68, AXIS = 210;
+const xs = DAYS.map((_, i) => X0 + i * STEP + (i >= 5 ? 18 : 0));
+el("text", { x: 20, y: 28, class: "cap" }).textContent = "DÉPARTS POSSIBLES";
+el("text", { x: 20, y: 300, class: "cap" }).textContent = "CAMIONS";
+el("line", { x1: 30, x2: 700, y1: AXIS, y2: AXIS, class: "axis" });
+DAYS.forEach((d, i) => { el("text", { x: xs[i], y: AXIS + 26, class: "day" }).textContent = d; });
+el("text", { x: xs[0] - 6, y: AXIS + 46, class: "week" }).textContent = "SEM. 1";
+el("text", { x: xs[5] - 6, y: AXIS + 46, class: "week" }).textContent = "SEM. 2";
+const arcLayer = el("g"), pathLayer = el("g"), nodeLayer = el("g"), dotLayer = el("g"), truckLayer = el("g");
+const nodes = xs.map((x) => el("circle", { cx: x, cy: AXIS, r: 6, fill: "#0C4E3E", stroke: "rgba(255,255,255,.55)", "stroke-width": 1.6 }, nodeLayer));
+
+// ---- one cycle = one supplier × plant couple, with its own needs and its own optimal departures
+const rnd = (() => { let s = 7; return () => (s = (s * 16807) % 2147483647) / 2147483647; })();
+const CYCLE = 10;   // seconds
+let plan = null;
+function newPlan() {
+  arcLayer.innerHTML = ""; pathLayer.innerHTML = ""; dotLayer.innerHTML = ""; truckLayer.innerHTML = "";
+  // needs: a few dots per day
+  const needs = [];
+  DAYS.forEach((_, i) => { const n = Math.floor(rnd() * 3.2); for (let k = 0; k < n; k++) needs.push({ day: i, k }); });
+  // optimal departures (a shortest path over the days): start, then jumps of 2 to 4 days
+  const chosen = [0]; while (chosen[chosen.length - 1] < 9) chosen.push(Math.min(9, chosen[chosen.length - 1] + 2 + Math.floor(rnd() * 2.4)));
+  const unique = [...new Set(chosen)];
+  // candidate arcs i -> j (window of 4 days): the graph the engine explores
+  const arcs = [];
+  for (let i = 0; i < 10; i++) for (let j = i + 1; j <= Math.min(9, i + 4); j++) {
+    const h = 26 + (j - i) * 26;
+    const path = el("path", { d: `M${xs[i]} ${AXIS} Q${(xs[i] + xs[j]) / 2} ${AXIS - h * 1.6} ${xs[j]} ${AXIS}`, fill: "none",
+      stroke: "rgba(207,230,216,.55)", "stroke-width": 1.1, opacity: 0 }, arcLayer);
+    arcs.push({ i, j, path, delay: rnd() });
+  }
+  const best = [];
+  for (let k = 0; k + 1 < unique.length; k++) {
+    const i = unique[k], j = unique[k + 1], h = 26 + (j - i) * 26;
+    const d = `M${xs[i]} ${AXIS} Q${(xs[i] + xs[j]) / 2} ${AXIS - h * 1.6} ${xs[j]} ${AXIS}`;
+    const p = el("path", { d, fill: "none", stroke: "#E8772E", "stroke-width": 3, "stroke-linecap": "round" }, pathLayer);
+    const len = p.getTotalLength(); p.setAttribute("stroke-dasharray", len); p.setAttribute("stroke-dashoffset", len);
+    best.push({ p, len });
+  }
+  // each need leaves with the latest chosen departure on or before its day (no delay, some anticipation)
+  const dots = needs.map((n, idx) => {
+    const dep = Math.max(...unique.filter((c) => c <= n.day));
+    const color = ["#F6C28B", "#CFE6D8", "#E8772E"][idx % 3];
+    const c = el("circle", { r: 4.2, fill: color, opacity: 0 }, dotLayer);
+    return { ...n, dep, c, jitter: (rnd() - .5) * 10 };
+  });
+  // trucks under the chosen departures (kept from the current design, with wheels)
+  const trucks = {};
+  unique.forEach((dep) => {
+    const load = dots.filter((d) => d.dep === dep);
+    if (!load.length) return;
+    const g = el("g", { class: "truck", opacity: 0 }, truckLayer);
+    const x = Math.min(xs[dep] - 34, 700 - 86), y = 322;   // the last truck stays inside the scene
+    el("rect", { x, y, width: 58, height: 34, rx: 5 }, g);
+    el("path", { d: `M${x + 58} ${y + 10} h13 l9 10 v14 h-22` }, g);
+    [[x + 13], [x + 43], [x + 71]].forEach(([cx]) => { el("circle", { cx, cy: y + 36, r: 6, class: "wheel" }, g); el("circle", { cx, cy: y + 36, r: 2.2, class: "hub" }, g); });
+    trucks[dep] = { g, x, y, n: 0 };
+  });
+  dots.forEach((d) => { const t = trucks[d.dep]; d.slot = t.n++; });
+  return { needs: dots, arcs, best, unique, trucks };
+}
+
+// ---- timeline of one cycle (seconds): needs fall, graph explored, best path drawn, needs grouped, trucks loaded
+const ease = (t) => (t <= 0 ? 0 : t >= 1 ? 1 : 1 - Math.pow(1 - t, 3));
+const seg = (t, a, b) => ease((t - a) / (b - a));
+const steps = [...document.querySelectorAll("#steps li")];
+let t0 = performance.now(), lastCycle = -1;
+function frame(now) {
+  const total = (now - t0) / 1000, cycle = Math.floor(total / CYCLE), t = total % CYCLE;
+  if (cycle !== lastCycle) { plan = newPlan(); lastCycle = cycle; }
+  document.getElementById("timer").textContent = Math.floor(total) + " s";
+  const phase = t < 1.6 ? 0 : t < 3.8 ? 1 : t < 5.2 ? 2 : t < 8.4 ? 3 : 4;
+  steps.forEach((li, i) => { li.className = i < phase ? "done" : i === phase ? "on" : ""; });
+
+  // 1. needs fall on their day (above the axis, stacked)
+  plan.needs.forEach((d, idx) => {
+    const fall = seg(t, 0.05 * idx, 0.05 * idx + 0.7);
+    const yDay = AXIS + 62 + d.k * 11;
+    let x = xs[d.day] + d.jitter * .3, y = 60 + (yDay - 60) * fall;
+    // 4. grouped on the departure day, then loaded in the truck
+    const group = seg(t, 5.2, 6.4), load = seg(t, 6.6 + 0.03 * idx, 7.6 + 0.03 * idx);
+    const tx = xs[d.dep];
+    x = x + (tx - x) * group;
+    const tr = plan.trucks[d.dep];
+    const sx = tr.x + 7 + (d.slot % 5) * 10.5, sy = tr.y + 9 + Math.floor(d.slot / 5) * 9;
+    if (load > 0) { x = x + (sx - x) * load; y = yDay + (sy - yDay) * load; }
+    const out = seg(t, 9.2, 9.9);
+    d.c.setAttribute("cx", x); d.c.setAttribute("cy", y);
+    d.c.setAttribute("opacity", Math.min(1, fall * 1.5) * (1 - out));
+  });
+  // 2. candidate arcs light up (the graph explored by the dynamic programme)
+  plan.arcs.forEach((a) => {
+    const on = seg(t, 1.6 + a.delay * 1.8, 2.0 + a.delay * 1.8), off = seg(t, 5.0, 6.0);
+    a.path.setAttribute("opacity", (0.9 * on * (1 - 0.75 * off)).toFixed(3));
+  });
+  // 3. shortest path drawn in orange, chosen days filled
+  plan.best.forEach((b, k) => {
+    const draw = seg(t, 3.8 + k * 0.28, 4.3 + k * 0.28), out = seg(t, 9.2, 9.9);
+    b.p.setAttribute("stroke-dashoffset", (b.len * (1 - draw)).toFixed(1));
+    b.p.setAttribute("opacity", 1 - out);
+  });
+  nodes.forEach((n, i) => {
+    const picked = plan.unique.includes(i) && t > 3.9 && t < 9.4;
+    n.setAttribute("fill", picked ? "#E8772E" : "#0C4E3E");
+    n.setAttribute("r", picked ? 7.5 : 6);
+    n.setAttribute("stroke", picked ? "#fff" : "rgba(255,255,255,.55)");
+  });
+  // 5. trucks roll in, then roll out at the end of the cycle
+  Object.values(plan.trucks).forEach((tr, k) => {
+    const inT = seg(t, 6.2 + k * 0.08, 6.8 + k * 0.08), outT = seg(t, 9.0, 9.9);
+    tr.g.setAttribute("opacity", inT);
+    tr.g.setAttribute("transform", `translate(${(-30 * (1 - inT) + 60 * outT).toFixed(1)} 0)`);
+  });
+  if (!FROZEN) requestAnimationFrame(frame);
+}
+// ?t=5.5 freezes the scene at that second (for screenshots); otherwise it loops
+const FROZEN = new URLSearchParams(location.search).get("t");
+if (FROZEN) frame(t0 + 1000 * parseFloat(FROZEN)); else requestAnimationFrame(frame);
+</script>
+</body>
+</html>

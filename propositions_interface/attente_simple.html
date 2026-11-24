@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Gilbert &amp; Co · Écran d'attente (proposition 3, simple)</title>
+<style>
+  /* Proposition 3 : l'écran actuel (camions + points qui se rangent), avec de temps en temps un moment « graphe » :
+     les points dispersés se relient et un chemin orange s'allume avant le rangement. ?t=5 fige l'image à 5 s. */
+  @font-face { font-family: 'Plus Jakarta Sans'; font-weight: 800; src: url('../Gilbert_and_Co/web/fonts/plus-jakarta-sans-latin-800-normal.woff2') format('woff2'); }
+  @font-face { font-family: 'Manrope'; font-weight: 600; src: url('../Gilbert_and_Co/web/fonts/manrope-latin-600-normal.woff2') format('woff2'); }
+  @font-face { font-family: 'Manrope'; font-weight: 700; src: url('../Gilbert_and_Co/web/fonts/manrope-latin-700-normal.woff2') format('woff2'); }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #F3F6F4; font-family: 'Manrope', system-ui, sans-serif; padding: 36px; }
+  .running {
+    position: relative; overflow: hidden; display: grid; grid-template-columns: 1.2fr 1fr; gap: 2rem; align-items: center;
+    max-width: 1180px; margin: 0 auto; min-height: 520px; padding: 3rem; border-radius: 24px; color: #F2FBF6;
+    background: linear-gradient(130deg, #0F5B46, #138062 70%, #1A9470);
+  }
+  .running::before { content: ""; position: absolute; right: -120px; top: -120px; width: 420px; height: 420px; border-radius: 50%; border: 40px solid rgba(255,255,255,.04); box-shadow: 0 0 0 46px rgba(255,255,255,.03); }
+  .running::after { content: ""; position: absolute; left: 0; bottom: 0; height: 4px; width: 30%; background: #E8772E; animation: sweep 1.6s ease-in-out infinite; }
+  @keyframes sweep { from { left: -30%; } to { left: 100%; } }
+  svg { width: 100%; height: auto; display: block; overflow: visible; position: relative; }
+  .kicker { margin: 0 0 .5rem; font-size: .72rem; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: #F6C28B; position: relative; }
+  .timer { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 6rem; font-weight: 800; line-height: 1; margin: .3rem 0 1rem; color: #fff; letter-spacing: -.04em; position: relative; }
+  .phrase { font-size: 1.12rem; color: #A9D3C2; min-height: 3em; margin: 0; max-width: 30ch; position: relative; }
+  .stop { position: relative; display: inline-flex; align-items: center; gap: .5rem; margin-top: 1.6rem; height: 40px; padding: 0 1.1rem; border-radius: 10px;
+    border: 1px solid rgba(255,255,255,.45); background: rgba(255,255,255,.08); color: #fff; font: 600 .9rem 'Manrope', sans-serif; cursor: pointer; }
+  .stop svg { width: 14px; height: 14px; }
+  .note { max-width: 1180px; margin: 1rem auto 0; color: #708579; font-size: .88rem; }
+  .truck rect, .truck path { fill: none; stroke: rgba(255,255,255,.55); stroke-width: 2; }
+  .wheel { fill: #0E5241; stroke: rgba(255,255,255,.8); stroke-width: 3.5; }
+  .hub { fill: #E8772E; }
+</style>
+</head>
+<body>
+<section class="running">
+  <svg id="scene" viewBox="0 0 520 380" aria-hidden="true"></svg>
+  <div class="running-text">
+    <p class="kicker">Plan de référence</p>
+    <p class="timer" id="timer">0 s</p>
+    <p class="phrase" id="phrase">On lit les besoins de chaque fournisseur…</p>
+    <button class="stop" type="button"><svg viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12" rx="2" fill="currentColor"/></svg>Arrêter le calcul</button>
+  </div>
+</section>
+<p class="note">Proposition 3 : l'animation actuelle (les besoins se rangent dans les camions), et une fois sur trois les besoins dispersés se relient
+en graphe : le moteur cherche le meilleur chemin (en orange), puis range les besoins.</p>
+
+<script>
+"use strict";
+const NS = "http://www.w3.org/2000/svg";
+const svg = document.getElementById("scene");
+const el = (tag, attrs = {}, parent = svg) => { const n = document.createElementNS(NS, tag); for (const k in attrs) n.setAttribute(k, attrs[k]); parent.appendChild(n); return n; };
+const W = 520, H = 360, N = 44;
+const graph = el("g"), pathLayer = el("g"), truckLayer = el("g"), dotLayer = el("g");
+
+// the four trucks of the current screen (same places), with their wheels
+const TRUCKS = [[0.05, 0.12], [0.55, 0.12], [0.05, 0.58], [0.55, 0.58]].map(([x, y]) => [x * W, y * H]);
+const truckEls = TRUCKS.map(([x, y]) => {
+  const g = el("g", { class: "truck" }, truckLayer);
+  el("rect", { x, y, width: 132, height: 70, rx: 12 }, g);
+  el("path", { d: `M${x + 132} ${y + 24} h20 a12 12 0 0 1 12 12 v34 h-32` }, g);
+  [x + 28, x + 104, x + 148].forEach((cx) => { el("circle", { cx, cy: y + 72, r: 9, class: "wheel" }, g); el("circle", { cx, cy: y + 72, r: 3.5, class: "hub" }, g); });
+  return g;
+});
+const COLORS = ["#F6C28B", "#E8772E", "#F6C28B", "#F6C28B", "#9FE0C5"];
+const dots = Array.from({ length: N }, (_, i) => el("circle", { r: 6, fill: COLORS[i % 5] }, dotLayer));
+const truckSlot = (i) => { const [tx, ty] = TRUCKS[i % 4], k = Math.floor(i / 4); return [tx + 20 + (k % 6) * 18, ty + 21 + Math.floor(k / 6) * 20]; };
+
+// timeline: scatter, group, scatter, group... ; one scatter out of three is a "graph" moment (longer)
+const rnd = (() => { let s = 11; return () => (s = (s * 16807) % 2147483647) / 2147483647; })();
+const MOVE = 1.3, segs = [];
+let tt = 0;
+for (let k = 0; k < 400; k++) {
+  const scatter = k % 2 === 0, graphy = scatter && k % 6 === 4;
+  const pos = scatter ? Array.from({ length: N }, () => [10 + rnd() * (W - 20), 10 + rnd() * (H - 20)]) : Array.from({ length: N }, (_, i) => truckSlot(i));
+  const dur = graphy ? 4.2 : 1.9;
+  segs.push({ start: tt, dur, scatter, graphy, pos });
+  tt += dur;
+}
+// graph of a scatter: each need linked to its two nearest neighbours, and a path through a few of them
+function buildGraph(seg) {
+  graph.innerHTML = ""; pathLayer.innerHTML = "";
+  const P = seg.pos, lines = new Set();
+  P.forEach((a, i) => {
+    P.map((b, j) => [j, (a[0] - b[0]) ** 2 + (a[1] - b[1]) ** 2]).filter(([j]) => j !== i).sort((u, v) => u[1] - v[1]).slice(0, 2)
+      .forEach(([j]) => lines.add(i < j ? `${i}-${j}` : `${j}-${i}`));
+  });
+  seg.lines = [...lines].map((key) => { const [i, j] = key.split("-").map(Number);
+    return el("line", { x1: P[i][0], y1: P[i][1], x2: P[j][0], y2: P[j][1], stroke: "rgba(255,255,255,.3)", "stroke-width": 1.2 }, graph); });
+  // a "shortest path" from left to right: greedy walk on the nearest neighbours that go right
+  let cur = P.map((p, i) => [i, p[0]]).sort((u, v) => u[1] - v[1])[0][0];
+  const route = [cur];
+  while (route.length < 9) {
+    const next = P.map((b, j) => [j, b[0] > P[cur][0] + 15 ? (P[cur][0] - b[0]) ** 2 + (P[cur][1] - b[1]) ** 2 : Infinity]).sort((u, v) => u[1] - v[1])[0];
+    if (!isFinite(next[1])) break;
+    cur = next[0]; route.push(cur);
+  }
+  const d = route.map((i, k) => `${k ? "L" : "M"}${P[i][0].toFixed(1)} ${P[i][1].toFixed(1)}`).join(" ");
+  seg.path = el("path", { d, fill: "none", stroke: "#E8772E", "stroke-width": 3, "stroke-linecap": "round", "stroke-linejoin": "round" }, pathLayer);
+  seg.len = seg.path.getTotalLength();
+  seg.path.setAttribute("stroke-dasharray", seg.len);
+  seg.route = route;
+}
+
+const PHRASES = ["On lit les besoins de chaque fournisseur…", "On essaie des milliers de plans de livraison…",
+  "On cherche, pour chaque fournisseur, les bons jours de la semaine…", "On étale les arrivées entre les jours…",
+  "On range chaque ligne dans son camion…", "On vérifie chaque règle, une par une…"];
+const ease = (x) => (x <= 0 ? 0 : x >= 1 ? 1 : 1 - Math.pow(1 - x, 3));
+let built = null;
+const t0 = performance.now();
+function frame(now) {
+  const t = (now - t0) / 1000;
+  document.getElementById("timer").textContent = Math.floor(t) + " s";
+  const idx = segs.findIndex((s) => t >= s.start && t < s.start + s.dur), seg = segs[Math.max(0, idx)], prev = segs[Math.max(0, idx - 1)];
+  document.getElementById("phrase").textContent = seg.graphy ? "On relie les besoins et on cherche le meilleur chemin…" : PHRASES[Math.floor(t / 5) % PHRASES.length];
+  const p = idx <= 0 && t < MOVE ? ease(t / MOVE) : ease((t - seg.start) / MOVE);
+  dots.forEach((d, i) => {
+    const a = idx <= 0 ? [W / 2, H / 2] : prev.pos[i], b = seg.pos[i];
+    d.setAttribute("cx", (a[0] + (b[0] - a[0]) * p).toFixed(1)); d.setAttribute("cy", (a[1] + (b[1] - a[1]) * p).toFixed(1));
+    d.setAttribute("r", 6);
+  });
+  truckEls.forEach((g) => g.setAttribute("opacity", seg.scatter ? (0.15 + 0.85 * (1 - p)) : (0.15 + 0.85 * p)));
+  // the graph moment: links appear, then the orange path is drawn, then everything fades before the trucks
+  if (seg.graphy) {
+    if (built !== seg) { buildGraph(seg); built = seg; }
+    const local = t - seg.start;
+    const links = ease((local - 1.2) / 0.6) * (1 - ease((local - 3.6) / 0.5));
+    seg.lines.forEach((l) => l.setAttribute("opacity", links.toFixed(3)));
+    const draw = ease((local - 1.9) / 1.2), fade = 1 - ease((local - 3.6) / 0.5);
+    seg.path.setAttribute("stroke-dashoffset", (seg.len * (1 - draw)).toFixed(1));
+    seg.path.setAttribute("opacity", fade.toFixed(3));
+    seg.route.forEach((i, k) => { if (draw * (seg.route.length - 1) >= k - 0.01 && fade > 0.05) { dots[i].setAttribute("r", 8); dots[i].setAttribute("fill", "#E8772E"); } else dots[i].setAttribute("fill", COLORS[i % 5]); });
+  } else if (built) { graph.innerHTML = ""; pathLayer.innerHTML = ""; dots.forEach((d, i) => d.setAttribute("fill", COLORS[i % 5])); built = null; }
+  if (!FROZEN) requestAnimationFrame(frame);
+}
+const FROZEN = new URLSearchParams(location.search).get("t");
+if (FROZEN) frame(t0 + 1000 * parseFloat(FROZEN)); else requestAnimationFrame(frame);
+</script>
+</body>
+</html>

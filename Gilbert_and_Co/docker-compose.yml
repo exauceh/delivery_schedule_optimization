@@ -1,0 +1,22 @@
+# Gilbert & Co en une commande :  docker compose up --build   puis ouvrir http://localhost:8000
+services:
+  gilbert:
+    build: .
+    image: gilbert-and-co:latest
+    ports:
+      - "8000:8000"
+    environment:
+      GILBERT_RUNS_DIR: /data/runs
+      GILBERT_IMPORTS_DIR: /data/imports
+      GILBERT_RUN_TIMEOUT_S: "900"
+    volumes:
+      - gilbert-data:/data          # imports et calculs conservés entre deux redémarrages
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/api/health')"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+volumes:
+  gilbert-data:

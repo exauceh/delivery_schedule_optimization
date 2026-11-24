@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Gilbert &amp; Co · Écran d'attente (proposition 2)</title>
+<style>
+  /* Proposition 2 : le graphe des départs dans le style de la présentation de l'algorithme (slides 2, 9 et 10),
+     aux couleurs Executive Dashboard, avec les camions conservés. ?t=6.5 fige l'image à 6,5 s. */
+  @font-face { font-family: 'Plus Jakarta Sans'; font-weight: 800; src: url('../Gilbert_and_Co/web/fonts/plus-jakarta-sans-latin-800-normal.woff2') format('woff2'); }
+  @font-face { font-family: 'Plus Jakarta Sans'; font-weight: 700; src: url('../Gilbert_and_Co/web/fonts/plus-jakarta-sans-latin-700-normal.woff2') format('woff2'); }
+  @font-face { font-family: 'Manrope'; font-weight: 500; src: url('../Gilbert_and_Co/web/fonts/manrope-latin-500-normal.woff2') format('woff2'); }
+  @font-face { font-family: 'Manrope'; font-weight: 600; src: url('../Gilbert_and_Co/web/fonts/manrope-latin-600-normal.woff2') format('woff2'); }
+  @font-face { font-family: 'Manrope'; font-weight: 700; src: url('../Gilbert_and_Co/web/fonts/manrope-latin-700-normal.woff2') format('woff2'); }
+  :root { --bg: #F3F6F4; --surface: #fff; --line: #DCE5DF; --ink: #192D25; --muted: #708579; --emerald: #105B48; --mint: #E4EFE8; --orange: #E8772E; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); font-family: 'Manrope', system-ui, sans-serif; color: var(--ink); padding: 36px; }
+  .wait { display: grid; grid-template-columns: minmax(0, 2.1fr) minmax(270px, 1fr); gap: 1.1rem; max-width: 1240px; margin: 0 auto; }
+  .card { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 1.4rem 1.5rem 1.2rem; }
+  .head { display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; }
+  .eyebrow { margin: 0; font-size: .74rem; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; color: var(--emerald); }
+  h2 { margin: .35rem 0 0; font-family: 'Plus Jakarta Sans', sans-serif; font-size: 1.25rem; font-weight: 700; letter-spacing: -.01em; }
+  .sub { margin: .25rem 0 0; color: var(--muted); font-size: .9rem; }
+  .profile { text-align: right; }
+  .chips { display: inline-flex; gap: 5px; }
+  .chips b { width: 30px; height: 30px; border-radius: 7px; display: grid; place-items: center; font-size: .8rem; font-weight: 700; background: #F1F5F2; color: #A3B3AA; transition: background .15s, color .15s; }
+  .chips b.on { background: var(--emerald); color: #fff; }
+  .profile small { display: block; margin-top: .35rem; font-size: .8rem; color: var(--muted); }
+  svg { width: 100%; height: auto; display: block; margin-top: .6rem; overflow: visible; }
+  .side { position: relative; overflow: hidden; border-radius: 12px; background: var(--emerald); color: #fff; padding: 1.6rem 1.6rem 1.5rem; }
+  .side::before { content: ""; position: absolute; right: -40%; top: -20%; width: 90%; aspect-ratio: 1; border-radius: 50%; background: rgba(255,255,255,.045); box-shadow: 0 0 0 60px rgba(255,255,255,.03); }
+  .side::after { content: ""; position: absolute; left: 0; bottom: 0; height: 3px; width: 30%; background: var(--orange); animation: sweep 1.8s ease-in-out infinite; }
+  @keyframes sweep { from { left: -30%; } to { left: 100%; } }
+  .side > * { position: relative; }
+  .label { margin: 0; font-size: .72rem; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; color: rgba(255,255,255,.75); }
+  .name { margin: .35rem 0 0; font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 700; font-size: 1.1rem; }
+  .timer { margin: .8rem 0 1.3rem; font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 800; font-size: 4.2rem; line-height: 1; letter-spacing: -.04em; }
+  .steps { list-style: none; padding: 0; margin: 0 0 1.5rem; display: grid; gap: .55rem; }
+  .steps li { display: flex; align-items: center; gap: .7rem; font-size: .92rem; color: rgba(255,255,255,.55); }
+  .steps li i { width: 20px; height: 20px; border-radius: 50%; border: 1.5px solid rgba(255,255,255,.35); display: grid; place-items: center; flex: none; }
+  .steps li.done { color: rgba(255,255,255,.85); }
+  .steps li.done i { background: rgba(255,255,255,.18); border-color: transparent; }
+  .steps li.done i::after { content: ""; width: 8px; height: 5px; border-left: 2px solid #fff; border-bottom: 2px solid #fff; transform: rotate(-45deg) translate(1px, -1px); }
+  .steps li.on { color: #fff; font-weight: 700; }
+  .steps li.on i { border-color: var(--orange); background: var(--orange); box-shadow: 0 0 0 5px rgba(232,119,46,.25); }
+  .stop { display: inline-flex; align-items: center; gap: .5rem; height: 40px; padding: 0 1.1rem; border-radius: 10px; border: 1px solid rgba(255,255,255,.45);
+    background: rgba(255,255,255,.08); color: #fff; font: 600 .9rem 'Manrope', sans-serif; cursor: pointer; }
+  .stop svg { width: 14px; height: 14px; margin: 0; }
+  .legend { display: flex; gap: 1.3rem; flex-wrap: wrap; margin-top: .4rem; font-size: .82rem; color: var(--muted); }
+  .legend span::before { content: ""; display: inline-block; width: 18px; height: 0; border-top: 2px solid #C9D6CD; margin-right: .4rem; vertical-align: middle; }
+  .legend .best::before { border-top: 3px solid var(--orange); }
+  .note { max-width: 1240px; margin: 1rem auto 0; color: var(--muted); font-size: .86rem; }
+  /* svg */
+  .node rect { fill: #F1F5F2; stroke: #B9CFC2; stroke-width: 1.2; transition: fill .2s; }
+  .node text { font: 600 12px 'Manrope', sans-serif; fill: #3E5248; text-anchor: middle; }
+  .node.seen rect { fill: #E4EFE8; stroke: #5E9F7E; }
+  .node.best rect { fill: #105B48; stroke: #105B48; }
+  .node.best text { fill: #fff; font-weight: 700; }
+  .node.fin rect { fill: #E4F3EA; stroke: #1FA77A; stroke-width: 1.6; }
+  .edge { fill: none; stroke: #C9D6CD; stroke-width: 1.1; }
+  .bestEdge { fill: none; stroke: #E8772E; stroke-width: 3; stroke-linecap: round; }
+  .pill rect { fill: #E8772E; }
+  .pill text { font: 700 10.5px 'Manrope', sans-serif; fill: #fff; text-anchor: middle; }
+  .cap { font: 700 10.5px 'Manrope', sans-serif; fill: #708579; letter-spacing: .14em; }
+  .week { font: 600 11.5px 'Manrope', sans-serif; fill: #708579; text-anchor: middle; }
+  .truck rect.body, .truck path { fill: #fff; stroke: #105B48; stroke-width: 1.6; }
+  .wheel { fill: #fff; stroke: #105B48; stroke-width: 2.2; }
+  .hub { fill: #E8772E; }
+  .tdate { font: 600 10.5px 'Manrope', sans-serif; fill: #3E5248; text-anchor: middle; }
+  .gauge { fill: #EEF2EF; }
+  .gaugeFill { fill: #1FA77A; }
+</style>
+</head>
+<body>
+<div class="wait">
+  <section class="card">
+    <div class="head">
+      <div>
+        <p class="eyebrow">Optimisation en cours</p>
+        <h2>Le plus court chemin des départs</h2>
+        <p class="sub">Exemple : SUP_00085 → PLT_004 · un nœud = un jour de départ possible, une flèche = un départ jusqu'au suivant</p>
+      </div>
+      <div class="profile">
+        <span class="chips" id="chips"><b>L</b><b>M</b><b>M</b><b>J</b><b>V</b></span>
+        <small id="profileTxt">profil testé</small>
+      </div>
+    </div>
+    <svg id="scene" viewBox="0 0 780 470" role="img" aria-label="Animation : graphe des jours de départ, plus court chemin, chargement des camions"></svg>
+    <div class="legend"><span>départs possibles</span><span class="best">chemin le moins cher</span></div>
+  </section>
+  <aside class="side">
+    <p class="label">Calcul en cours</p>
+    <p class="name">Plan de référence</p>
+    <p class="timer" id="timer">0 s</p>
+    <ol class="steps" id="steps">
+      <li><i></i>31 profils testés par couple</li>
+      <li><i></i>Graphe des départs possibles</li>
+      <li><i></i>Plus court chemin</li>
+      <li><i></i>Chargement des camions</li>
+      <li><i></i>Lissage et contrôles</li>
+    </ol>
+    <button class="stop" type="button"><svg viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12" rx="2" fill="currentColor"/></svg>Arrêter le calcul</button>
+  </aside>
+</div>
+<p class="note">Proposition 2 : reprise des graphes de la présentation de l'algorithme (profils testés, graphe des départs, chemin le moins cher avec le coût de chaque arête),
+puis les camions du chemin retenu se chargent. Exemple tiré de la présentation (SUP_00085 → PLT_004, profil { lun, mer, ven }, arêtes à 331,41 €), réduit à 4 semaines, en boucle pendant le calcul.</p>
+
+<script>
+"use strict";
+const NS = "http://www.w3.org/2000/svg";
+const svg = document.getElementById("scene");
+const el = (tag, attrs = {}, parent = svg) => { const n = document.createElementNS(NS, tag); for (const k in attrs) n.setAttribute(k, attrs[k]); parent.appendChild(n); return n; };
+const defs = el("defs");
+const marker = (id, color) => { const m = el("marker", { id, viewBox: "0 0 10 10", refX: 9, refY: 5, markerWidth: 6, markerHeight: 6, orient: "auto-start-reverse" }, defs); el("path", { d: "M0 0 L10 5 L0 10 z", fill: color }, m); };
+marker("arrGrey", "#C9D6CD"); marker("arrBest", "#E8772E");
+
+// ---- the graph of slide 10, on 4 weeks: profile { lun, mer, ven } -> 12 departure days + end
+const ROWS = [["lun", 0], ["mer", 2], ["ven", 4]];
+const WEEKS = [["09/11", 9], ["16/11", 16], ["23/11", 23], ["30/11", 30]];
+const W = 104, H = 34, X0 = 30, DX = 168, Y0 = 66, DY = 82;
+const nodes = [];
+WEEKS.forEach(([wl, mon], c) => {
+  el("text", { x: X0 + c * DX + W / 2, y: 28, class: "week" }).textContent = `semaine du ${wl}`;
+  ROWS.forEach(([d, off], r) => {
+    const day = mon + off, date = day > 30 ? `0${day - 30}/12` : `${String(day).padStart(2, "0")}/11`;
+    nodes.push({ id: nodes.length, label: `${d} ${date}`, abs: mon + off, x: X0 + c * DX, y: Y0 + r * DY, col: c, row: r });
+  });
+});
+const FIN = { id: nodes.length, label: "Fin", abs: 99, x: X0 + 4 * DX - 20, y: Y0 + DY, col: 4, row: 1, fin: true };
+nodes.push(FIN);
+// edges: a departure carries the needs until the next departure, at most 7 days ahead (as in the presentation)
+const edges = [];
+nodes.forEach((a) => nodes.forEach((b) => {
+  if (a.fin) return;
+  if (b.fin ? a.col === 3 : b.abs > a.abs && b.abs - a.abs <= 7) edges.push({ a, b });
+}));
+const anchor = (n, side) => side === "out" ? [n.x + W, n.y + H / 2] : [n.x, n.y + H / 2];
+function edgePath(a, b) {
+  if (!b.fin && a.col === b.col && b.row - a.row === 1) return `M${a.x + W / 2} ${a.y + H} L${b.x + W / 2} ${b.y - 2}`;   // next day of the same week
+  if (!b.fin && a.col === b.col) {   // skipping a day of the same week: around the left side, like the presentation
+    const y1 = a.y + H / 2, y2 = b.y + H / 2;
+    return `M${a.x} ${y1} C${a.x - 34} ${y1} ${b.x - 34} ${y2} ${b.x - 2} ${y2}`;
+  }
+  const [x1, y1] = anchor(a, "out"), [x2, y2] = anchor(b, "in");
+  const mx = (x1 + x2) / 2;
+  return `M${x1} ${y1} C${mx} ${y1} ${mx} ${y2} ${x2 - 2} ${y2}`;
+}
+const edgeLayer = el("g"), bestLayer = el("g"), nodeLayer = el("g"), pillLayer = el("g"), truckLayer = el("g");
+edges.forEach((e) => { e.path = el("path", { d: edgePath(e.a, e.b), class: "edge", "marker-end": "url(#arrGrey)", opacity: 0 }, edgeLayer); });
+nodes.forEach((n) => {
+  const g = el("g", { class: "node" + (n.fin ? " fin" : ""), opacity: 0 }, nodeLayer);
+  el("rect", { x: n.x, y: n.y, width: n.fin ? 80 : W, height: H, rx: 8 }, g);
+  el("text", { x: n.x + (n.fin ? 40 : W / 2), y: n.y + H / 2 + 4 }, g).textContent = n.label;
+  n.g = g;
+});
+if (FIN) { FIN.x += 0; }
+// the cheapest path of the presentation: lun 09/11 -> ven 13/11 -> ven 20/11 -> ven 27/11 -> ven 04/12 -> Fin
+const byLabel = (l) => nodes.find((n) => n.label === l);
+const bestNodes = ["lun 09/11", "ven 13/11", "ven 20/11", "ven 27/11", "ven 04/12", "Fin"].map(byLabel);
+const best = [];
+for (let k = 0; k + 1 < bestNodes.length; k++) {
+  const a = bestNodes[k], b = bestNodes[k + 1];
+  const p = el("path", { d: edgePath(a, b), class: "bestEdge", "marker-end": "url(#arrBest)" }, bestLayer);
+  const len = p.getTotalLength(); p.setAttribute("stroke-dasharray", len); p.setAttribute("stroke-dashoffset", len);
+  const mid = p.getPointAtLength(len / 2);
+  const pill = el("g", { class: "pill", opacity: 0 }, pillLayer);
+  el("rect", { x: mid.x - 29, y: mid.y - 10, width: 58, height: 20, rx: 10 }, pill);
+  el("text", { x: mid.x, y: mid.y + 4 }, pill).textContent = "331,41 €";
+  best.push({ p, len, pill });
+}
+el("text", { x: 2, y: 352, class: "cap" }).textContent = "CAMIONS DU CHEMIN RETENU";
+const EDGE_EUR = 331.41;   // price of each edge of this example (presentation, slide 10)
+el("text", { x: 778, y: 352, class: "cap", "text-anchor": "end" }).textContent =
+  `TOTAL ${new Intl.NumberFormat("fr-FR", { minimumFractionDigits: 2 }).format(EDGE_EUR * (bestNodes.length - 1))} €`;
+// trucks: one per departure of the path (kept from the current screen, with wheels)
+const trucks = bestNodes.slice(0, -1).map((n, k) => {
+  const x = 22 + k * 156, y = 372;
+  const g = el("g", { class: "truck", opacity: 0 }, truckLayer);
+  el("rect", { x, y, width: 78, height: 40, rx: 6, class: "body" }, g);
+  el("path", { d: `M${x + 78} ${y + 12} h16 l11 12 v16 h-27 z` }, g);
+  [x + 16, x + 58, x + 94].forEach((cx) => { el("circle", { cx, cy: y + 42, r: 7, class: "wheel" }, g); el("circle", { cx, cy: y + 42, r: 2.5, class: "hub" }, g); });
+  el("text", { x: x + 52, y: y + 68, class: "tdate" }, g).textContent = n.label;
+  const dots = [];
+  const n0 = 4 + (k * 3) % 5;
+  for (let i = 0; i < n0; i++) dots.push(el("circle", { cx: x + 10 + (i % 6) * 11, cy: y + 12 + Math.floor(i / 6) * 11, r: 4, fill: ["#1FA77A", "#E8772E", "#F6C28B", "#105B48"][i % 4], opacity: 0 }, g));
+  return { g, dots };
+});
+
+// ---- timeline of one cycle (s)
+const CYCLE = 11;
+const ease = (t) => (t <= 0 ? 0 : t >= 1 ? 1 : 1 - Math.pow(1 - t, 3));
+const seg = (t, a, b) => ease((t - a) / (b - a));
+const chips = [...document.querySelectorAll("#chips b")], steps = [...document.querySelectorAll("#steps li")];
+const SETS = [[0], [1, 3], [0, 2, 4], [4], [0, 1, 2, 3, 4], [1, 2], [0, 3], [2, 4], [0, 1, 4], [0, 2, 4]];
+const t0 = performance.now();
+function frame(now) {
+  const total = (now - t0) / 1000, t = total % CYCLE;
+  document.getElementById("timer").textContent = Math.floor(total) + " s";
+  const phase = t < 1.6 ? 0 : t < 3.4 ? 1 : t < 6.2 ? 2 : t < 9.4 ? 3 : 4;
+  steps.forEach((li, i) => { li.className = i < phase ? "done" : i === phase ? "on" : ""; });
+  // 1. profiles tested (slide 2): the chips run through day sets, then settle on { lun, mer, ven }
+  const set = t < 1.6 ? SETS[Math.min(SETS.length - 1, Math.floor(t / 0.16))] : [0, 2, 4];
+  chips.forEach((c, i) => c.classList.toggle("on", set.includes(i)));
+  document.getElementById("profileTxt").textContent = t < 1.6 ? `profil ${Math.min(31, 1 + Math.floor(t / 0.052))} / 31` : "profil { lun, mer, ven }";
+  // 2. nodes column by column, then every possible edge (grey)
+  nodes.forEach((n) => n.g.setAttribute("opacity", seg(t, 1.6 + n.col * 0.22, 2.0 + n.col * 0.22)));
+  edges.forEach((e, i) => e.path.setAttribute("opacity", seg(t, 2.3 + (i % 17) * 0.05, 2.8 + (i % 17) * 0.05)));
+  // 3. the dynamic programme sweeps the weeks, then the cheapest path is drawn with the price of each edge
+  nodes.forEach((n) => {
+    const seen = t > 3.4 + n.col * 0.45 && t < 10.4;
+    const isBest = bestNodes.includes(n) && !n.fin && t > 5.2 + bestNodes.indexOf(n) * 0.25 && t < 10.4;
+    n.g.classList.toggle("seen", seen && !isBest);
+    n.g.classList.toggle("best", isBest);
+  });
+  best.forEach((b, k) => {
+    const draw = seg(t, 5.2 + k * 0.25, 5.6 + k * 0.25), out = seg(t, 10.2, 10.9);
+    b.p.setAttribute("stroke-dashoffset", (b.len * (1 - draw)).toFixed(1));
+    b.p.setAttribute("opacity", draw > 0 ? 1 - out : 0);
+    b.p.setAttribute("marker-end", draw > 0.97 ? "url(#arrBest)" : "none");   // the arrowhead appears once the edge is drawn
+    b.pill.setAttribute("opacity", Math.min(seg(t, 5.6 + k * 0.25, 5.9 + k * 0.25), 1 - out));
+  });
+  // 4. one truck per departure of the path, loaded with its needs
+  trucks.forEach((tr, k) => {
+    const inT = seg(t, 6.4 + k * 0.15, 7.0 + k * 0.15), outT = seg(t, 10.0, 10.9);
+    tr.g.setAttribute("opacity", inT * (1 - outT));
+    tr.g.setAttribute("transform", `translate(${(-24 * (1 - inT) + 40 * outT).toFixed(1)} 0)`);
+    tr.dots.forEach((d, i) => d.setAttribute("opacity", seg(t, 7.2 + k * 0.15 + i * 0.12, 7.4 + k * 0.15 + i * 0.12)));
+  });
+  if (!FROZEN) requestAnimationFrame(frame);
+}
+const FROZEN = new URLSearchParams(location.search).get("t");
+if (FROZEN) frame(t0 + 1000 * parseFloat(FROZEN)); else requestAnimationFrame(frame);
+</script>
+</body>
+</html>
