@@ -10,6 +10,8 @@ Depuis le dépôt, exécuter `git fetch origin` pour récupérer les objets Git 
 
 La couverture s’applique aux 4 389 lignes préparées. L’audit relève 134 lignes dont une charge est imputée, 379 besoins du 1er janvier hors horizon et une ligne de 26,9 t écartée avant la planification. RG06 assouplie autorise les 142 affectations qui s’écartent de la lecture stricte.
 
+Les 150 couples dont toutes les charges et distances sont d’origine représentent 55 097,58 € des économies calculées. Les 30 autres représentent 11 083,08 €. Cette ventilation décrit le plan publié, sans isoler l’effet de l’imputation.
+
 Reproduire le scénario retenu seul depuis la racine du dépôt.
 
 ```powershell
