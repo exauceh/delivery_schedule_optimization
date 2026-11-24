@@ -7,9 +7,10 @@ Le moteur choisit les jours de départ et les chargements qui minimisent le coû
 | Besoin | Fichier | Contenu |
 |---|---|---|
 | **Calculer un plan** | [Jalon 3 · Notebook moteur](milestone3/moteur_optimisation.ipynb) | Exécute le solveur en mode pilote ou complet et produit les fichiers de sortie. |
+| **Comprendre la formulation** | [Jalon 3 · Annexe mathématique](milestone3/modelisation_mathematique.md) | Variables, objectif, contraintes, relaxation et preuve de coût. |
 | **Vérifier le plan et expliquer les gains** | [Jalon 4 · Notebook avant/après](milestone4/bilan_avant_apres.ipynb) | Tests, exhaustivité, capacités, délais, coûts, remplissage et contributions par usine. |
 | **Consulter le plan publié** | [Synthèse du calcul](milestone4/resultats_verifies/comparatif.json) | Meilleur plan vérifié, économies calculées et écart restant à la borne. |
-| **Relire l’implémentation** | [Solveur Python](milestone4/optimisation_cout.py) · [Suite de tests](milestone4/test_partition_hall.py) | Le notebook moteur appelle ce code. |
+| **Relire l’implémentation** | [Solveur Python](src/delivery_schedule_optimization/optimisation_cout.py) · [Suite de tests](milestone4/test_optimisation_cout.py) | Le notebook moteur appelle le solveur et le notebook du jalon 4 exécute les tests. |
 
 ## Comment fonctionne le moteur
 
@@ -42,4 +43,4 @@ Utiliser un environnement Jupyter avec Python, pandas, NumPy, SciPy et holidays.
 
 Le mode `pilote` résout un couple dans les deux périmètres. Le mode `complet` relance tous les couples à partir du plan figé et consolide le meilleur plan faisable et la meilleure borne disponibles. Les nouvelles sorties vont dans `results/moteur-notebook-pilote/` ou `results/moteur-notebook-complet/`. Le notebook du jalon 4 audite les exports publiés dans `milestone4/resultats_verifies/`. Un calcul limité en temps peut produire un plan ou une borne différents.
 
-Les comparatifs précédents restent disponibles dans les dossiers des [jalons 3](milestone3/) et [4](milestone4/).
+Les comparatifs précédents restent disponibles au [jalon 3](milestone3/) et dans les [archives du jalon 4](archives/milestone4/).

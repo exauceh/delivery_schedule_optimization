@@ -4,6 +4,4 @@ Le [notebook avant/après](bilan_avant_apres.ipynb) explique la méthode et exé
 
 Ouvrir le notebook depuis la racine ou depuis `milestone4/`, puis exécuter ses cellules dans l’ordre. Il utilise les [exports figés](resultats_verifies/) et le commit des données `a0e8aba`. Le [guide du projet](../README.md) centralise les règles, les résultats et les indications pour [relancer le moteur](../milestone3/moteur_optimisation.ipynb).
 
-## Comparatifs précédents
-
-[Notebook de vérification du plan de Wissam](milestone4_wissam.ipynb) · [Chronométrage](chrono_wissam.json) · [Historique des expériences d’optimisation](https://github.com/exauceh/delivery_schedule_optimization/blob/0f21353/milestone4/README.md)
+[Suite de tests](test_optimisation_cout.py) · [Annexe mathématique](../milestone3/modelisation_mathematique.md) · [Archives des comparatifs](../archives/milestone4/)

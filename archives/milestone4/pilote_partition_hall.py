@@ -12,8 +12,8 @@ from time import perf_counter
 
 import pandas as pd
 
-from partition_hall import Need, days_between, solve_all_profiles
 from delivery_schedule_optimization.baseline import BaselineConfig
+from delivery_schedule_optimization.partition_hall import Need, days_between, solve_all_profiles
 from delivery_schedule_optimization.profile_optimizer import german_national_holidays
 
 

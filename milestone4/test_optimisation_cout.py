@@ -4,8 +4,8 @@ from itertools import product
 import unittest
 
 from delivery_schedule_optimization.fast_plan import Line
-from optimisation_cout import PROFILES, combine_profiles, solve_pair, solve_profile_partition
-from partition_hall import Departure, Need, allocate_witness, solve_profile
+from delivery_schedule_optimization.optimisation_cout import PROFILES, combine_profiles, solve_pair, solve_profile_partition
+from delivery_schedule_optimization.partition_hall import Departure, Need, allocate_witness, solve_profile
 
 
 def brute(needs, slots, witness, bands, prices):
