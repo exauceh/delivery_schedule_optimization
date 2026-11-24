@@ -109,8 +109,9 @@ rien : tous ses chiffres viennent des tables de sortie d'une exécution, par les
   chaque camion.
 - **Scénarios** : tous les calculs côte à côte (économie, camions, pics par usine, réglages, durée).
 
-Un lissage avec surcoût est beaucoup plus long que le lissage gratuit : environ 6 minutes pour 0,5 % sur le planning du
-projet, contre une quinzaine de secondes. L'interface le signale quand on choisit ce réglage.
+Un lissage avec surcoût est plus long que le lissage gratuit : environ 50 secondes pour 0,5 % sur le planning du projet,
+contre une dizaine de secondes (les usines sont lissées en parallèle, l'usine la plus lente fixe la durée). L'interface
+le signale quand on choisit ce réglage.
 
 ## API
 

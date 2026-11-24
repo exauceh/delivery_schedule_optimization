@@ -3,8 +3,6 @@
 from __future__ import annotations
 
 import itertools
-import os
-from concurrent.futures import ProcessPoolExecutor
 from datetime import date
 
 import pandas as pd
@@ -14,6 +12,7 @@ from ..domain.config import COUPLE, PlannerConfig
 from ..domain.models import Candidates, CouplePlan
 from ..pricing.tariff import Tariff
 from .graph import optimal_plan
+from .parallel import parallel_map, worker_count
 from .reassign import reassign
 
 CoupleJob = tuple[pd.DataFrame, set[date], Tariff, PlannerConfig, date]  # lines, holidays, tariff, config, start
@@ -28,23 +27,8 @@ def candidate_plans(lines: pd.DataFrame, holidays: set[date], tariff: Tariff, co
     start = plan_start(lines, config)
     groups = list(lines.groupby(COUPLE, sort=True))
     jobs = [(group, holidays, tariff, config, start) for _, group in groups]
-    workers = min(config.workers or os.cpu_count() or 1, len(jobs))
-    if workers <= 1:
-        results = [couple_candidates(job) for job in jobs]
-    else:
-        # One maths thread per process: the parallelism is between processes, and each OpenBLAS thread pool
-        # would otherwise reserve its own memory at start-up.
-        threads = {name: os.environ.get(name) for name in ("OPENBLAS_NUM_THREADS", "OMP_NUM_THREADS", "MKL_NUM_THREADS")}
-        os.environ.update({name: "1" for name in threads})
-        try:
-            with ProcessPoolExecutor(max_workers=workers) as pool:
-                results = list(pool.map(couple_candidates, jobs, chunksize=max(1, len(jobs) // (4 * workers))))
-        finally:
-            for name, value in threads.items():
-                if value is None:
-                    os.environ.pop(name, None)
-                else:
-                    os.environ[name] = value
+    workers = worker_count(config.workers, len(jobs))
+    results = parallel_map(couple_candidates, jobs, workers, chunksize=max(1, len(jobs) // (4 * workers)))
     return {(str(key[0]), str(key[1])): plans for (key, _), plans in zip(groups, results)}
 
 

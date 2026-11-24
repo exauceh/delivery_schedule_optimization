@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import logging
+import time
 from collections import defaultdict
 from collections.abc import Iterable
 from datetime import date
@@ -13,9 +14,13 @@ import pandas as pd
 from ..domain.calendar import monday
 from ..domain.config import PlannerConfig
 from ..domain.models import Candidates, CouplePlan, Plans
+from .parallel import parallel_map, worker_count
 from .selection import choose_profiles, selection_key
 
 FrontierPoint = tuple[int, float, Plans]  # (smoothing indicator, cost, one plan per couple)
+PlantJob = tuple[Candidates, float, PlannerConfig]  # options of the couples of one plant, budget, config
+
+logger = logging.getLogger(__name__)
 
 
 def smoothing_options(candidates: Candidates, chosen: Plans, config: PlannerConfig = PlannerConfig()) -> Candidates:
@@ -85,7 +90,7 @@ def plant_frontier(options: Candidates, budget: float, config: PlannerConfig) ->
         if result.x is None:
             return None
         if result.status != 0:  # time limit: the solution is valid (every rule holds) but not proven optimal
-            logging.getLogger(__name__).warning("smoothing level %s: optimum not proven within %.0f s (%s)",
+            logger.warning("smoothing level %s: optimum not proven within %.0f s (%s)",
                                                 level, config.smoothing_time_limit, result.message)
         plans = {variables[j][0]: variables[j][1] for j in np.flatnonzero(result.x[:n_x] > 0.5)}
         return smoothing_indicator(plans.values()), sum(p.cost for p in plans.values()), plans
@@ -102,12 +107,21 @@ def plant_frontier(options: Candidates, budget: float, config: PlannerConfig) ->
     return frontier
 
 
+def plant_frontier_job(job: PlantJob) -> list[FrontierPoint]:
+    """`plant_frontier` of one plant (top-level function, so that it can run in another process)."""
+    options, budget, config = job
+    start = time.perf_counter()
+    frontier = plant_frontier(options, budget, config)
+    logger.debug("smoothing frontier of %d couples: %d levels in %.1f s", len(options), len(frontier), time.perf_counter() - start)
+    return frontier
+
+
 def smooth(candidates: Candidates, config: PlannerConfig) -> Plans:
     """RG09: spread the delivery days of the couples of each plant, at the lowest cost (exact).
 
     A couple only moves between plans with the same profile (and, with `overflow_first`, the same overflow) as its
     RG07 choice: RG07 is kept.
-    1. per plant, exact frontier: cheapest plan for each level of the smoothing indicator;
+    1. per plant, exact frontier: cheapest plan for each level of the smoothing indicator (plants in parallel);
     2. the budget (`smoothing_budget` x cost of the RG07 choice) is shared between the plants so that the
        sum of the indicators is the lowest, then the cost (exhaustive over the frontiers).
     With a zero budget, the planner still takes, among the cheapest plans, the best spread one.
@@ -118,8 +132,12 @@ def smooth(candidates: Candidates, config: PlannerConfig) -> Plans:
         return chosen
     options = smoothing_options(candidates, chosen, config)
     budget = config.smoothing_budget * sum(p.cost for p in chosen.values())
-    frontiers = [plant_frontier({k: v for k, v in options.items() if k[1] == plant}, budget, config)
-                 for plant in sorted({k[1] for k in options})]
+    # The frontiers of the plants are independent: one process per plant (the slowest plant sets the time).
+    plants = sorted({k[1] for k in options})
+    jobs: list[PlantJob] = [({k: v for k, v in options.items() if k[1] == plant}, budget, config) for plant in plants]
+    start = time.perf_counter()
+    frontiers = parallel_map(plant_frontier_job, jobs, worker_count(config.workers, len(jobs)))
+    logger.info("smoothing frontiers of %d plants in %.1f s (budget %.0f)", len(plants), time.perf_counter() - start, budget)
     combos: list[FrontierPoint] = [(0, 0.0, {})]  # (indicator, cost, plans), Pareto front over the plants seen so far
     for frontier in frontiers:
         merged = [(i + fi, c + fc, {**plans, **fplans}) for i, c, plans in combos for fi, fc, fplans in frontier]

@@ -270,8 +270,8 @@ function renderForm() {
   const w = $("#tuningWarn"), warnings = [];
   if (F.anticipation !== DEFAULT_F.anticipation)
     warnings.push(`${F.anticipation} jours d'avance : en dehors de la règle des ${DEFAULT_F.anticipation} jours, à présenter comme un scénario.`);
-  if (F.smoothing > 0)   // each level of the paid smoothing is an integer programme: several minutes instead of seconds
-    warnings.push("Lissage avec surcoût : le calcul prend plusieurs minutes (environ 6 min pour 0,5 % sur le planning du projet).");
+  if (F.smoothing > 0)   // each level of the paid smoothing is an integer programme: about a minute instead of seconds
+    warnings.push("Lissage avec surcoût : le calcul est plus long (environ 50 s pour 0,5 % sur le planning du projet, contre 10 s).");
   w.hidden = !warnings.length;
   w.textContent = warnings.join(" ");
 }

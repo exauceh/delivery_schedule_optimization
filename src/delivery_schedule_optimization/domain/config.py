@@ -33,7 +33,7 @@ class PlannerConfig:
     # window [date - max_advance_days, date]; True = only with the latest departure on or before its date.
     strict_coverage: bool = False
     reassign_passes: int = 50  # improvement passes of the assignment when strict_coverage is False
-    workers: int | None = None  # processes for the candidate plans (None = every CPU core, 1 = no parallelism)
+    workers: int | None = None  # processes for the candidate plans and the smoothing of the plants (None = every CPU core, 1 = no parallelism)
     # Client answer "add delivery days rather than trucks": True = fewest overflowing departures before the
     # cost; False = the cost decides alone (a departure may take a second truck if this is cheaper).
     overflow_first: bool = False
