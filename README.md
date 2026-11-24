@@ -1,3 +1,5 @@
 # Optimisation du planning de livraison
 
-Pour la présentation du **Milestone 3**, ouvrir le [notebook de l’algorithme](milestone3/milestone3_prime.ipynb) ou la [présentation PDF](milestone2/planification_testbed/presentation-ensemble.pdf). Le notebook explique et vérifie le plan à 49 camions au jour de pointe.
+Le plan retenu pour le **Milestone 3** est le [plan de Wissam](https://github.com/exauceh/delivery_schedule_optimization/blob/a0e8aba/milestone3/candidat_max.ipynb), avec RG06 assouplie. Le [Milestone 4](milestone4/) vérifie ses affectations et chiffre les gains par usine.
+
+Le [notebook de la variante RG06 stricte](milestone3/milestone3_prime.ipynb) et sa [présentation PDF](milestone2/planification_testbed/presentation-ensemble.pdf) restent disponibles pour le comparatif.

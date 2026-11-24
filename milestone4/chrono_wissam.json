@@ -1,0 +1,17 @@
+{
+  "commit": "a0e8aba",
+  "workers": 8,
+  "candidates": 2227,
+  "setup_and_baseline_s": 2.066,
+  "candidates_s": 35.215,
+  "smoothing_s": 7.472,
+  "checks_and_exports_s": 1.102,
+  "seconds_total": 45.855,
+  "process_seconds": 46.113,
+  "checks_passed": 15,
+  "matching_allocations": 4389,
+  "trucks": 760,
+  "cost_eur": 110543.95,
+  "saving_eur": 66180.66,
+  "peak": 68
+}
