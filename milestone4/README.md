@@ -1,10 +1,18 @@
 # Milestone 4 · Vérification du plan et des gains
 
+## Notre méthode et son bilan
+
+On choisit ensemble le profil de jours ouvrés, la date de départ et le camion de chaque ligne, par couple fournisseur × usine. Le moteur respecte la fenêtre J−7 à J ainsi que les limites de poids et de volume. Le coût dépend du tarif de chaque camion. On garde donc la possibilité d’ouvrir un camion de plus quand la grille rend cette option moins chère. Le solveur conserve le meilleur plan vérifié et une borne inférieure de coût pour mesurer la marge restante.
+
+Le [bilan avant/après](bilan_avant_apres.ipynb) explique les cinq étapes, donne un exemple tarifaire et contrôle le plan à partir des [exports figés](resultats_verifies/). Il exécute les tests, vérifie les affectations et compare coûts, camions et remplissage par périmètre. La référence est reconstruite à partir des dates de besoin et de la grille tarifaire. Exécuter le notebook avec Python, pandas, NumPy, SciPy et holidays, avec le commit de données `a0e8aba` disponible dans Git.
+
+## Vérification du plan de Wissam
+
 Le [notebook du Milestone 4](milestone4_wissam.ipynb) utilise le plan retenu de Wissam au commit a0e8aba. Il rapproche d’abord les lignes et les camions, puis reconstruit le coût de référence et compare les coûts et le remplissage.
 
 Depuis le dépôt, exécuter `git fetch origin` pour récupérer les objets Git de la branche de Wissam. Ouvrir le notebook avec un environnement qui contient pandas, NumPy, SciPy et holidays. Les résultats de la vérification sont enregistrés dans le notebook.
 
-## Résultat vérifié
+### Résultat du plan de Wissam
 
 **760 camions, 66 180,66 € d’économies calculées et 46,11 s de bout en bout** sur le poste de test. Les affectations recalculées correspondent à l’export de Wissam. Le pic passe de 118 à 68 camions dans la journée la plus chargée et les pics baissent dans les quatre usines. [Détail des mesures](chrono_wissam.json)
 
