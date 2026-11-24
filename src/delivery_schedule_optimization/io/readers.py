@@ -8,7 +8,8 @@ from pathlib import Path
 
 import pandas as pd
 
-from .schemas import NUMERIC_COLUMNS, REQUIRED_COLUMNS, InputError, InputName
+from .rate_sheet_pdf import read_rate_sheet_pdf
+from .schemas import NUMERIC_COLUMNS, PDF_MAGIC, REQUIRED_COLUMNS, InputError, InputName, RateSheet
 
 logger = logging.getLogger(__name__)
 
@@ -51,6 +52,12 @@ def read_distances(source: Source) -> pd.DataFrame:
     return _read_csv(source, InputName.DISTANCES, encoding="utf-8-sig")
 
 
-def read_rate_sheet(source: Source) -> pd.DataFrame:
-    """Wide rate sheet: one row per distance bracket (`km_up_to`), one column per weight bracket."""
-    return _read_csv(source, InputName.RATE_SHEET, dtype={"km_up_to": str})
+def read_rate_sheet(source: Source) -> RateSheet:
+    """The carrier's rate sheet, as a PDF (`rate_sheet.pdf`, read with its margin and diesel surcharge) or as a CSV.
+
+    CSV format: one row per distance bracket (`km_up_to`), one column per weight bracket.
+    """
+    content = source if isinstance(source, bytes) else source.read_bytes()
+    if content.startswith(PDF_MAGIC):
+        return read_rate_sheet_pdf(content)
+    return RateSheet(table=_read_csv(content, InputName.RATE_SHEET, dtype={"km_up_to": str}), file_format="csv")

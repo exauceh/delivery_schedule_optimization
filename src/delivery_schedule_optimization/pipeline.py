@@ -10,7 +10,7 @@ import logging
 import time
 from collections.abc import Iterator
 from contextlib import contextmanager
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 
 import pandas as pd
 
@@ -20,7 +20,7 @@ from .domain.config import PlannerConfig, PreparationConfig
 from .engine.candidates import candidate_plans
 from .engine.selection import choose_profiles
 from .engine.smoothing import smooth
-from .io.schemas import OutputName
+from .io.schemas import OutputName, RateSheet
 from .preparation.lines import prepare_lines
 from .preparation.pipeline import prepare
 from .pricing.tariff import Tariff, rate_grid
@@ -41,17 +41,19 @@ class RunConfig:
 
 @dataclass(frozen=True)
 class RawInputs:
-    """The three input tables, as read from the files (see `io.readers`)."""
+    """The three inputs, as read from the files (see `io.readers`)."""
 
     schedule: pd.DataFrame
     distances: pd.DataFrame
-    rate_sheet: pd.DataFrame
+    rate_sheet: RateSheet
 
 
 @dataclass(frozen=True)
 class PipelineResult:
-    """Everything a run produces: output tables, indicators, data accuracy, rule checks and timings."""
+    """Everything a run produces: output tables, indicators, data accuracy, rule checks, timings, parameters used."""
 
+    planner: PlannerConfig  # parameters actually used (margin and diesel surcharge of the PDF rate sheet included)
+    rate_sheet: dict[str, str | float | None]
     tables: dict[OutputName, pd.DataFrame]
     kpis: dict[str, float]
     accuracy: dict[str, float]
@@ -76,14 +78,24 @@ class StageTimer:
             logger.info("Stage %s: %.1f s", name, self.timings[name])
 
 
+def terms_of_the_rate_sheet(planner: PlannerConfig, rate_sheet: RateSheet) -> PlannerConfig:
+    """A PDF rate sheet sets the margin and the diesel surcharge of the run (RG11); a CSV keeps the parameters."""
+    if rate_sheet.margin is None or rate_sheet.diesel_surcharge is None:
+        return planner
+    if (planner.margin, planner.diesel_surcharge) != (rate_sheet.margin, rate_sheet.diesel_surcharge):
+        logger.warning("Margin and diesel surcharge of the PDF rate sheet (%s, %s) replace the parameters (%s, %s)",
+                       rate_sheet.margin, rate_sheet.diesel_surcharge, planner.margin, planner.diesel_surcharge)
+    return replace(planner, margin=rate_sheet.margin, diesel_surcharge=rate_sheet.diesel_surcharge)
+
+
 def run_pipeline(inputs: RawInputs, config: RunConfig) -> PipelineResult:
     """Run the whole engine on raw inputs. Same inputs and parameters give the same results (deterministic)."""
-    planner = config.planner
+    planner = terms_of_the_rate_sheet(config.planner, inputs.rate_sheet)
     timer = StageTimer()
     with timer.stage("preparation"):
         prepared = prepare(inputs.schedule, inputs.distances, planner, config.preparation)
         lines = prepare_lines(prepared.consolidated, planner)
-        tariff = Tariff(rate_grid(inputs.rate_sheet), planner)
+        tariff = Tariff(rate_grid(inputs.rate_sheet.table), planner)
         holidays = public_holidays(lines, planner)
     with timer.stage("current_situation"):
         deliveries_before, _ = current_deliveries(lines, tariff, planner)
@@ -114,4 +126,7 @@ def run_pipeline(inputs: RawInputs, config: RunConfig) -> PipelineResult:
         OutputName.SAVING: outputs.saving,
         OutputName.CHECKS: checks,
     }
-    return PipelineResult(tables=tables, kpis=kpis, accuracy=prepared.accuracy, checks_passed=checks_passed, timings=timer.timings)
+    rate_sheet: dict[str, str | float | None] = {"format": inputs.rate_sheet.file_format, "valid_from": inputs.rate_sheet.valid_from,
+                  "margin": planner.margin, "diesel_surcharge": planner.diesel_surcharge}
+    return PipelineResult(planner=planner, rate_sheet=rate_sheet, tables=tables, kpis=kpis, accuracy=prepared.accuracy,
+                          checks_passed=checks_passed, timings=timer.timings)

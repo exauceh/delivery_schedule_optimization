@@ -2,7 +2,10 @@
 
 from __future__ import annotations
 
+from dataclasses import dataclass
 from enum import StrEnum
+
+import pandas as pd
 
 
 class InputError(ValueError):
@@ -22,6 +25,29 @@ REQUIRED_COLUMNS: dict[InputName, list[str]] = {
     InputName.DISTANCES: ["supplier_id", "distance"],
     InputName.RATE_SHEET: ["km_up_to"],
 }
+PDF_MAGIC = b"%PDF"
+
+
+def file_suffix(content: bytes) -> str:
+    """Extension under which an uploaded input is stored: .pdf for a PDF (rate sheet), .csv otherwise."""
+    return ".pdf" if content.startswith(PDF_MAGIC) else ".csv"
+
+
+@dataclass(frozen=True)
+class RateSheet:
+    """The rate sheet read from a CSV or a PDF.
+
+    `table` is the price grid in the wide CSV format (`km_up_to`, then one column per weight bracket). A PDF also gives
+    the freight margin, the diesel surcharge and the validity date of the grid; a CSV does not (None).
+    """
+
+    table: pd.DataFrame
+    file_format: str
+    margin: float | None = None
+    diesel_surcharge: float | None = None
+    valid_from: str | None = None
+
+
 NUMERIC_COLUMNS: dict[InputName, list[str]] = {
     InputName.SCHEDULE: ["schedule_quantity", "weight", "volume"],
     InputName.DISTANCES: [],

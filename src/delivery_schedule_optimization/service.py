@@ -11,7 +11,7 @@ from datetime import UTC, datetime
 from importlib.metadata import PackageNotFoundError, version
 from pathlib import Path
 
-from .domain.parameters import parse_parameters
+from .domain.parameters import dump_parameters, parse_parameters
 from .io.readers import read_distances, read_rate_sheet, read_schedule
 from .io.schemas import InputName
 from .io.writers import write_tables
@@ -55,6 +55,7 @@ def execute_run(repository: RunRepository, run_id: str, workers: int | None = No
             manifest = manifest.model_copy(update={
                 "status": RunStatus.SUCCEEDED, "finished_at": datetime.now(UTC), "timings": result.timings,
                 "kpis": result.kpis, "accuracy": result.accuracy, "checks_passed": result.checks_passed,
+                "parameters": dump_parameters(result.planner, preparation), "rate_sheet": result.rate_sheet,
             })
             logger.info("Run %s succeeded in %.1f s", run_id, sum(result.timings.values()))
     repository.save(manifest)

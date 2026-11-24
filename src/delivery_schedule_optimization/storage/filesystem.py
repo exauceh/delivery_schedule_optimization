@@ -12,7 +12,7 @@ from pathlib import Path
 
 from pydantic import JsonValue
 
-from ..io.schemas import InputName
+from ..io.schemas import InputName, file_suffix
 from ..io.writers import zip_directory
 from .base import RunManifest, RunNotFoundError
 
@@ -39,7 +39,7 @@ class FileRunRepository:
         (folder / "input").mkdir(parents=True)
         hashes: dict[str, str] = {}
         for name, content in inputs.items():
-            (folder / "input" / f"{name}.csv").write_bytes(content)
+            (folder / "input" / f"{name}{file_suffix(content)}").write_bytes(content)
             hashes[str(name)] = hashlib.sha256(content).hexdigest()
         manifest = RunManifest(run_id=run_id, created_at=datetime.now(UTC), app_version=app_version, parameters=parameters, inputs=hashes)
         self.save(manifest)
@@ -63,7 +63,11 @@ class FileRunRepository:
         tmp.replace(path)  # atomic: a reader never sees a half-written manifest
 
     def input_path(self, run_id: str, name: InputName) -> Path:
-        return self._dir(run_id) / "input" / f"{name}.csv"
+        """The stored input file (.csv, or .pdf for a rate sheet in PDF)."""
+        matches = sorted((self._dir(run_id) / "input").glob(f"{name}.*"))
+        if not matches:
+            raise FileNotFoundError(f"run {run_id}: input {name} not found")
+        return matches[0]
 
     def output_dir(self, run_id: str) -> Path:
         return self._dir(run_id) / "output"

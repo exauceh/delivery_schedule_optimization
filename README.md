@@ -14,7 +14,7 @@ Prérequis : [uv](https://docs.astral.sh/uv/) (il installe lui-même Python 3.14
 uv sync                                   # environnement : application + tests + notebooks
 
 # Une exécution en ligne de commande (sans serveur)
-uv run main.py run --schedule docs/released_schedule.csv --distances docs/distances.csv --rate-sheet docs/rate_sheet.csv
+uv run main.py run --schedule docs/released_schedule.csv --distances docs/distances.csv --rate-sheet courses/rate_sheet.pdf
 
 # L'API (documentation interactive sur http://127.0.0.1:8000/docs)
 uv run main.py serve
@@ -31,13 +31,19 @@ secret n'est nécessaire.
 
 ## Entrées et sorties
 
-Une exécution prend toujours les trois mêmes fichiers CSV ; l'application ne stocke aucune donnée de référence.
+Une exécution prend toujours les trois mêmes fichiers ; l'application ne stocke aucune donnée de référence.
 
 | Entrée | Contenu |
 | :--- | :--- |
 | `released_schedule.csv` | Une ligne par besoin : `date`, `supplier_id`, `material`, `plant`, `unloading_point`, `schedule_quantity`, `weight`, `volume` |
 | `distances.csv` | `supplier_id`, `distance` (km) |
-| `rate_sheet.csv` | `km_up_to` et une colonne par tranche de poids (prix d'un camion avant marge et surcharge diesel) |
+| `rate_sheet.pdf` (ou `.csv`) | La grille du transporteur, telle quelle en PDF, ou retranscrite en CSV (`km_up_to` et une colonne par tranche de poids) |
+
+**Grille en PDF.** L'application lit la grille de prix d'après la position des mots sur la page, ainsi que la marge,
+la surcharge diesel et la date de validité. Elle recalcule ensuite l'exemple imprimé dans le PDF (300 km, 1 000 kg :
+82,77 € → 335,34 €) : si la grille ou les coefficients lus ne le retrouvent pas, le fichier est refusé. La marge et
+la surcharge du PDF sont celles utilisées par l'exécution (elles remplacent les paramètres) et sont enregistrées dans
+le manifeste. Avec une grille en CSV, ce sont les paramètres `margin` et `diesel_surcharge` qui s'appliquent.
 
 Chaque exécution écrit dans `runs/<run_id>/output/` :
 

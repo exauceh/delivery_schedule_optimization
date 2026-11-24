@@ -40,7 +40,7 @@ async def _content(upload: UploadFile, name: InputName, max_bytes: int) -> bytes
 async def create_run(
     released_schedule: Annotated[UploadFile, File(description="Released schedule (CSV): one row per need")],
     distances: Annotated[UploadFile, File(description="Distance of every supplier (CSV)")],
-    rate_sheet: Annotated[UploadFile, File(description="Rate sheet (CSV): km_up_to x weight brackets")],
+    rate_sheet: Annotated[UploadFile, File(description="Rate sheet of the carrier: the PDF (rate_sheet.pdf) or a CSV (km_up_to x weight brackets)")],
     repository: Annotated[RunRepository, Depends(get_repository)],
     runner: Annotated[JobRunner, Depends(get_runner)],
     settings: Annotated[Settings, Depends(get_settings_from_app)],

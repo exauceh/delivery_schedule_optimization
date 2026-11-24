@@ -38,6 +38,7 @@ class RunManifest(BaseModel):
     timings: dict[str, float] = Field(default_factory=dict, description="stage -> seconds")
     kpis: dict[str, float] = Field(default_factory=dict)
     accuracy: dict[str, float] = Field(default_factory=dict)
+    rate_sheet: dict[str, str | float | None] = Field(default_factory=dict, description="format, validity, margin and surcharge used")
     checks_passed: bool | None = None
     error: str | None = None
 

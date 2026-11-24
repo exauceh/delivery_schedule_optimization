@@ -55,6 +55,17 @@ def test_import_run_and_read_the_results(client: TestClient, small_inputs: dict[
     assert "Run" in client.get(f"/runs/{run['run_id']}/log").text
 
 
+def test_rate_sheet_in_pdf(client: TestClient, small_inputs: dict[InputName, bytes]) -> None:
+    """The carrier's PDF is accepted as is: same results as the CSV, margin and surcharge taken from the PDF."""
+    pdf = (Path(__file__).resolve().parents[2] / "courses" / "rate_sheet.pdf").read_bytes()
+    with_csv = client.post("/runs", files=_files(small_inputs)).json()
+    with_pdf = client.post("/runs", files=_files({**small_inputs, InputName.RATE_SHEET: pdf})).json()
+    assert with_pdf["status"] == "succeeded", with_pdf["error"]
+    assert with_pdf["rate_sheet"] == {"format": "pdf", "valid_from": "01.08.2026", "margin": 2.3923, "diesel_surcharge": 1.1943}
+    assert with_csv["rate_sheet"]["format"] == "csv"
+    assert with_pdf["kpis"] == with_csv["kpis"]
+
+
 def test_file_with_a_missing_column_is_refused_at_once(client: TestClient, small_inputs: dict[InputName, bytes]) -> None:
     files = _files({**small_inputs, InputName.DISTANCES: b"supplier,km\nA,10\n"})
     response = client.post("/runs", files=files)
