@@ -221,6 +221,8 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+courses/~$Presentation_cours_projet_consolidation_livraisons.pptx
+courses/Presentation_cours_projet_consolidation_livraisons.pptx
 
 # Runs of the application (inputs, outputs, logs)
 runs/
