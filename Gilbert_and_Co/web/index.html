@@ -223,6 +223,14 @@
 
 <div class="tooltip" id="tooltip" role="tooltip"></div>
 <div class="toast" id="toast" role="status"></div>
+<div class="confirm" id="confirmBox" hidden>
+  <div class="confirm-card" role="alertdialog" aria-modal="true" aria-labelledby="confirmTitle" aria-describedby="confirmText">
+    <span class="confirm-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 8v5M12 16.5h.01"/><circle cx="12" cy="12" r="9"/></svg></span>
+    <h2 id="confirmTitle"></h2>
+    <p id="confirmText"></p>
+    <div class="confirm-actions"><button type="button" class="ed-btn" id="confirmCancel">Annuler</button><button type="button" class="ed-btn primary" id="confirmOk">Confirmer</button></div>
+  </div>
+</div>
 <script src="app.js"></script>
 </body>
 </html>

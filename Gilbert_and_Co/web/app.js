@@ -31,6 +31,30 @@ async function api(path, opts) {
   return r.status === 204 ? null : r.json();
 }
 
+// confirmation window in the style of the application (replaces the browser confirm())
+function askConfirm({ title, text = "", ok = "Confirmer", cancel = "Annuler", danger = false }) {
+  return new Promise((resolve) => {
+    const root = $("#confirmBox"), okBtn = $("#confirmOk"), cancelBtn = $("#confirmCancel"), last = document.activeElement;
+    $("#confirmTitle").textContent = title; $("#confirmText").textContent = text;
+    okBtn.textContent = ok; cancelBtn.textContent = cancel; okBtn.classList.toggle("danger", danger);
+    root.hidden = false; requestAnimationFrame(() => root.classList.add("on"));
+    cancelBtn.focus();
+    const done = (value) => {
+      root.classList.remove("on"); root.hidden = true;
+      okBtn.onclick = cancelBtn.onclick = root.onclick = null; document.removeEventListener("keydown", keys, true);
+      if (last && last.focus) last.focus();
+      resolve(value);
+    };
+    const keys = (e) => {
+      if (e.key === "Escape") { e.preventDefault(); done(false); }
+      if (e.key === "Tab") { e.preventDefault(); (document.activeElement === okBtn ? cancelBtn : okBtn).focus(); }   // focus stays in the window
+    };
+    okBtn.onclick = () => done(true); cancelBtn.onclick = () => done(false);
+    root.onclick = (e) => { if (e.target === root) done(false); };   // click outside the window = cancel
+    document.addEventListener("keydown", keys, true);
+  });
+}
+
 function toast(msg) {
   const t = $("#toast"); t.textContent = msg; t.classList.add("on");
   clearTimeout(t._h); t._h = setTimeout(() => t.classList.remove("on"), 5200);
@@ -189,7 +213,7 @@ function renderHistory() {
     S.sourceImport = b.dataset.reuse; renderLaunch(); renderHistory(); window.scrollTo({ top: 0, behavior: "smooth" });
   }));
   $$("[data-del-imp]").forEach((b) => b.addEventListener("click", async () => {
-    if (!confirm("Supprimer cet import ? Les calculs déjà faits restent consultables.")) return;
+    if (!(await askConfirm({ title: "Supprimer cet import ?", text: "Les calculs déjà faits restent consultables.", ok: "Supprimer", danger: true }))) return;
     try {
       await api("/imports/" + b.dataset.delImp, { method: "DELETE" });
       if (S.sourceImport === b.dataset.delImp) S.sourceImport = null;
@@ -523,7 +547,8 @@ window.addEventListener("resize", () => { clearTimeout(gatherResize); gatherResi
 
 // stop button of the waiting screen
 $("#stopRunBtn").addEventListener("click", async () => {
-  if (!S.runningId || !confirm("Arrêter le calcul en cours ? Les résultats partiels ne sont pas conservés.")) return;
+  if (!S.runningId) return;
+  if (!(await askConfirm({ title: "Arrêter le calcul ?", text: "Le moteur s'arrête tout de suite. Les résultats partiels ne sont pas conservés.", ok: "Arrêter le calcul", cancel: "Continuer le calcul", danger: true }))) return;
   const btn = $("#stopRunBtn"); btn.disabled = true; btn.classList.add("busy");
   try {
     await api(`/runs/${S.runningId}/stop`, { method: "POST" });
@@ -970,7 +995,7 @@ function renderScenarios() {
     if (c.dataset.ok === "true") openRun(c.dataset.run, "apercu");
   }));
   $$("#scenarioCards [data-del]").forEach((b) => b.addEventListener("click", async () => {
-    if (!confirm("Supprimer ce calcul et ses fichiers ?")) return;
+    if (!(await askConfirm({ title: "Supprimer ce calcul ?", text: "Le calcul et ses fichiers de sortie seront supprimés.", ok: "Supprimer", danger: true }))) return;
     try {
       await api("/runs/" + b.dataset.del, { method: "DELETE" });
       await refreshRuns();
