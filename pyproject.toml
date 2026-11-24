@@ -1,27 +1,25 @@
 [project]
 name = "delivery-schedule-optimization"
 version = "0.1.0"
-description = "Add your description here"
+description = "Delivery schedule consolidation: delivery profiles, truck loading and savings (backend)"
 readme = "README.md"
 authors = [
     { name = "exauceh", email = "houeglaex@gmail.com" }
 ]
 requires-python = ">=3.14"
 dependencies = [
-    "highspy>=1.8",
+    "fastapi>=0.165.0",
     "holidays>=0.109",
-    "ipywidgets>=8.1.9",
-    "matplotlib>=3.10,<3.11",
     "numpy>=2.1,<2.4",
     "pandas>=2.2,<3",
-    "pulp>=3.0,<4",
-    "pypdf>=7.1.0",
+    "pydantic-settings>=2.16.3",
+    "python-multipart>=0.0.34",
     "scipy>=1.16.3",
-    "setuptools>=80,<81",
+    "uvicorn[standard]>=0.54.0",
 ]
 
 [project.scripts]
-delivery-schedule-optimization = "delivery_schedule_optimization:main"
+delivery-schedule-optimization = "delivery_schedule_optimization.cli:main"
 
 [build-system]
 requires = ["uv_build>=0.12.15,<0.13.0"]
@@ -29,6 +27,53 @@ build-backend = "uv_build"
 
 [dependency-groups]
 dev = [
-    "ipykernel>=7.4.0",
-    "nbclient>=0.11.0",
+    "httpx>=0.28.1",
+    "mypy>=2.4.1",
+    "pandas-stubs>=2.3,<3",
+    "pytest>=9.2.0",
+    "ruff>=0.17.6",
+    "scipy-stubs>=1.18.1.1",
 ]
+# Milestone notebooks and their PDF generators only: never installed in the application image
+notebooks = [
+    "ipykernel>=7.4.0",
+    "ipywidgets>=8.1.9",
+    "matplotlib>=3.10,<3.11",
+    "nbclient>=0.11.0",
+    "pypdf>=7.1.1",
+]
+
+[tool.uv]
+default-groups = ["dev", "notebooks"]
+
+[tool.ruff]
+line-length = 160
+target-version = "py314"
+src = ["src", "tests"]
+extend-exclude = ["milestone1", "milestone2", "milestone3", "test"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP", "SIM", "RUF"]
+ignore = [
+    "RUF001", "RUF002", "RUF003",  # French texts use typographic characters (’, ×, −) on purpose
+]
+
+[tool.ruff.lint.per-file-ignores]
+# Engine ported as-is from the milestone 3 notebook: its loops and tie-breaking are kept identical so that the results do
+# not change (regression test). B905: zip(strict=True) would add checks the original code never ran; B008: the default
+# PlannerConfig() is a frozen dataclass, safe as a default argument.
+"src/delivery_schedule_optimization/engine/*.py" = ["B007", "B008", "B023", "B905", "SIM102", "SIM108", "RUF005", "RUF015"]
+"src/delivery_schedule_optimization/{baseline,reporting,validation}/*.py" = ["B905", "RUF005", "RUF015", "SIM108"]
+
+[tool.mypy]
+strict = true
+python_version = "3.14"
+mypy_path = "src"
+packages = ["delivery_schedule_optimization"]
+plugins = ["pydantic.mypy"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra"
+markers = ["slow: full run on the real planning (about 2 minutes)"]
+log_level = "INFO"

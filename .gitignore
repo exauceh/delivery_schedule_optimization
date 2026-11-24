@@ -221,3 +221,6 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# Runs of the application (inputs, outputs, logs)
+runs/

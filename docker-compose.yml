@@ -1,0 +1,18 @@
+services:
+  api:
+    build: .
+    image: delivery-schedule-optimization:latest
+    ports:
+      - "8000:8000"
+    env_file:
+      - path: .env
+        required: false
+    environment:
+      DSO_RUNS_DIR: /data/runs
+      DSO_HOST: 0.0.0.0
+    volumes:
+      - runs:/data/runs  # the runs survive a restart of the container
+    restart: unless-stopped
+
+volumes:
+  runs:

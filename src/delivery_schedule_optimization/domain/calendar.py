@@ -1,0 +1,45 @@
+"""Calendar of the plan: working days, German public holidays (RG10), weeks and sets of weekdays (RG05)."""
+
+from __future__ import annotations
+
+import itertools
+from datetime import date, timedelta
+
+import holidays as holiday_calendars
+import pandas as pd
+
+from .config import PlannerConfig
+
+
+def public_holidays(lines: pd.DataFrame, config: PlannerConfig) -> set[date]:
+    years = range(lines["date"].min().year - 1, lines["date"].max().year + 1)
+    return set(holiday_calendars.country_holidays(config.holiday_country, years=years))
+
+
+def day_sets(config: PlannerConfig) -> list[tuple[int, ...]]:
+    """Every set of weekdays whose size is an allowed profile (31 sets for 1..5)."""
+    return [p for k in sorted(config.allowed_frequencies) for p in itertools.combinations(range(5), k)]
+
+
+def plan_start(lines: pd.DataFrame, config: PlannerConfig) -> date:
+    return pd.Timestamp(config.plan_start).date() if config.plan_start else lines["date"].min().date()
+
+
+def is_working_day(day: date, holidays: set[date]) -> bool:
+    return day.weekday() < 5 and day not in holidays
+
+
+def first_working_day(start: date, holidays: set[date]) -> date:
+    day = start
+    while not is_working_day(day, holidays):
+        day += timedelta(days=1)
+    return day
+
+
+def monday(day: date) -> date:
+    return day - timedelta(days=day.weekday())
+
+
+def horizon_weeks(lines: pd.DataFrame) -> list[date]:
+    first = monday(lines["date"].min().date())
+    return [first + timedelta(weeks=w) for w in range((monday(lines["date"].max().date()) - first).days // 7 + 1)]

@@ -1,0 +1,43 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  checks:
+    name: Lint, types and tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+        with:
+          version: "0.12.15"
+      - name: Install
+        run: uv sync --frozen --no-group notebooks
+      - name: Lint
+        run: uv run ruff check src tests main.py
+      - name: Types (mypy strict)
+        run: uv run mypy
+      - name: Tests
+        run: uv run pytest -m "not slow"
+
+  regression:
+    name: Non-regression on the real planning
+    needs: checks
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+        with:
+          version: "0.12.15"
+      - run: uv sync --frozen --no-group notebooks
+      - run: uv run pytest -m slow
+
+  docker:
+    name: Docker image
+    needs: checks
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: docker build -t delivery-schedule-optimization:ci .
