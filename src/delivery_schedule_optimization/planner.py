@@ -378,8 +378,7 @@ def departure_nodes(due: list[date], days: tuple[int, ...], holidays: set[date],
 
 
 def optimal_plan(lines: pd.DataFrame, days: tuple[int, ...], holidays: set[date], tariff: Tariff,
-                 config: PlannerConfig, start: date, startup_need_day: bool = False,
-                 same_days: bool = True) -> CouplePlan | None:
+                 config: PlannerConfig, start: date, startup_need_day: bool = False) -> CouplePlan | None:
     """Best plan of one couple on one set of days, by dynamic programming (exact).
 
     With RG06 a plan is fully defined by its departure days: each need leaves with the latest departure
@@ -392,7 +391,6 @@ def optimal_plan(lines: pd.DataFrame, days: tuple[int, ...], holidays: set[date]
     Start-up (needs dated before the first profile day of the plan): the programme chooses the start-up
     departures like the others (usually one); with `startup_need_day`, each start-up need leaves on its
     own date, as today (more departures, but none moved to the first day: an option for smoothing).
-    With `same_days=False` the "same days" rule is ignored (lower bound of the cost, for information only).
     """
     first_day = first_working_day(start, holidays)
     due_dates = lines["date"].dt.date.to_numpy()
@@ -493,13 +491,13 @@ def optimal_plan(lines: pd.DataFrame, days: tuple[int, ...], holidays: set[date]
         if path is None:
             return None
         plan = evaluate_departures(lines, path, days, tariff, config)
-        if not same_days or (plan.same_days and plan.frequency in config.allowed_frequencies):
+        if plan.same_days and plan.frequency in config.allowed_frequencies:
             return plan
     return None
 
 
 def reassign(lines: pd.DataFrame, plan: CouplePlan, holidays: set[date], tariff: Tariff, config: PlannerConfig,
-             start: date, same_days: bool = True) -> CouplePlan:
+             start: date) -> CouplePlan:
     """RG06 relaxed: improve the assignment of the needs to the planned departures (local search).
 
     Each need may leave with any planned departure of its couple within [date - max_advance_days, date]
@@ -544,7 +542,7 @@ def reassign(lines: pd.DataFrame, plan: CouplePlan, holidays: set[date], tariff:
     def valid(new_assign) -> CouplePlan | None:
         candidate = evaluate(lines, [[(slot_of[d], d)] for d in new_assign], [0] * len(new_assign),
                              plan.allowed_days, tariff, config)
-        ok = not same_days or (candidate.same_days and candidate.frequency in config.allowed_frequencies)
+        ok = candidate.same_days and candidate.frequency in config.allowed_frequencies
         return candidate if ok else None
 
     allowed = [set(o) for o in options]
@@ -674,19 +672,6 @@ def couple_candidates(job: tuple) -> list[CouplePlan]:
         if config.lowest_profile_first and any(p.overflow_departures == 0 for p in plans.values()):
             break
     return list(plans.values())
-
-
-def lower_bound(lines: pd.DataFrame, holidays: set[date], tariff: Tariff, config: PlannerConfig) -> float:
-    """Cost if every couple could leave any working day (no fixed days), same method as the real plans.
-    With strict RG06 it is a lower bound (exact programme); with RG06 relaxed it is an estimate (local search)."""
-    start = plan_start(lines, config)
-    total = 0.0
-    for _, group in lines.groupby(COUPLE, sort=True):
-        plan = optimal_plan(group, tuple(range(5)), holidays, tariff, config, start, same_days=False)
-        if not config.strict_coverage:  # same assignment improvement as the real plans (then an estimate, not a bound)
-            plan = reassign(group, plan, holidays, tariff, config, start, same_days=False)
-        total += plan.cost
-    return total
 
 
 def selection_key(plan: CouplePlan, config: PlannerConfig = PlannerConfig()) -> tuple:
