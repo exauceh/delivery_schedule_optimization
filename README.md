@@ -1,12 +1,10 @@
 # Consolidation du planning de livraisons
 
-Backend du projet de consolidation des livraisons (ESIGELEC, projet Data & IA). À partir du planning publié par les
+Backend du projet de consolidation des livraisons. À partir du planning publié par les
 usines, le moteur choisit pour chaque couple fournisseur × usine un **profil de livraison** (des jours de livraison
 fixes), regroupe les besoins dans des **camions**, répartit les livraisons sur la semaine pour chaque usine et
 **chiffre les économies** par rapport à la situation actuelle, sans jamais livrer en retard ni surcharger un camion.
 
-Sur le planning de novembre 2026 : 1 741 → 760 camions, 176 725 € → 110 544 € sur 6 semaines (saving de 37,4 %),
-toutes les règles métier vérifiées, en 25 secondes environ.
 
 ## Démarrage rapide
 
