@@ -28,10 +28,10 @@ dataset consolidé
 
 | Étape | Fonction principale | Méthode | Garantie |
 | :--- | :--- | :--- | :--- |
-| 1a | [`optimal_plan`](../src/delivery_schedule_optimization/planner.py#L380-L496) | programmation dynamique (plus court chemin) | optimal pour un ensemble de jours, avec RG06 stricte |
-| 1b | [`reassign`](../src/delivery_schedule_optimization/planner.py#L499-L625) | recherche locale | améliore le plan, sans garantie d'optimum |
-| 2 | [`choose_profiles`](../src/delivery_schedule_optimization/planner.py#L689-L691) | tri des candidats | le moins cher parmi les candidats |
-| 3 | [`smooth`](../src/delivery_schedule_optimization/planner.py#L775-L804) | MILP par usine (HiGHS) + partage du budget | optimal à chaque niveau de lissage |
+| 1a | [`optimal_plan`](../src/delivery_schedule_optimization/planner.py#L345-L460) | programmation dynamique (plus court chemin) | optimal pour un ensemble de jours, avec RG06 stricte |
+| 1b | [`reassign`](../src/delivery_schedule_optimization/planner.py#L463-L587) | recherche locale | améliore le plan, sans garantie d'optimum |
+| 2 | [`choose_profiles`](../src/delivery_schedule_optimization/planner.py#L644-L646) | tri des candidats | le moins cher parmi les candidats |
+| 3 | [`smooth`](../src/delivery_schedule_optimization/planner.py#L730-L759) | MILP par usine (HiGHS) + partage du budget | optimal à chaque niveau de lissage |
 
 ---
 
@@ -39,7 +39,7 @@ dataset consolidé
 
 ### Les paramètres : `PlannerConfig`
 
-Tous les réglages métier sont dans [`PlannerConfig`](../src/delivery_schedule_optimization/planner.py#L51-L89). On les change dans le notebook, sans toucher au code.
+Tous les réglages métier sont dans [`PlannerConfig`](../src/delivery_schedule_optimization/planner.py#L51-L84). On les change dans le notebook, sans toucher au code.
 
 | Paramètre | Défaut | Rôle |
 | :--- | :--- | :--- |
@@ -48,23 +48,22 @@ Tous les réglages métier sont dans [`PlannerConfig`](../src/delivery_schedule_
 | `max_advance_days` | 7 | avance maximale, en jours calendaires (RG03) |
 | `allowed_frequencies` | 1 à 5 | profils autorisés (RG05) |
 | `holiday_country` | DE | jours fériés allemands (RG10) |
-| `objective` | `"cost"` | `"trucks"` : le moins de camions d'abord, puis le coût |
 | `strict_coverage` | `False` | `False` : RG06 assouplie, un besoin peut partir avec tout départ de sa fenêtre (étape 1b) |
 | `smoothing`, `smoothing_budget` | `True`, 0 | lissage activé ; surcoût accepté pour lisser (0 = lissage gratuit) |
-| `lowest_profile_first`, `overflow_first` | `False` | anciennes lectures de RG07 (voir étape 2) |
+| `overflow_first` | `False` | `True` : le moins de départs à plusieurs camions avant le coût, préférence du client (voir étape 2) |
 | `plan_start`, `startup_delivery` | premier besoin, `"need_day"` | rien ne part avant le planning ; gestion de la première semaine |
 | `workers` | tous les cœurs | les couples sont calculés en parallèle |
 
 ### Les données
 
-- **Les besoins** : [`load_lines`](../src/delivery_schedule_optimization/planner.py#L92-L109) lit le dataset consolidé (`data/consolidated_dataset_max.csv`). Une ligne = un besoin (date, fournisseur, material, usine, quai). La fonction vérifie qu'aucune ligne ne dépasse un camion et qu'un fournisseur n'a qu'une distance. Elle marque les lignes **imputées** par un camion plein (`imputed_full_truck`) : poids ou volume inconnu, complété par 24 500 kg ou 110,4 m³.
-- **La grille tarifaire** : [`load_rate_grid`](../src/delivery_schedule_optimization/planner.py#L112-L118) et [`Tariff`](../src/delivery_schedule_optimization/planner.py#L121-L132). Le prix d'**un** camion dépend de la tranche de distance du fournisseur et de la tranche de poids du camion. La lecture est « jusqu'à » (`searchsorted`, `side="left"`) : 1 000 kg tombe dans la tranche ≤ 1 000 ; 1 001 kg dans la suivante. Au-delà de 4 000 kg, le prix est forfaitaire.
-- **Les jours fériés** : [`public_holidays`](../src/delivery_schedule_optimization/planner.py#L135-L137) (calendrier allemand). Aucun dans l'horizon du 09/11 au 18/12.
-- **La situation actuelle** : [`load_baseline`](../src/delivery_schedule_optimization/planner.py#L807-L820) lit les livraisons du Milestone 2 (une par couple et par jour de besoin), puis [`current_situation`](../src/delivery_schedule_optimization/planner.py#L823-L853) les **recharge camion par camion comme le plan** (lignes entières, chaque camion payé sur son poids). La référence et le plan sont ainsi mesurés de la même façon : 1 665 livraisons, 1 741 camions, 176 725 €.
+- **Les besoins** : [`load_lines`](../src/delivery_schedule_optimization/planner.py#L87-L104) lit le dataset consolidé (`data/consolidated_dataset_max.csv`). Une ligne = un besoin (date, fournisseur, material, usine, quai). La fonction vérifie qu'aucune ligne ne dépasse un camion et qu'un fournisseur n'a qu'une distance. Elle marque les lignes **imputées** par un camion plein (`imputed_full_truck`) : poids ou volume inconnu, complété par 24 500 kg ou 110,4 m³.
+- **La grille tarifaire** : [`load_rate_grid`](../src/delivery_schedule_optimization/planner.py#L107-L113) et [`Tariff`](../src/delivery_schedule_optimization/planner.py#L116-L127). Le prix d'**un** camion dépend de la tranche de distance du fournisseur et de la tranche de poids du camion. La lecture est « jusqu'à » (`searchsorted`, `side="left"`) : 1 000 kg tombe dans la tranche ≤ 1 000 ; 1 001 kg dans la suivante. Au-delà de 4 000 kg, le prix est forfaitaire.
+- **Les jours fériés** : [`public_holidays`](../src/delivery_schedule_optimization/planner.py#L130-L132) (calendrier allemand). Aucun dans l'horizon du 09/11 au 18/12.
+- **La situation actuelle** : [`load_baseline`](../src/delivery_schedule_optimization/planner.py#L762-L775) lit les livraisons du Milestone 2 (une par couple et par jour de besoin), puis [`current_situation`](../src/delivery_schedule_optimization/planner.py#L778-L808) les **recharge camion par camion comme le plan** (lignes entières, chaque camion payé sur son poids). La référence et le plan sont ainsi mesurés de la même façon : 1 665 livraisons, 1 741 camions, 176 725 €.
 
 ### Le chargement d'une livraison : `pack`
 
-[`pack`](../src/delivery_schedule_optimization/planner.py#L208-L223) range les lignes d'un départ dans des camions :
+[`pack`](../src/delivery_schedule_optimization/planner.py#L203-L218) range les lignes d'un départ dans des camions :
 
 1. les lignes sont triées de la plus « remplissante » à la moins remplissante (le plus grand des deux ratios poids / 24 500 et volume / 110,4) ;
 2. chaque ligne va dans le **premier camion où elle tient** (poids et volume) ; sinon un nouveau camion est ouvert.
@@ -75,7 +74,7 @@ C'est l'heuristique *first-fit decreasing*. Une ligne n'est jamais coupée (RG04
 
 ## 1. Les plans candidats de chaque couple
 
-Pour **chaque couple** et **chaque ensemble de jours** de la semaine, l'optimiseur calcule le meilleur plan possible. C'est le rôle de [`candidate_plans`](../src/delivery_schedule_optimization/planner.py#L629-L657), qui répartit les couples entre les cœurs du processeur, et de [`couple_candidates`](../src/delivery_schedule_optimization/planner.py#L660-L674), qui traite un couple :
+Pour **chaque couple** et **chaque ensemble de jours** de la semaine, l'optimiseur calcule le meilleur plan possible. C'est le rôle de [`candidate_plans`](../src/delivery_schedule_optimization/planner.py#L591-L617), qui répartit les couples entre les cœurs du processeur, et de [`couple_candidates`](../src/delivery_schedule_optimization/planner.py#L620-L632), qui traite un couple :
 
 ```python
 for size in sorted(config.allowed_frequencies):              # profils 1 à 5
@@ -90,17 +89,17 @@ Un ensemble est **éliminé** s'il est impossible (par exemple {jeudi} quand le 
 
 ### Ce qu'est un plan : `CouplePlan`
 
-Un plan ([`CouplePlan`](../src/delivery_schedule_optimization/planner.py#L227-L258)) donne pour chaque ligne du couple son **jour de livraison**, puis ses camions et son coût. Il est calculé par [`evaluate`](../src/delivery_schedule_optimization/planner.py#L261-L289), qui charge chaque départ avec `pack` et le paie avec `Tariff`.
+Un plan ([`CouplePlan`](../src/delivery_schedule_optimization/planner.py#L222-L253)) donne pour chaque ligne du couple son **jour de livraison**, puis ses camions et son coût. Il est calculé par [`evaluate`](../src/delivery_schedule_optimization/planner.py#L256-L284), qui charge chaque départ avec `pack` et le paie avec `Tariff`.
 
-- **Profil** ([`frequency`](../src/delivery_schedule_optimization/planner.py#L239-L242)) = le plus grand nombre de livraisons faites en une semaine. « 3 2 1 2 1 3 » sur 6 semaines = profil 3.
-- **Règle des mêmes jours** ([`same_days`](../src/delivery_schedule_optimization/planner.py#L255-L258)) : le couple livre toujours sur le même ensemble de jours, et la taille de cet ensemble est égale au profil. Avec {lundi, mercredi, vendredi}, une semaine peut livrer lundi + vendredi et une autre seulement mercredi, mais au moins une semaine doit livrer les trois.
+- **Profil** ([`frequency`](../src/delivery_schedule_optimization/planner.py#L234-L237)) = le plus grand nombre de livraisons faites en une semaine. « 3 2 1 2 1 3 » sur 6 semaines = profil 3.
+- **Règle des mêmes jours** ([`same_days`](../src/delivery_schedule_optimization/planner.py#L250-L253)) : le couple livre toujours sur le même ensemble de jours, et la taille de cet ensemble est égale au profil. Avec {lundi, mercredi, vendredi}, une semaine peut livrer lundi + vendredi et une autre seulement mercredi, mais au moins une semaine doit livrer les trois.
 - **Départs en débordement** (`overflow_departures`) : les départs dont les lignes mesurées (non imputées) ne tiennent pas dans un camion.
 
 ### 1a. Les jours de départ : un plus court chemin dans un graphe
 
-[`optimal_plan`](../src/delivery_schedule_optimization/planner.py#L380-L496) trouve les meilleurs jours de départ d'un couple pour un ensemble de jours donné, **sans essayer toutes les combinaisons**.
+[`optimal_plan`](../src/delivery_schedule_optimization/planner.py#L345-L460) trouve les meilleurs jours de départ d'un couple pour un ensemble de jours donné, **sans essayer toutes les combinaisons**.
 
-**L'idée qui rend le graphe possible (RG06 stricte) :** un besoin part avec le **dernier départ à sa date ou avant**. Une fois les dates de départ choisies, l'affectation est donc automatique ([`evaluate_departures`](../src/delivery_schedule_optimization/planner.py#L292-L302)) :
+**L'idée qui rend le graphe possible (RG06 stricte) :** un besoin part avec le **dernier départ à sa date ou avant**. Une fois les dates de départ choisies, l'affectation est donc automatique ([`evaluate_departures`](../src/delivery_schedule_optimization/planner.py#L287-L297)) :
 
 ```
 départs choisis :  lun 09        jeu 12                lun 16
@@ -114,53 +113,52 @@ Le départ du 09 emporte les besoins datés du 09 jusqu'au départ suivant (excl
 
 | Élément | Signification | Code |
 | :--- | :--- | :--- |
-| Nœud | un jour de départ possible : un jour de l'ensemble entre le 09/11 et le dernier besoin ; un jour férié est remplacé par le jour ouvré précédent (RG10) ; avant le premier jour de l'ensemble, n'importe quel jour ouvré peut servir de **départ de démarrage** | [`departure_nodes`](../src/delivery_schedule_optimization/planner.py#L351-L377) |
-| Arête i → j | « je pars le jour i, le départ suivant est j » : le départ i emporte les besoins datés de [i ; j[ | [`segment(i, j)`](../src/delivery_schedule_optimization/planner.py#L408-L435) |
-| Poids de l'arête | les camions de ce départ (`pack`), leur prix (`Tariff`), le nombre de camions, l'avance totale | [L425-L436](../src/delivery_schedule_optimization/planner.py#L423-L434) |
-| Arête interdite | un besoin emporté serait à plus de 7 jours (RG03), ou un départ de démarrage emporterait un besoin daté après le premier jour de l'ensemble | [L417-L424](../src/delivery_schedule_optimization/planner.py#L415-L422) |
+| Nœud | un jour de départ possible : un jour de l'ensemble entre le 09/11 et le dernier besoin ; un jour férié est remplacé par le jour ouvré précédent (RG10) ; avant le premier jour de l'ensemble, n'importe quel jour ouvré peut servir de **départ de démarrage** | [`departure_nodes`](../src/delivery_schedule_optimization/planner.py#L316-L342) |
+| Arête i → j | « je pars le jour i, le départ suivant est j » : le départ i emporte les besoins datés de [i ; j[ | [`segment(i, j)`](../src/delivery_schedule_optimization/planner.py#L373-L399) |
+| Poids de l'arête | les camions de ce départ (`pack`), leur prix (`Tariff`), le nombre de camions, l'avance totale | [L388-L397](../src/delivery_schedule_optimization/planner.py#L388-L397) |
+| Arête interdite | un besoin emporté serait à plus de 7 jours (RG03), ou un départ de démarrage emporterait un besoin daté après le premier jour de l'ensemble | [L380-L387](../src/delivery_schedule_optimization/planner.py#L380-L387) |
 
 Exemple réel (SUP_00085 → PLT_004, profil {lun, mer, ven}) : **19 nœuds et 52 arêtes**, au lieu de 2¹⁸ = 262 144 combinaisons de jours de départ. Même en ignorant les profils (tous les jours ouvrés) : 31 nœuds et 165 arêtes, au lieu d'environ un milliard de combinaisons.
 
-**Le calcul** ([`solve`](../src/delivery_schedule_optimization/planner.py#L440-L487)) parcourt les nœuds dans l'ordre des dates et garde, pour chaque nœud, **le meilleur coût pour y arriver** (principe de Bellman) :
+**Le calcul** ([`solve`](../src/delivery_schedule_optimization/planner.py#L404-L451)) parcourt les nœuds dans l'ordre des dates et garde, pour chaque nœud, **le meilleur coût pour y arriver** (principe de Bellman) :
 
 ```
 best[j] = min sur i < j de ( best[i] + segment(i, j) )
 ```
 
-- **Coupure** ([L463-L465](../src/delivery_schedule_optimization/planner.py#L461-L463)) : on remonte de j vers les départs plus anciens ; dès qu'un départ i viole les 7 jours, tous les départs plus anciens la violent aussi, et la boucle s'arrête. Chaque nœud ne regarde qu'environ une semaine en arrière.
-- **Fin** ([L472-L489](../src/delivery_schedule_optimization/planner.py#L470-L487)) : on choisit le meilleur « dernier départ » (qui emporte tous les besoins restants), puis on remonte les prédécesseurs mémorisés pour reconstituer le chemin.
-- **Critères comparés dans l'ordre** : départs en débordement (seulement si `overflow_first`), puis coût, puis nombre de camions, puis avance totale. L'ordre coût / camions s'inverse avec `objective="trucks"`.
+- **Coupure** ([L425-L427](../src/delivery_schedule_optimization/planner.py#L425-L427)) : on remonte de j vers les départs plus anciens ; dès qu'un départ i viole les 7 jours, tous les départs plus anciens la violent aussi, et la boucle s'arrête. Chaque nœud ne regarde qu'environ une semaine en arrière.
+- **Fin** ([L434-L451](../src/delivery_schedule_optimization/planner.py#L434-L451)) : on choisit le meilleur « dernier départ » (qui emporte tous les besoins restants), puis on remonte les prédécesseurs mémorisés pour reconstituer le chemin.
+- **Critères comparés dans l'ordre** : départs en débordement (seulement si `overflow_first`), puis coût, puis nombre de camions, puis avance totale.
 
-**La règle des mêmes jours** ([L491-L498](../src/delivery_schedule_optimization/planner.py#L489-L496)) : le premier passage l'ignore. Si le chemin trouvé ne la respecte pas, un second passage refait le calcul avec un **état enrichi** à chaque nœud (jours déjà utilisés, semaine courante, nombre de départs dans la semaine) et ne garde à la fin que les chemins qui utilisent tous les jours de l'ensemble, dont une semaine complète.
+**La règle des mêmes jours** ([L453-L460](../src/delivery_schedule_optimization/planner.py#L453-L460)) : le premier passage l'ignore. Si le chemin trouvé ne la respecte pas, un second passage refait le calcul avec un **état enrichi** à chaque nœud (jours déjà utilisés, semaine courante, nombre de départs dans la semaine) et ne garde à la fin que les chemins qui utilisent tous les jours de l'ensemble, dont une semaine complète.
 
-**Le démarrage :** rien ne part avant le premier jour du planning (09/11). Les besoins datés avant le premier jour de l'ensemble partent avec des départs de démarrage. Avec `need_day=True` ([L423](../src/delivery_schedule_optimization/planner.py#L421)), chacun part le jour même de son besoin, comme aujourd'hui ; avec `need_day=False`, le graphe choisit ces départs comme les autres. Les deux variantes sont gardées comme candidats.
+**Le démarrage :** rien ne part avant le premier jour du planning (09/11). Les besoins datés avant le premier jour de l'ensemble partent avec des départs de démarrage. Avec `need_day=True` ([L386](../src/delivery_schedule_optimization/planner.py#L386)), chacun part le jour même de son besoin, comme aujourd'hui ; avec `need_day=False`, le graphe choisit ces départs comme les autres. Les deux variantes sont gardées comme candidats.
 
 ### 1b. L'affectation des besoins : la recherche locale
 
 Le graphe suppose que chaque besoin part avec le **dernier** départ avant sa date (RG06 stricte). L'équipe a assoupli cette règle : un besoin peut partir avec **n'importe quel départ prévu** de son couple dans sa fenêtre [date − 7 jours ; date]. Cela ouvre des économies (remplir un camion qui part de toute façon), mais le coût ne se découpe plus en tronçons : plus de plus court chemin.
 
-[`reassign`](../src/delivery_schedule_optimization/planner.py#L499-L625) part du plan du graphe et garde les **jours de départ**. Elle déplace des besoins d'un départ à un autre, et ne garde un mouvement que si le coût baisse strictement ([`cost`](../src/delivery_schedule_optimization/planner.py#L527-L538)). Trois mouvements, dans cet ordre :
+[`reassign`](../src/delivery_schedule_optimization/planner.py#L463-L587) part du plan du graphe et garde les **jours de départ**. Elle déplace des besoins d'un départ à un autre, et ne garde un mouvement que si le coût baisse strictement ([`cost`](../src/delivery_schedule_optimization/planner.py#L491-L501)). Trois mouvements, dans cet ordre :
 
 | Mouvement | Ce qu'il fait | Code |
 | :--- | :--- | :--- |
-| 1. Vider un départ | toutes les lignes d'un départ vont vers d'autres départs ouverts de leur fenêtre ; le départ disparaît | [L584-L603](../src/delivery_schedule_optimization/planner.py#L582-L601) |
-| 2. Déplacer une ligne | une ligne passe à un autre départ si la somme des deux coûts baisse | [L604-L618](../src/delivery_schedule_optimization/planner.py#L602-L616) |
-| 3. Déplacer une paire | seulement si 1 et 2 ne trouvent plus rien : deux lignes d'un même départ partent ensemble | [`move_pair`](../src/delivery_schedule_optimization/planner.py#L550-L578) |
+| 1. Vider un départ | toutes les lignes d'un départ vont vers d'autres départs ouverts de leur fenêtre ; le départ disparaît | [L546-L565](../src/delivery_schedule_optimization/planner.py#L546-L565) |
+| 2. Déplacer une ligne | une ligne passe à un autre départ si la somme des deux coûts baisse | [L566-L580](../src/delivery_schedule_optimization/planner.py#L566-L580) |
+| 3. Déplacer une paire | seulement si 1 et 2 ne trouvent plus rien : deux lignes d'un même départ partent ensemble | [`move_pair`](../src/delivery_schedule_optimization/planner.py#L514-L542) |
 
 **Pourquoi des paires :** le prix d'un camion dépend de sa tranche de poids. Exemple réel (SUP_00041 → PLT_004) : déplacer seule la ligne de 185 kg ou seule celle de 149,6 kg coûte plus cher, mais les déplacer ensemble fait changer de tranche les deux camions et coûte moins cher.
 
-Un mouvement qui viderait un départ n'est accepté que si la règle des mêmes jours reste respectée ([`valid`](../src/delivery_schedule_optimization/planner.py#L542-L546)). La recherche s'arrête quand plus aucun mouvement n'améliore (au plus `reassign_passes` = 50 passes). Le plan amélioré n'est gardé que s'il est moins cher que celui du graphe ([L623-L627](../src/delivery_schedule_optimization/planner.py#L621-L625)).
+Un mouvement qui viderait un départ n'est accepté que si la règle des mêmes jours reste respectée ([`valid`](../src/delivery_schedule_optimization/planner.py#L506-L510)). La recherche s'arrête quand plus aucun mouvement n'améliore (au plus `reassign_passes` = 50 passes). Le plan amélioré n'est gardé que s'il est moins cher que celui du graphe ([L585-L587](../src/delivery_schedule_optimization/planner.py#L585-L587)).
 
 ---
 
 ## 2. Le choix du plan de chaque couple (RG07)
 
-[`choose_profiles`](../src/delivery_schedule_optimization/planner.py#L689-L691) prend, pour chaque couple, le candidat le plus petit selon [`selection_key`](../src/delivery_schedule_optimization/planner.py#L677-L686) :
+[`choose_profiles`](../src/delivery_schedule_optimization/planner.py#L644-L646) prend, pour chaque couple, le candidat le plus petit selon [`selection_key`](../src/delivery_schedule_optimization/planner.py#L635-L639) :
 
 1. le moins de départs en débordement (seulement si `overflow_first`) ;
-2. le profil le plus bas (seulement si `lowest_profile_first`) ;
-3. **le coût le plus bas** (ou le moins de camions avec `objective="trucks"`) ;
-4. puis le moins d'avance, le profil le plus bas, et les jours les plus tôt dans la semaine.
+2. **le coût le plus bas** ;
+3. puis le moins de camions, le moins d'avance, le profil le plus bas, et les jours les plus tôt dans la semaine.
 
 Avec les réglages par défaut, c'est donc **le plan le moins cher** du couple. Le profil n'est pas imposé : c'est le résultat du meilleur plan.
 
@@ -172,11 +170,11 @@ Chaque couple a souvent **plusieurs plans au même coût** (par exemple lundi, v
 
 ### Le menu de chaque couple
 
-[`smoothing_options`](../src/delivery_schedule_optimization/planner.py#L694-L702) donne les plans que chaque couple peut prendre. Avec les réglages par défaut, **tous ses candidats** sont permis : un couple peut changer de jours, et même de profil, si c'est intéressant.
+[`smoothing_options`](../src/delivery_schedule_optimization/planner.py#L649-L657) donne les plans que chaque couple peut prendre. Avec les réglages par défaut, **tous ses candidats** sont permis : un couple peut changer de jours, et même de profil, si c'est intéressant.
 
 ### L'indicateur de lissage
 
-[`smoothing_indicator`](../src/delivery_schedule_optimization/planner.py#L705-L716) mesure la répartition des camions d'une usine :
+[`smoothing_indicator`](../src/delivery_schedule_optimization/planner.py#L660-L671) mesure la répartition des camions d'une usine :
 
 ```
 indicateur = Σ (camions du jour le plus chargé de chaque semaine) + camions du jour le plus chargé de la période
@@ -186,7 +184,7 @@ Plus il est bas, mieux les camions sont répartis. Il additionne les pics **de c
 
 ### Le modèle d'une usine
 
-[`plant_frontier`](../src/delivery_schedule_optimization/planner.py#L719-L772) écrit un programme linéaire en nombres entiers et le résout avec HiGHS (`scipy.optimize.milp`) :
+[`plant_frontier`](../src/delivery_schedule_optimization/planner.py#L674-L727) écrit un programme linéaire en nombres entiers et le résout avec HiGHS (`scipy.optimize.milp`) :
 
 | | Définition |
 | :--- | :--- |
@@ -202,9 +200,9 @@ M_s et M ne sont pas des données mais des variables **auxiliaires** : elles ser
 
 ### La frontière : resserrer L pas à pas
 
-Le modèle minimise le coût sous la contrainte « indicateur ≤ L ». La boucle ([L780-L787](../src/delivery_schedule_optimization/planner.py#L765-L772)) fait varier L :
+Le modèle minimise le coût sous la contrainte « indicateur ≤ L ». La boucle ([L720-L727](../src/delivery_schedule_optimization/planner.py#L720-L727)) fait varier L :
 
-1. **sans L** ([`cheapest(None)`](../src/delivery_schedule_optimization/planner.py#L746-L763)) : le plan le moins cher de l'usine, et son indicateur I ;
+1. **sans L** ([`cheapest(None)`](../src/delivery_schedule_optimization/planner.py#L701-L718)) : le plan le moins cher de l'usine, et son indicateur I ;
 2. on impose **L = I − 1** et on relance : le plan le moins cher au moins un cran mieux lissé ;
 3. on recommence tant que le coût reste dans le budget ;
 4. on s'arrête quand le budget est dépassé ou qu'aucun plan n'atteint L.
@@ -215,10 +213,10 @@ Exemple réel (PLT_002, 64 couples, 662 plans) : l'indicateur passe de **166 à 
 
 ### Le partage du budget entre les usines
 
-[`smooth`](../src/delivery_schedule_optimization/planner.py#L775-L804) calcule la frontière de chaque usine, puis les combine. Le budget (`smoothing_budget` × coût sans lissage) est **commun aux 4 usines** ([L804](../src/delivery_schedule_optimization/planner.py#L789)) :
+[`smooth`](../src/delivery_schedule_optimization/planner.py#L730-L759) calcule la frontière de chaque usine, puis les combine. Le budget (`smoothing_budget` × coût sans lissage) est **commun aux 4 usines** ([L744](../src/delivery_schedule_optimization/planner.py#L744)) :
 
-- les frontières sont fusionnées usine par usine en gardant les combinaisons non dominées (aucune autre n'est à la fois moins chère et mieux lissée) ([L807-L815](../src/delivery_schedule_optimization/planner.py#L792-L800)) ;
-- on prend la combinaison dont l'indicateur total est le plus bas sans dépasser le budget, puis la moins chère ([L816-L819](../src/delivery_schedule_optimization/planner.py#L801-L804)).
+- les frontières sont fusionnées usine par usine en gardant les combinaisons non dominées (aucune autre n'est à la fois moins chère et mieux lissée) ([L747-L755](../src/delivery_schedule_optimization/planner.py#L747-L755)) ;
+- on prend la combinaison dont l'indicateur total est le plus bas sans dépasser le budget, puis la moins chère ([L756-L759](../src/delivery_schedule_optimization/planner.py#L756-L759)).
 
 Le budget va donc là où un cran de lissage coûte le moins cher.
 
@@ -232,10 +230,10 @@ Le budget va donc là où un cran de lissage coûte le moins cher.
 
 ## 4. Les sorties et les contrôles
 
-- **Sortie 1 (profils)** : [`couple_summary`](../src/delivery_schedule_optimization/planner.py#L927-L977), une ligne par couple (profil, jours, coût avant et après, saving).
-- **Sortie 2 (camions et affectations)** : [`export`](../src/delivery_schedule_optimization/planner.py#L875-L907) donne une ligne par camion et une ligne par besoin (camion, jour de livraison, avance, règle appliquée : jour du profil, démarrage ou férié avancé) ; [`truck_contents`](../src/delivery_schedule_optimization/planner.py#L910-L919) regroupe le contenu de chaque camion par material et quai.
+- **Sortie 1 (profils)** : [`couple_summary`](../src/delivery_schedule_optimization/planner.py#L882-L932), une ligne par couple (profil, jours, coût avant et après, saving).
+- **Sortie 2 (camions et affectations)** : [`export`](../src/delivery_schedule_optimization/planner.py#L830-L862) donne une ligne par camion et une ligne par besoin (camion, jour de livraison, avance, règle appliquée : jour du profil, démarrage ou férié avancé) ; [`truck_contents`](../src/delivery_schedule_optimization/planner.py#L865-L874) regroupe le contenu de chaque camion par material et quai.
 - **Sortie 3 (saving)** : calculée dans le notebook à partir de la référence et du plan.
-- **Contrôles** : [`check`](../src/delivery_schedule_optimization/planner.py#L1007-L1095) revérifie chaque règle sur le plan terminé, **indépendamment de la façon dont il a été construit** : RG01 (un couple par camion), RG02 (jamais de retard), RG03 (7 jours au plus), RG04 (capacité recalculée depuis les lignes), RG05 et la règle des mêmes jours, RG06 (assouplie ou stricte), RG07 (coût dans le budget de lissage), RG08 (chaque ligne livrée une seule fois, quantités conservées par usine et material), RG10 (ni week-end ni jour férié), le démarrage (rien avant le premier jour du plan) et RG11 (totaux et prix de chaque camion recalculés).
+- **Contrôles** : [`check`](../src/delivery_schedule_optimization/planner.py#L962-L1046) revérifie chaque règle sur le plan terminé, **indépendamment de la façon dont il a été construit** : RG01 (un couple par camion), RG02 (jamais de retard), RG03 (7 jours au plus), RG04 (capacité recalculée depuis les lignes), RG05 et la règle des mêmes jours, RG06 (assouplie ou stricte), RG07 (coût dans le budget de lissage), RG08 (chaque ligne livrée une seule fois, quantités conservées par usine et material), RG10 (ni week-end ni jour férié), le démarrage (rien avant le premier jour du plan) et RG11 (totaux et prix de chaque camion recalculés).
 
 ### Résultat (6 semaines, imputation max)
 

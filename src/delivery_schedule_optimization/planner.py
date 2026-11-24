@@ -64,10 +64,6 @@ class PlannerConfig:
     # planner only spreads the days among plans of the same cost (smoothing for free).
     smoothing_budget: float = 0.0
     smoothing_time_limit: float = 60.0  # seconds given to the solver
-    objective: str = "cost"  # "cost": cheapest plan first; "trucks": fewest trucks first, then cost
-    # Profile = largest number of deliveries in one week ("3 2 1 1 2 1" = profile 3). True = also prefer the
-    # lowest profile before the cost (former RG07 reading); False = the profile is the result of the best plan.
-    lowest_profile_first: bool = False
     # RG06 (coverage). False (default) = a need may leave with ANY planned departure of its couple within its
     # window [date - max_advance_days, date]; True = only with the latest departure on or before its date.
     strict_coverage: bool = False
@@ -76,7 +72,6 @@ class PlannerConfig:
     # Client answer "add delivery days rather than trucks": True = fewest overflowing departures before the
     # cost; False = the cost decides alone (a departure may take a second truck if this is cheaper).
     overflow_first: bool = False
-    improvement_passes: int = 20  # greedy reference planner (`plan_couple`) only
     # First possible delivery day: nothing ships before the schedule is released. None = date of the first need.
     plan_start: str | None = None
     # Needs with no profile day on or after plan_start in their window: "need_day" = delivered on their own
@@ -302,19 +297,11 @@ def evaluate_departures(lines: pd.DataFrame, departures: list[tuple[date | None,
     return evaluate(lines, options, [0] * len(options), allowed_days, tariff, config)
 
 
-def plan_key(plan: CouplePlan) -> tuple:
-    """Inside one set of days: valid profile first, then fewest overflows, cheapest, fewest trucks, least advance."""
-    return (not plan.same_days, plan.overflow_departures, round(plan.cost, 6), plan.n_trucks, plan.total_advance)
-
-
 def plan_couple(lines: pd.DataFrame, days: tuple[int, ...], holidays: set[date], tariff: Tariff,
-                config: PlannerConfig, start: date | None = None, optimize: bool = True) -> CouplePlan | None:
-    """Plan one couple on one set of days.
+                config: PlannerConfig, start: date | None = None) -> CouplePlan | None:
+    """Plan one couple on one set of days, every need on its latest possible day (RG06).
 
-    Every need starts on its latest possible day (RG06). If `optimize`, the planner then tries to empty
-    each departure by moving its needs to another departure already planned within their window,
-    and keeps the move when the plan improves (`plan_key`). Returns None if a need cannot be covered
-    or if the deliveries do not respect the "same days" rule.
+    Returns None if a need cannot be covered.
     """
     first_day = first_working_day(start, holidays) if start else None
     by_date = {d: delivery_options(d, days, holidays, config.max_advance_days, first_day, config.startup_delivery)
@@ -322,29 +309,7 @@ def plan_couple(lines: pd.DataFrame, days: tuple[int, ...], holidays: set[date],
     if any(not opts for opts in by_date.values()):
         return None
     options = [by_date[d] for d in lines["date"].dt.date]
-    choice = [0] * len(options)
-    best = evaluate(lines, options, choice, days, tariff, config)
-    for _ in range(config.improvement_passes if optimize else 0):
-        improved = False
-        departures = sorted(np.unique(best.dates), key=lambda d: best.truck_weights[[i for i, (t, _) in enumerate(best.trucks) if t == d]].sum())
-        for day in departures:
-            others = set(best.dates.tolist()) - {pd.Timestamp(day).date()}
-            trial = choice.copy()
-            for i in np.flatnonzero(best.dates == day):
-                alternative = next((j for j, (_, delivery) in enumerate(options[i]) if delivery in others), None)
-                if alternative is None:
-                    break
-                trial[i] = alternative
-            else:
-                candidate = evaluate(lines, options, trial, days, tariff, config)
-                if plan_key(candidate) < plan_key(best):
-                    choice, best, improved = trial, candidate, True
-                    break
-        if not improved:
-            break
-    if optimize and (not best.same_days or best.frequency not in config.allowed_frequencies):
-        return None
-    return best
+    return evaluate(lines, options, [0] * len(options), days, tariff, config)
 
 
 # --------------------------------------------------------------------------- exact plan of one couple
@@ -430,8 +395,7 @@ def optimal_plan(lines: pd.DataFrame, days: tuple[int, ...], holidays: set[date]
                 advance = sum((d - delivery).days for d in due_dates[idx])
                 price = float(tariff(np.full(len(kg), distance), kg).sum())
                 first = over if config.overflow_first else 0  # overflow is compared first only on demand
-                cache[i, j] = ((first, len(kg), price, advance) if config.objective == "trucks"
-                               else (first, price, len(kg), advance))
+                cache[i, j] = (first, price, len(kg), advance)
         return cache[i, j]
 
     def add(a, b):
@@ -502,7 +466,7 @@ def reassign(lines: pd.DataFrame, plan: CouplePlan, holidays: set[date], tariff:
 
     Each need may leave with any planned departure of its couple within [date - max_advance_days, date]
     (a start-up departure only takes needs dated before the first profile day). Three moves, kept when the
-    objective strictly decreases:
+    cost strictly decreases:
     1. empty a whole departure into the others;
     2. move one line to another departure;
     3. only when 1 and 2 find nothing in a pass: move TWO lines of the same departure together to another
@@ -535,7 +499,7 @@ def reassign(lines: pd.DataFrame, plan: CouplePlan, holidays: set[date], tariff:
             packed = pack(weight[pos], volume[pos], config)
             trucks = len(packed)
             price = float(tariff(np.full(trucks, distance), [weight[pos[t]].sum() for t in packed]).sum())
-        return trucks * 1e6 + price if config.objective == "trucks" else price + trucks * 1e-6
+        return price + trucks * 1e-6  # fewer trucks only breaks ties
 
     current = {d: cost(m) for d, m in members.items()}
 
@@ -619,9 +583,7 @@ def reassign(lines: pd.DataFrame, plan: CouplePlan, holidays: set[date], tariff:
         if not improved:
             break
     result = valid(assign)
-    better = result is not None and (
-        (result.n_trucks, result.cost) < (plan.n_trucks, plan.cost - 1e-9) if config.objective == "trucks"
-        else result.cost < plan.cost - 1e-9)
+    better = result is not None and result.cost < plan.cost - 1e-9
     return result if better else plan
 
 
@@ -629,8 +591,6 @@ def reassign(lines: pd.DataFrame, plan: CouplePlan, holidays: set[date], tariff:
 def candidate_plans(lines: pd.DataFrame, holidays: set[date], tariff: Tariff, config: PlannerConfig) -> dict:
     """Best valid plan of every couple on each set of days (exact dynamic programme), duplicates removed.
 
-    With `lowest_profile_first`, profiles are evaluated from the lowest: once a profile has a plan whose
-    departures all fit in one truck, the higher profiles are not needed (they would never be chosen).
     The couples are independent (RG01): they are spread over `workers` processes. The result does not
     depend on the number of processes.
     """
@@ -669,21 +629,16 @@ def couple_candidates(job: tuple) -> list[CouplePlan]:
                     plan = reassign(group, plan, holidays, tariff, config, start)
                 if plan is not None:
                     plans.setdefault((plan.profile, tuple(plan.dates.tolist())), plan)
-        if config.lowest_profile_first and any(p.overflow_departures == 0 for p in plans.values()):
-            break
     return list(plans.values())
 
 
 def selection_key(plan: CouplePlan, config: PlannerConfig = PlannerConfig()) -> tuple:
     """Choice of the plan of a couple (RG07 + client answer "add delivery days rather than trucks"):
-    fewest overflowing departures first; then, with `lowest_profile_first`, the lowest profile; then the
-    objective (cheapest or fewest trucks); then least advance, then earliest days of the week.
-    The profile itself is always the largest number of deliveries made in one week."""
-    cost, trucks = round(plan.cost, 6), plan.n_trucks
-    main = (trucks, cost) if config.objective == "trucks" else (cost, trucks)
-    lowest = (plan.frequency,) if config.lowest_profile_first else ()
+    with `overflow_first`, fewest overflowing departures first; then the cheapest, fewest trucks, least advance,
+    then earliest days of the week. The profile itself is always the largest number of deliveries made in one week."""
     overflow = (plan.overflow_departures,) if config.overflow_first else ()
-    return (*overflow, *lowest, *main, plan.overflow_departures, plan.total_advance, plan.frequency, plan.profile)
+    return (*overflow, round(plan.cost, 6), plan.n_trucks, plan.overflow_departures, plan.total_advance,
+            plan.frequency, plan.profile)
 
 
 def choose_profiles(candidates: dict, config: PlannerConfig = PlannerConfig()) -> dict:
@@ -692,11 +647,11 @@ def choose_profiles(candidates: dict, config: PlannerConfig = PlannerConfig()) -
 
 
 def smoothing_options(candidates: dict, chosen: dict, config: PlannerConfig = PlannerConfig()) -> dict:
-    """Plans a couple may take when smoothing: same number of overflowing departures as its RG07 choice
-    (and the same profile with `lowest_profile_first`), so that RG07 stays respected."""
+    """Plans a couple may take when smoothing: with `overflow_first`, same number of overflowing departures
+    as its RG07 choice, so that RG07 stays respected."""
     return {
-        key: sorted([p for p in plans if (not config.overflow_first or p.overflow_departures == chosen[key].overflow_departures)
-                     and (not config.lowest_profile_first or p.frequency == chosen[key].frequency)],
+        key: sorted([p for p in plans
+                     if not config.overflow_first or p.overflow_departures == chosen[key].overflow_departures],
                     key=lambda p: selection_key(p, config))
         for key, plans in candidates.items()
     }
@@ -857,7 +812,7 @@ def reference_plan(lines: pd.DataFrame, holidays: set[date], tariff: Tariff, con
     """Scenario A rebuilt with the planner's packing (used to compare with `prime`, whose reference packs whole lines)."""
     plans = {}
     for key, group in lines.groupby(COUPLE, sort=True):
-        plan = plan_couple(group, tuple(range(5)), holidays, tariff, config, optimize=False)
+        plan = plan_couple(group, tuple(range(5)), holidays, tariff, config)
         if plan is None or (plan.dates != group["date"].to_numpy(dtype="datetime64[D]")).any():
             raise ValueError(f"need outside a working day for {key}")
         plans[key] = plan
@@ -1056,11 +1011,7 @@ def check(lines: pd.DataFrame, plans: dict, trucks: pd.DataFrame, allocations: p
          bool(((alloc["need_date"] - alloc["delivery_date"]).dt.days.between(0, config.max_advance_days)).all())),
     ]
     if candidates is not None:
-        if config.lowest_profile_first:
-            rows.append(("RG07", "Aucun profil plus bas n'aurait évité les débordements aussi bien",
-                         all(not any(p.frequency < plans[k].frequency and p.overflow_departures <= plans[k].overflow_departures
-                                     for p in candidates[k]) for k in plans)))
-        elif config.overflow_first:
+        if config.overflow_first:
             rows.append(("RG07", "Aucun autre plan du couple n'a moins de départs dépassant un camion "
                                  "(le client préfère ajouter des jours plutôt que des camions)",
                          all(plans[k].overflow_departures == min(p.overflow_departures for p in candidates[k])
