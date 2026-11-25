@@ -17,7 +17,7 @@ import numpy as np
 import pandas as pd
 
 from ..domain.calendar import first_working_day, is_working_day, plan_start
-from ..domain.config import COUPLE, DAY_NAMES, PlannerConfig
+from ..domain.config import COUPLE, DAY_NAMES, MissingDistance, PlannerConfig, PreparationConfig
 from ..pricing.tariff import Tariff
 
 logger = logging.getLogger(__name__)
@@ -172,14 +172,15 @@ def test_h05_imputed_line_alone(allocations: pd.DataFrame) -> TestOutcome:
     return bool((sizes == 1).all()), f"{len(sizes)} camion(s) avec une ligne imputée, {int((sizes > 1).sum())} partagé(s)"
 
 
-def test_h06_imputed_distance(lines: pd.DataFrame, trucks: pd.DataFrame, distances: pd.DataFrame) -> TestOutcome:
-    """H06 - un fournisseur sans distance reçoit la plus longue distance des fournisseurs connus du planning"""
+def test_h06_imputed_distance(lines: pd.DataFrame, trucks: pd.DataFrame, distances: pd.DataFrame,
+                              method: MissingDistance = "max") -> TestOutcome:
+    """H06 - un fournisseur sans distance reçoit la distance choisie (la plus longue ou la médiane) des fournisseurs connus du planning"""
     known = distances.dropna(subset=["distance"]).drop_duplicates("supplier_id").set_index("supplier_id")["distance"]
     known = known[known.index.isin(lines["supplier_id"])]
     missing = sorted(set(lines["supplier_id"]) - set(known.index))
     if not missing:
         return True, "aucun fournisseur sans distance"
-    expected = float(known.max())
+    expected = float(known.max() if method == "max" else known.median())
     in_lines = lines.loc[lines["supplier_id"].isin(missing), "distance"]
     in_trucks = trucks.loc[trucks["supplier_id"].isin(missing), "distance"]
     ok = bool(np.allclose(in_lines, expected) and np.allclose(in_trucks, expected))
@@ -254,9 +255,10 @@ class RunTables:
     saving: pd.DataFrame  # output 3
 
 
-def output_tests(run: RunTables, holidays: set[date], tariff: Tariff,
-                 config: PlannerConfig) -> list[tuple[str, Callable[..., TestOutcome], tuple[object, ...]]]:
+def output_tests(run: RunTables, holidays: set[date], tariff: Tariff, config: PlannerConfig,
+                 preparation: PreparationConfig | None = None) -> list[tuple[str, Callable[..., TestOutcome], tuple[object, ...]]]:
     """Every output test with its suite and its arguments, in the order of the Milestone 4 notebook."""
+    preparation = preparation or PreparationConfig()
     a = run.allocations
     return [
         ("A2 - contraintes", test_rg01_one_couple_per_truck, (a,)),
@@ -275,7 +277,7 @@ def output_tests(run: RunTables, holidays: set[date], tariff: Tariff,
         ("A2 - contraintes", test_contents_match_allocations, (run.contents, a)),
         ("A2 - contraintes", test_weekly_patterns_add_up, (run.profiles, run.saving)),
         ("A3 - données manquantes", test_h05_imputed_line_alone, (a,)),
-        ("A3 - données manquantes", test_h06_imputed_distance, (run.lines, run.trucks, run.distances)),
+        ("A3 - données manquantes", test_h06_imputed_distance, (run.lines, run.trucks, run.distances, preparation.missing_distance)),
         ("A4 - exhaustivité", test_each_line_delivered_once, (a,)),
         ("A4 - exhaustivité", test_no_line_forgotten, (a, run.lines)),
         ("A4 - exhaustivité", test_quantities, (a, run.lines)),
@@ -297,9 +299,11 @@ def run_test(suite: str, fn: Callable[..., TestOutcome], *args: object) -> dict[
     return {"suite": suite, "fonction": fn.__name__, "test": label, "respecté": bool(passed), "détail": detail}
 
 
-def run_output_tests(run: RunTables, holidays: set[date], tariff: Tariff, config: PlannerConfig) -> pd.DataFrame:
+def run_output_tests(run: RunTables, holidays: set[date], tariff: Tariff, config: PlannerConfig,
+                     preparation: PreparationConfig | None = None) -> pd.DataFrame:
     """Run every output test on one run: one row per test (suite, function, label, passed, detail)."""
-    results = pd.DataFrame([run_test(suite, fn, *args) for suite, fn, args in output_tests(run, holidays, tariff, config)],
+    tests = output_tests(run, holidays, tariff, config, preparation)
+    results = pd.DataFrame([run_test(suite, fn, *args) for suite, fn, args in tests],
                            columns=RESULT_COLUMNS)
     failed = results.loc[~results["respecté"], "fonction"].tolist()
     if failed:

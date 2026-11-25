@@ -19,7 +19,7 @@ const JOURS = ["dim.", "lun.", "mar.", "mer.", "jeu.", "ven.", "sam."];
 const dayLabel = (iso) => { const d = new Date(iso + "T12:00:00"); return `${JOURS[d.getDay()]} ${String(d.getDate()).padStart(2, "0")}/${String(d.getMonth() + 1).padStart(2, "0")}`; };
 const short = (iso) => iso.slice(8, 10) + "/" + iso.slice(5, 7);
 
-const S = { runs: [], sourceRun: null, current: null, summary: null, view: "accueil", files: {}, polling: null, trucksPage: 0, selectedTruck: null, suppliers: [], sort: {} };
+const S = { runs: [], sourceRun: null, example: false, quality: null, qualityKey: null, qualityState: "idle", qualityError: "", current: null, summary: null, view: "accueil", files: {}, polling: null, trucksPage: 0, selectedTruck: null, suppliers: [], sort: {} };
 const DONE = "succeeded", FAILED = "failed", CANCELLED = "cancelled", FINISHED = [DONE, FAILED, CANCELLED];
 // parameters of the planner used by a run (defaults filled in by the API)
 const planner = (run) => (run && run.parameters && run.parameters.planner) || {};
@@ -57,7 +57,7 @@ const CRUMBS = { accueil: "Nouveau calcul", running: "Calcul en cours", apercu: 
                  camions: "Camions", fournisseurs: "Fournisseurs", scenarios: "Scénarios" };
 function show(view) {
   if (!VIEWS.includes(view)) view = "accueil";
-  if (!["accueil", "running"].includes(view) && !S.summary) view = "accueil";
+  if (!["accueil", "running"].includes(view) && !S.summary && !(view === "scenarios" && S.runs.length)) view = "accueil";
   S.view = view;
   $("#crumbCurrent").textContent = CRUMBS[view] || "";
   document.body.dataset.view = view;   // the scenario selector is only shown on the synthesis of a scenario
@@ -65,7 +65,7 @@ function show(view) {
   $$(".sidenav button[data-view]").forEach((b) => b.classList.toggle("active", b.dataset.view === view));
   if (location.hash !== "#" + view && view !== "running") history.replaceState(null, "", "#" + view);
   window.scrollTo({ top: 0 });
-  const render = { accueil: () => { renderLaunch(); renderHistory(); }, apercu: renderOverview, calendrier: renderCalendarView, profils: renderProfiles, camions: renderTrucks,
+  const render = { accueil: renderLaunch, apercu: renderOverview, calendrier: renderCalendarView, profils: renderProfiles, camions: renderTrucks,
                    fournisseurs: renderSuppliers, scenarios: renderScenarios }[view];
   if (render) render();
 }
@@ -96,7 +96,14 @@ function renderSource() {
     box.innerHTML = `<div class="source-pick"><span class="ico">${FILE_ICON}</span><div><p class="f-lab">Données</p>
       <b>Fichiers de « ${esc(src.label)} »</b><span>importés le ${fmtStamp(src.created_at)}${k.lines ? ` · ${num(k.lines)} lignes · ${num(k.couples)} couples` : ""}</span></div>
       <button class="link" id="changeSource">Importer d'autres fichiers</button></div>`;
-    $("#changeSource").addEventListener("click", () => { S.sourceRun = null; renderLaunch(); renderHistory(); });
+    $("#changeSource").addEventListener("click", () => { S.sourceRun = null; renderLaunch(); });
+    return;
+  }
+  if (S.example) {
+    box.innerHTML = `<div class="source-pick"><span class="ico">${FILE_ICON}</span><div><p class="f-lab">Données</p>
+      <b>Fichiers de l'exemple</b><span>planning de novembre 2026, distances et grille tarifaire du projet</span></div>
+      <button class="link" id="changeSource">Importer mes fichiers</button></div>`;
+    $("#changeSource").addEventListener("click", () => { S.example = false; renderLaunch(); });
     return;
   }
   box.innerHTML = `<p class="f-lab">Vos fichiers</p>
@@ -113,7 +120,7 @@ function renderSource() {
       ${f ? `<button class="clear" data-clear="${key}" title="Retirer ce fichier">×</button>` : ""}
       <input type="file" accept="${key === "rates" ? ".pdf" : ".csv"}" data-file="${key}"></label>`;
   }).join("")}</div>`;
-  const set = (key, file) => { S.files[key] = file; renderLaunch(); };
+  const set = (key, file) => { S.files[key] = file; S.example = false; renderLaunch(); };
   // several files dropped anywhere in the box: each one goes to its slot; a single file dropped on a slot stays there
   $$("#sourceBox .drop, #dropAll").forEach((z) => {
     z.addEventListener("dragover", (e) => { e.preventDefault(); z.classList.add("over"); });
@@ -155,7 +162,7 @@ async function placeFiles(files) {
     seen[key] = true;
     S.files[key] = f; placed.push(f.name);
   }
-  S.sourceRun = null;
+  S.sourceRun = null; S.example = false;
   renderLaunch();
   const msg = [];
   if (unknown.length) msg.push(`Fichier${unknown.length > 1 ? "s" : ""} non reconnu${unknown.length > 1 ? "s" : ""} : ${unknown.join(", ")}`);
@@ -163,38 +170,141 @@ async function placeFiles(files) {
   if (msg.length) toast(msg.join(". ") + ".");
 }
 
-function canLaunch() { return !!S.sourceRun || IMPORT_FILES.every(([key]) => S.files[key]); }
+function sourceReady() { return S.example || !!S.sourceRun || IMPORT_FILES.every(([key]) => S.files[key]); }
+// the missing data of the import, and whether the user has chosen how to complete each kind
+function missingKinds() {
+  const m = S.quality && S.quality.missing;
+  return { load: !!m && m.weight.rows + m.volume.rows > 0, distance: !!m && m.suppliers_without_distance.length > 0 };
+}
+function choicesDone() {
+  const need = missingKinds();
+  return (!need.load || !!F.missing_load) && (!need.distance || !!F.missing_distance);
+}
+function canLaunch() { return sourceReady() && S.qualityState === "ready" && choicesDone(); }
 
 function renderLaunch() {
-  renderSource(); renderForm();
+  refreshQuality();
+  renderSource(); renderForm(); renderMissing(); renderQuality();
   const src = S.runs.find((r) => r.run_id === S.sourceRun);
-  $("#goTitle").textContent = src ? "Relancer l'optimisation" : "Importer et lancer l'optimisation";
-  $("#goNote").textContent = src ? `Sur les fichiers de « ${src.label} », avec les réglages ci-dessus.` :
-    canLaunch() ? "Les fichiers sont prêts : un clic suffit." : "Déposez le planning, les distances et la grille tarifaire pour commencer.";
+  $("#goTitle").textContent = src ? "Relancer l'optimisation" : S.example ? "Lancer l'optimisation sur l'exemple" : "Importer et lancer l'optimisation";
+  let note;
+  if (!sourceReady()) note = "Déposez le planning, les distances et la grille tarifaire pour commencer.";
+  else if (S.qualityState === "loading") note = "Analyse des données en cours…";
+  else if (S.qualityState === "error") note = "Les fichiers ne peuvent pas être utilisés : voir la qualité des données.";
+  else if (!choicesDone()) note = "Des données sont absentes : choisissez comment les compléter dans les réglages détaillés.";
+  else if (src) note = `Sur les fichiers de « ${src.label} », avec les réglages ci-dessus.`;
+  else note = "Les données sont prêtes : un clic suffit.";
+  $("#goNote").textContent = note;
   $("#composeBtn").disabled = !canLaunch();
+  $("#exampleBtn").hidden = S.example;
+}
+
+// ----------------------------------------------------------------------------- data quality of the import
+function sourceKey() {
+  if (S.example) return "example";
+  if (S.sourceRun) return "run:" + S.sourceRun;
+  const { schedule, distances, rates } = S.files;
+  if (!schedule || !distances) return null;
+  return ["files", ...[schedule, distances, rates].map((f) => (f ? `${f.name}:${f.size}:${f.lastModified}` : "-"))].join("|");
+}
+async function refreshQuality() {
+  const key = sourceKey();
+  if (key === S.qualityKey) return;
+  S.qualityKey = key; S.quality = null; S.qualityError = "";
+  F.missing_load = null; F.missing_distance = null;   // new data: the user chooses again
+  if (!key) { S.qualityState = "idle"; return; }
+  S.qualityState = "loading";
+  try {
+    let q;
+    if (key === "example") q = await api("/quality/example");
+    else if (S.sourceRun) q = await api(`/runs/${S.sourceRun}/quality`);
+    else {
+      const fd = new FormData();
+      fd.append("released_schedule", S.files.schedule); fd.append("distances", S.files.distances);
+      if (S.files.rates) fd.append("rate_sheet", S.files.rates);
+      q = await api("/quality", { method: "POST", body: fd });
+    }
+    if (S.qualityKey !== key) return;   // the source changed meanwhile
+    S.quality = q; S.qualityState = "ready";
+    if (q.has_missing) $("#tuning").open = true;
+  } catch (err) {
+    if (S.qualityKey !== key) return;
+    S.qualityState = "error"; S.qualityError = err.message;
+  }
+  if (S.view === "accueil") renderLaunch();
+}
+
+const LOAD_CHOICES = { full_truck: "un camion plein", material_median: "la médiane du même matériel" };
+function chosenTreatment(check) {
+  if (check.rule === "DQ04" && F.missing_load) return "complété par " + LOAD_CHOICES[F.missing_load];
+  if (check.rule === "DQ07" && F.missing_distance && S.quality) {
+    const m = S.quality.missing;
+    return F.missing_distance === "max" ? `plus longue distance du planning (${km(m.distance_max)})` : `distance médiane du planning (${km(m.distance_median)})`;
+  }
+  return check.treatment;
+}
+const km = (v) => `${nf0.format(v)} km`;
+
+function renderQuality() {
+  const box = $("#qualityPanel"), q = S.quality;
+  const head = `<div class="panel-head"><h3>Qualité des données</h3><span class="muted">${q ? `${num(q.rows_raw)} lignes importées` : ""}</span></div>`;
+  if (S.qualityState === "idle") {
+    box.innerHTML = head + `<p class="empty-note">Déposez le planning et les distances, ou essayez l'exemple : la qualité des données s'affiche ici avant le calcul.</p>`;
+    return;
+  }
+  if (S.qualityState === "loading") { box.innerHTML = head + `<p class="empty-note q-loading">Analyse des fichiers…</p>`; return; }
+  if (S.qualityState === "error") { box.innerHTML = head + `<p class="q-error">${esc(S.qualityError)}</p>`; return; }
+  const m = q.missing, need = missingKinds();
+  const tiles = [[num(q.lines), "besoins à planifier"], [`${fmtDate(q.first_date)} → ${fmtDate(q.last_date, true)}`, "période des besoins"],
+    [num(q.suppliers), "fournisseurs"], [num(q.plants), "usines"], [num(q.couples), "couples"], [num(q.materials), "matériels"]];
+  const missing = [];
+  if (m.weight.rows) missing.push(`<li><b>${num(m.weight.rows)} poids</b> manquants ou nuls</li>`);
+  if (m.volume.rows) missing.push(`<li><b>${num(m.volume.rows)} volumes</b> manquants ou nuls</li>`);
+  if (need.distance) missing.push(`<li><b>${m.suppliers_without_distance.length} fournisseur${m.suppliers_without_distance.length > 1 ? "s" : ""} sans distance</b> : ${m.suppliers_without_distance.map(esc).join(", ")}</li>`);
+  const done = choicesDone();
+  const found = q.checks.filter((c) => c.count), clean = q.checks.filter((c) => !c.count);
+  box.innerHTML = head + `<div class="q-tiles">${tiles.map(([v, l]) => `<div class="q-tile"><b>${v}</b><span>${l}</span></div>`).join("")}</div>
+    ${q.has_missing ? `<div class="q-missing ${done ? "done" : ""}"><p class="q-title">Données absentes</p><ul>${missing.join("")}</ul>
+      <p class="q-note">${done ? "✓ Méthode choisie dans les réglages : elles seront complétées ainsi." : "À compléter : choisissez la méthode dans les réglages détaillés avant de lancer."}</p></div>`
+      : `<div class="q-missing done"><p class="q-title">Aucune donnée absente</p><p class="q-note">Chaque ligne a un poids et un volume, chaque fournisseur une distance.</p></div>`}
+    <p class="q-sub">Contrôles appliqués</p>
+    <ul class="q-checks">${found.map((c) => {
+      const todo = (c.rule === "DQ04" && !F.missing_load) || (c.rule === "DQ07" && !F.missing_distance);
+      return `<li class="${todo ? "todo" : c.kind === "info" ? "info" : "fix"}"><span class="q-label">${esc(c.label)}</span><span class="q-count">${num(c.count)}</span>
+        <span class="q-treat">${esc(todo ? c.treatment : chosenTreatment(c))}</span></li>`;
+    }).join("")}</ul>
+    ${clean.length ? `<p class="q-clean">✓ Rien à signaler : ${[...new Set(clean.map((c) => c.label.toLowerCase()))].map(esc).join(", ")}.</p>` : ""}`;
+}
+
+function renderMissing() {
+  const box = $("#missingFiche"), q = S.quality;
+  const visible = S.qualityState === "ready" && q.has_missing;
+  box.hidden = !visible;
+  if (!visible) return;
+  const m = q.missing, need = missingKinds();
+  const loadHint = { full_truck: "Prudent : chaque ligne incomplète voyage seule dans son camion, le coût est majoré.",
+    material_median: `Quantité × poids et volume médians par pièce du même matériel (${num(m.weight.material)} poids) ; à défaut, ligne médiane du fournisseur (${num(m.weight.supplier)}) ; sinon un camion plein (${num(m.weight.full_truck)}).` };
+  const distanceHint = { max: "Prudent : le transport de ce fournisseur est chiffré au plus cher.", median: "Une distance typique des fournisseurs du planning." };
+  box.classList.toggle("off", !choicesDone());
+  box.innerHTML = `<p class="f-lab">Données absentes : comment les compléter ?</p>
+    ${need.load ? `<div class="m-row"><p class="m-q">Poids ou volume manquant (${num(m.weight.rows)} poids, ${num(m.volume.rows)} volumes)</p>
+      <div class="chips" data-choice="missing_load"><button type="button" data-v="full_truck">Camion plein</button><button type="button" data-v="material_median">Médiane du matériel</button></div>
+      <p class="m-hint">${F.missing_load ? loadHint[F.missing_load] : "Camion plein : prudent. Médiane : estimation à partir des autres lignes du même matériel."}</p></div>` : ""}
+    ${need.distance ? `<div class="m-row"><p class="m-q">Distance manquante (${m.suppliers_without_distance.map(esc).join(", ")})</p>
+      <div class="chips" data-choice="missing_distance"><button type="button" data-v="max">La plus longue · ${km(m.distance_max)}</button><button type="button" data-v="median">Médiane · ${km(m.distance_median)}</button></div>
+      <p class="m-hint">${F.missing_distance ? distanceHint[F.missing_distance] : "La plus longue : prudent. Médiane : distance typique du planning."}</p></div>` : ""}`;
+  $$("[data-choice] button", box).forEach((b) => {
+    const field = b.parentElement.dataset.choice;
+    b.classList.toggle("on", F[field] === b.dataset.v);
+    b.addEventListener("click", () => { F[field] = b.dataset.v; renderLaunch(); });
+  });
 }
 
 const STATUS = { queued: "En attente", running: "En cours", succeeded: "Terminé", failed: "Échec", cancelled: "Annulé" };
-function renderHistory() {
-  const list = S.runs || [];
-  $("#historyCount").textContent = list.length ? `${list.length} calcul${list.length > 1 ? "s" : ""}` : "";
-  $("#importList").innerHTML = list.length ? list.map((r) => {
-    const k = r.kpis || {}, ok = r.status === DONE;
-    return `<div class="imp ${r.run_id === S.sourceRun ? "current" : ""}">
-      <div class="imp-main"><div class="imp-name">${esc(r.label)}</div>
-        <div class="imp-meta">lancé le ${fmtStamp(r.created_at)}</div></div>
-      <div class="imp-period"><b>${ok ? eur(k.saving) + " d'économie" : STATUS[r.status] || r.status}</b><span>${ok ? `${num(k.lines)} lignes · ${num(k.couples)} couples · ${num(k.trucks_after)} camions` : esc(r.error || "")}</span></div>
-      <div class="imp-actions">
-        ${ok ? `<button class="btn ghost small" data-open-run="${r.run_id}">Voir les résultats</button>` : ""}
-        <button class="btn ghost small" data-reuse="${r.run_id}" title="Relancer sur les mêmes fichiers, avec d'autres réglages">Relancer</button>
-        ${FINISHED.includes(r.status) ? `<button class="c-del" data-del-run="${r.run_id}" title="Supprimer ce calcul">×</button>` : ""}</div>
-    </div>`;
-  }).join("") : `<p class="empty-note">Aucun calcul pour l'instant.</p>`;
-  $$("[data-open-run]").forEach((b) => b.addEventListener("click", () => openRun(b.dataset.openRun, "apercu")));
-  $$("[data-reuse]").forEach((b) => b.addEventListener("click", () => {
-    S.sourceRun = b.dataset.reuse; S.files = {}; renderLaunch(); renderHistory(); window.scrollTo({ top: 0, behavior: "smooth" });
-  }));
-  $$("[data-del-run]").forEach((b) => b.addEventListener("click", () => deleteRun(b.dataset.delRun)));
+// relaunch a run on the same files, with other settings (from the Scénarios page)
+function reuseRun(id) {
+  S.sourceRun = id; S.files = {}; S.example = false;
+  show("accueil"); window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
 async function deleteRun(id) {
@@ -208,30 +318,30 @@ async function deleteRun(id) {
       if (next) await openRun(next.run_id, S.view === "accueil" ? "accueil" : "scenarios");
       else { S.summary = null; S.current = null; updateDock(); show("accueil"); }
     } else if (S.view === "scenarios") renderScenarios();
-    else { renderLaunch(); renderHistory(); }
+    else renderLaunch();
   } catch (err) { toast(err.message); }
 }
 
-async function launch(example = false) {
-  const btn = example ? $("#exampleBtn") : $("#composeBtn");
-  if (!example && !canLaunch()) return;
+async function launch() {
+  const btn = $("#composeBtn");
+  if (!canLaunch()) return;
   btn.disabled = true; btn.classList.add("busy");
   try {
     const fd = new FormData();
-    fd.append("label", $("#f-label").value.trim() || (example ? "Exemple" : "Scénario"));
+    fd.append("label", $("#f-label").value.trim() || (S.example ? "Exemple" : "Scénario"));
     fd.append("parameters", JSON.stringify(runParameters()));
     let path = "/runs";
-    if (example) path = "/runs/example";
+    if (S.example) path = "/runs/example";
     else if (S.sourceRun) path = `/runs/${S.sourceRun}/rerun`;
     else IMPORT_FILES.forEach(([key, , , field]) => fd.append(field, S.files[key]));
     const run = await api(path, { method: "POST", body: fd });
-    S.files = {};
+    S.files = {}; S.example = false; S.sourceRun = null;
     startRunning(run);
   } catch (err) {
-    toast(err.message); renderLaunch(); renderHistory();
+    toast(err.message); renderLaunch();
   } finally { btn.disabled = false; btn.classList.remove("busy"); if (S.view === "accueil") renderLaunch(); }
 }
-$("#composeBtn").addEventListener("click", () => launch(false));
+$("#composeBtn").addEventListener("click", () => launch());
 // files dropped anywhere in the "files" area (also when a previous run was selected)
 $("#sourceBox").addEventListener("dragover", (e) => e.preventDefault());
 $("#sourceBox").addEventListener("drop", (e) => {
@@ -239,16 +349,21 @@ $("#sourceBox").addEventListener("drop", (e) => {
   const files = [...e.dataTransfer.files];
   if (files.length) placeFiles(files);
 });
-$("#exampleBtn").addEventListener("click", () => launch(true));
+// the example is a source like the dropped files: its data quality shows, then the user launches
+$("#exampleBtn").addEventListener("click", () => { S.example = true; S.sourceRun = null; S.files = {}; renderLaunch(); });
 
 // settings of the form -> parameters of the planner (POST /api/runs, field "parameters")
 function runParameters() {
-  return { planner: { max_advance_days: F.anticipation, smoothing_budget: F.smoothing } };
+  const preparation = {};   // how the missing data are completed: only asked (and sent) when some are missing
+  const need = missingKinds();
+  if (need.load && F.missing_load) preparation.missing_load = F.missing_load;
+  if (need.distance && F.missing_distance) preparation.missing_distance = F.missing_distance;
+  return { planner: { max_advance_days: F.anticipation, smoothing_budget: F.smoothing }, preparation };
 }
 
 // ----------------------------------------------------------------------------- settings (folded menus)
 let DEFAULT_F = { anticipation: 7, smoothing: 0 };
-const F = { ...DEFAULT_F };
+const F = { ...DEFAULT_F, missing_load: null, missing_distance: null };
 function pctTxt(x) { return x === 0 ? "aucun" : `${(x * 100).toLocaleString("fr-FR", { maximumFractionDigits: 1 })} %`; }
 function placePill(seg) {
   const on = $("button.on", seg), pill = $(".pill", seg);
@@ -266,6 +381,7 @@ function renderForm() {
   const changed = Object.keys(DEFAULT_F).some((k) => F[k] !== DEFAULT_F[k]);
   $("#tuningSum").textContent = changed ? [`${F.anticipation} j d'avance`,
     F.smoothing ? `lissage ${pctTxt(F.smoothing)}` : "lissage gratuit"].join(" · ") : "par défaut : coût minimal";
+  if (F.missing_load === "material_median" || F.missing_distance === "median") $("#tuningSum").textContent += " · médiane si absent";
   const w = $("#tuningWarn"), warnings = [];
   if (F.anticipation !== DEFAULT_F.anticipation)
     warnings.push(`${F.anticipation} jours d'avance : en dehors de la règle des ${DEFAULT_F.anticipation} jours, à présenter comme un scénario.`);
@@ -687,10 +803,14 @@ function stamp(label, value, target, ok, r) {
     <div class="s-val">${value}</div><div class="s-target">cible ${target}</div></div>`;
 }
 
+function imputationChips(run) {
+  const prep = (run && run.parameters && run.parameters.preparation) || {};
+  return [prep.missing_load === "material_median" ? "poids absents : médiane" : null, prep.missing_distance === "median" ? "distance absente : médiane" : null];
+}
 function settingsChips(run) {
   const p = planner(run), freq = p.allowed_frequencies ? Math.max(...p.allowed_frequencies) : 5;
   return [`${p.max_advance_days ?? 7} j d'avance`, p.smoothing_budget ? `lissage ${nf1.format(p.smoothing_budget * 100)} %` : "lissage gratuit",
-    freq < 5 ? `≤ ${freq} / semaine` : null, run && run.source_run_id ? "relance" : null].filter(Boolean)
+    freq < 5 ? `≤ ${freq} / semaine` : null, ...imputationChips(run), run && run.source_run_id ? "relance" : null].filter(Boolean)
     .map((c) => `<span class="tag">${esc(c)}</span>`).join(" ");
 }
 
@@ -905,12 +1025,14 @@ function renderScenarios() {
       <div class="c-chips">${settingsChips(r)}</div>
       ${ok ? `<div class="c-saving">${eur(r.kpis.saving)}</div><div class="c-meta">${num(r.kpis.trucks_after)} camions · pics ${Object.values(r.plant_peaks || {}).join(" / ")} · ${Math.round(runtime(r))} s</div>`
            : `<div class="c-saving">${r.status === FAILED ? "Erreur : " + esc(r.error || "") : STATUS[r.status] || r.status}</div>`}
+      ${FINISHED.includes(r.status) ? `<button class="btn ghost small c-reuse" data-reuse="${r.run_id}" title="Relancer sur les mêmes fichiers, avec d'autres réglages">Relancer</button>` : ""}
     </div>`;
   }).join("");
   $$("#scenarioCards .card").forEach((c) => c.addEventListener("click", (e) => {
-    if (e.target.closest("[data-del]")) return;
+    if (e.target.closest("[data-del], [data-reuse]")) return;
     if (c.dataset.ok === "true") openRun(c.dataset.run, "apercu");
   }));
+  $$("#scenarioCards [data-reuse]").forEach((b) => b.addEventListener("click", () => reuseRun(b.dataset.reuse)));
   $$("#scenarioCards [data-del]").forEach((b) => b.addEventListener("click", () => deleteRun(b.dataset.del)));
 }
 

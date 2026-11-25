@@ -123,6 +123,35 @@ def test_delete_a_run(client: TestClient, run_id: str) -> None:
     assert client.delete(f"/api/runs/{other}").status_code == 404
 
 
+def test_data_quality_before_the_launch(client: TestClient, run_id: str, small_inputs: dict[InputName, bytes]) -> None:
+    files = {"released_schedule": ("released_schedule.csv", small_inputs[InputName.SCHEDULE], "text/csv"),
+             "distances": ("distances.csv", small_inputs[InputName.DISTANCES], "text/csv")}
+    response = client.post("/api/quality", files=files)
+    assert response.status_code == 200, response.text
+    quality = response.json()
+    assert quality == client.get("/api/quality/example").json() == client.get(f"/api/runs/{run_id}/quality").json()  # same files
+    run = client.get(f"/api/runs/{run_id}").json()
+    assert quality["lines"] == run["kpis"]["lines"] and quality["rows_raw"] > quality["lines"]
+    missing = quality["missing"]
+    assert missing["suppliers_without_distance"] == ["SUP_00130"] and quality["has_missing"]
+    assert missing["distance_median"] <= missing["distance_max"]
+    dq07 = next(c for c in quality["checks"] if c["rule"] == "DQ07")
+    assert dq07["count"] == 1 and dq07["treatment"].startswith("à compléter")
+    broken = {**files, "distances": ("distances.csv", b"supplier;km\nA;3\n", "text/csv")}
+    assert client.post("/api/quality", files=broken).status_code == 422
+
+
+def test_run_with_the_median_imputation(client: TestClient, run_id: str) -> None:
+    response = client.post(f"/api/runs/{run_id}/rerun", data={
+        "label": "Médianes", "parameters": json.dumps({"preparation": {"missing_load": "material_median", "missing_distance": "median"}})})
+    rerun = response.json()
+    assert rerun["status"] == "succeeded" and rerun["checks_passed"], rerun.get("error")  # H06 checks the median distance
+    assert rerun["parameters"]["preparation"]["missing_distance"] == "median"
+    situation = client.get(f"/api/runs/{rerun['run_id']}/views/situation").json()
+    assert any(a["rule"] == "DQ07" and "médiane" in a["treatment"] for a in situation["anomalies"])
+    assert client.post(f"/api/runs/{run_id}/rerun", data={"parameters": '{"preparation": {"missing_load": "mean"}}'}).status_code == 422
+
+
 def test_views_of_an_unknown_run(client: TestClient) -> None:
     assert client.get("/api/runs/20260101-000000-abcdef/views/summary").status_code == 404
 

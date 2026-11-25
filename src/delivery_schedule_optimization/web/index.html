@@ -58,6 +58,7 @@
                 <span><b id="antVal">7</b> jours</span><button type="button" data-step="1" aria-label="Un jour de plus">+</button></div></div>
             <div class="fiche" data-field="smoothing"><p class="f-lab">Surcoût accepté pour lisser</p>
               <div class="chips"><button type="button" data-v="0">aucun</button><button type="button" data-v="0.005">0,5&nbsp;%</button><button type="button" data-v="0.01">1&nbsp;%</button><button type="button" data-v="0.02">2&nbsp;%</button></div></div>
+            <div class="fiche missing" id="missingFiche" hidden></div>
           </div>
             <p class="fold-warn" id="tuningWarn" hidden></p>
           </details>
@@ -74,10 +75,7 @@
           </div>
         </div>
       </div>
-      <div class="panel history">
-        <div class="history-head"><h3>Calculs précédents</h3><span class="muted" id="historyCount"></span></div>
-        <div id="importList" class="import-list"></div>
-      </div>
+      <div class="panel quality" id="qualityPanel" aria-live="polite"></div>
     </div>
   </section>
 

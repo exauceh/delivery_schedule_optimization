@@ -17,6 +17,10 @@ class AnomalyRegister:
     """Every finding of the preparation: rule (DQxx), source file, severity, rows concerned and action taken."""
 
     entries: list[dict[str, object]] = field(default_factory=list)
+    # missing data and how they were completed (shown by the data quality report of the interface)
+    missing_loads: dict[str, dict[str, int]] = field(default_factory=dict)  # column -> rows per source (material, supplier, full_truck)
+    missing_distances: list[str] = field(default_factory=list)  # suppliers of the planning without a distance
+    distance_fallbacks: dict[str, float] = field(default_factory=dict)  # "max" and "median" distance of the planning suppliers (km)
 
     def add(self, rule: str, source: str, severity: str, n_rows: int, action: str) -> None:
         """Record one finding and log it: a warning when rows are concerned and the severity is not "info"."""

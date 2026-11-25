@@ -299,7 +299,7 @@ class Situation(BaseModel):
     heatmap: Heatmap
 
 
-# (rule, start of the action written by the preparation) -> label, treatment, kind
+# (rule, part of the action written by the preparation) -> label, treatment, kind; the first match wins
 ANOMALIES: list[tuple[str, str, str, str, str]] = [
     ("DQ01", "dropped (quantity = 0", "Quantité nulle", "lignes retirées : aucun besoin", "corrige"),
     ("DQ01", "dropped (negative", "Quantité négative", "lignes retirées", "corrige"),
@@ -309,17 +309,20 @@ ANOMALIES: list[tuple[str, str, str, str, str]] = [
     ("DQ02", "flagged and kept (no delivery on", "Besoin un jour férié", "gardé : livré un jour ouvré avant", "info"),
     ("DQ03", "no cumulative date", "Date de cumul en fin de planning", "aucune", "info"),
     ("DQ03", "dropped (date", "Date de cumul en fin de planning", "lignes retirées : besoins cumulés après l'horizon", "corrige"),
+    ("DQ04", "weight imputed (material median", "Poids manquant ou nul", "complété par la médiane du même matériel", "corrige"),
+    ("DQ04", "volume imputed (material median", "Volume manquant ou nul", "complété par la médiane du même matériel", "corrige"),
     ("DQ04", "weight imputed", "Poids manquant ou nul", "complété par un camion plein (24 500 kg)", "corrige"),
     ("DQ04", "volume imputed", "Volume manquant ou nul", "complété par un camion plein (110,4 m³)", "corrige"),
     ("DQ05", "dropped", "Ligne plus grande qu'un camion", "lignes retirées", "corrige"),
     ("DQ06", "kept first value", "Fournisseur en double dans les distances", "première distance gardée", "corrige"),
+    ("DQ07", "median", "Fournisseur sans distance", "distance médiane des fournisseurs du planning", "corrige"),
     ("DQ07", "", "Fournisseur sans distance", "plus longue distance des fournisseurs du planning", "corrige"),
 ]
 
 
 def anomaly(rule: str, action: str, rows: int) -> Anomaly:
     for code, start, label, treatment, kind in ANOMALIES:
-        if code == rule and action.startswith(start):
+        if code == rule and start in action:
             km = re.search(r"\(([\d.]+) km\)", action) if rule == "DQ07" else None
             return Anomaly(rule=rule, label=label, count=rows,
                            treatment=f"{treatment} ({float(km.group(1)):g} km)".replace(".", ",") if km else treatment, kind=kind)
@@ -334,11 +337,16 @@ def rules(manifest: RunManifest) -> list[str]:
     frequencies = ", ".join(str(f) for f in allowed) if isinstance(allowed, list) else "1, 2, 3, 4, 5"
     budget = p.get("smoothing_budget", 0.0)
     smoothing = "seulement entre des plans de même coût" if not budget else f"avec au plus {float(str(budget)) * 100:g} % de surcoût"
+    preparation = manifest.parameters.get("preparation")
+    preparation = preparation if isinstance(preparation, dict) else {}
+    load = ("complété par un camion plein : la ligne voyage seule" if preparation.get("missing_load", "full_truck") == "full_truck"
+            else "complété par la quantité × la médiane par pièce du même matériel (à défaut, la ligne médiane du fournisseur)")
+    distance = "la plus longue" if preparation.get("missing_distance", "max") == "max" else "la distance médiane"
     return [
         "Les lignes à quantité nulle, négative ou manquante sont retirées : elles ne portent aucun besoin.",
         "La dernière date du planning, qui cumule les besoins au-delà de l'horizon, est retirée.",
-        "Un poids ou un volume manquant est complété par un camion plein : la ligne voyage seule.",
-        "Une ligne plus grande qu'un camion est retirée ; un fournisseur sans distance reçoit la plus longue distance du planning.",
+        f"Un poids ou un volume manquant est {load}.",
+        f"Une ligne plus grande qu'un camion est retirée ; un fournisseur sans distance reçoit {distance} des distances du planning.",
         "Un camion ne transporte qu'un couple fournisseur × usine, et jamais plus de 24 500 kg ni 110,4 m³.",
         f"Aucune livraison en retard, et au plus {advance} jours calendaires d'avance ; le plan peut commencer {advance} jours "
         "avant le premier besoin.",

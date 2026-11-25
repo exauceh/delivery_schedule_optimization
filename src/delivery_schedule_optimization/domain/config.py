@@ -3,11 +3,16 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from typing import Literal
 
 DAY_NAMES = ("lundi", "mardi", "mercredi", "jeudi", "vendredi")
 
 
 COUPLE = ["supplier_id", "plant"]
+
+# How missing data are completed (DQ04, DQ07). The first value of each is the prudent choice of Milestone 1 (H05, H06).
+MissingLoad = Literal["full_truck", "material_median"]  # a full truck / quantity x median per piece of the same material
+MissingDistance = Literal["max", "median"]  # longest / median distance of the planning suppliers
 
 
 @dataclass(frozen=True)
@@ -43,9 +48,17 @@ class PlannerConfig:
 class PreparationConfig:
     """Parameters of the data preparation (Milestone 1 cleaning, DQ01 to DQ07).
 
-    Missing weights, volumes and distances are always completed the prudent way: a full truck and the longest
-    distance of the planning suppliers (H05, H06).
+    By default, missing weights, volumes and distances are completed the prudent way: a full truck and the longest
+    distance of the planning suppliers (H05, H06). The interface asks the user to choose when data are missing.
     """
+
+    # DQ04: missing or non-positive weight / volume of a line. "full_truck" = the capacity of one truck (the line travels
+    # alone); "material_median" = quantity x median weight (volume) per piece of the same material on its known lines,
+    # else the median line of its supplier, else a full truck; never more than one truck.
+    missing_load: MissingLoad = "full_truck"
+    # DQ07: supplier of the planning without a distance. "max" = the longest, "median" = the median distance of the
+    # planning suppliers that have one.
+    missing_distance: MissingDistance = "max"
 
     # DQ03: the planning ends with one date that accumulates every need after the daily horizon (01/01/2027 in the
     # November 2026 planning). None = detected automatically: the last date of the file when it comes more than

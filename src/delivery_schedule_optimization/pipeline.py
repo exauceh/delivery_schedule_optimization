@@ -109,7 +109,7 @@ def run_pipeline(inputs: RawInputs, config: RunConfig) -> PipelineResult:
             RunTables(lines=lines, distances=inputs.distances, deliveries_before=deliveries_before, profiles=outputs.profiles,
                       trucks=outputs.trucks, allocations=outputs.allocations, contents=outputs.truck_contents,
                       saving=outputs.saving),
-            holidays, tariff, planner)
+            holidays, tariff, planner, config.preparation)
         checks_passed = bool(checks["respecté"].all() and output_tests["respecté"].all())
     logger.info("Run done: cost %.0f -> %.0f EUR (saving %.1f %%), %d -> %d trucks", kpis["cost_before"], kpis["cost_after"],
                 kpis["saving_pct"], kpis["trucks_before"], kpis["trucks_after"])

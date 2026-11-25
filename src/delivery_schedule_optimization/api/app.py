@@ -17,7 +17,7 @@ from ..settings import Settings, get_settings
 from ..storage.base import RunNotFoundError, RunRepository, RunStatus
 from ..storage.filesystem import FileRunRepository
 from .jobs import JobRunner, ProcessJobRunner
-from .routes import health, results, runs, views
+from .routes import health, quality, results, runs, views
 
 WEB_DIR = Path(__file__).resolve().parent.parent / "web"  # the interface: HTML, CSS, JS, logo, fonts
 
@@ -60,7 +60,7 @@ def create_app(settings: Settings | None = None, repository: RunRepository | Non
     async def run_not_found(_: Request, exc: RunNotFoundError) -> JSONResponse:
         return JSONResponse(status_code=status.HTTP_404_NOT_FOUND, content={"detail": f"run not found: {exc}"})
 
-    for router in (health.router, runs.router, results.router, views.router):
+    for router in (health.router, quality.router, runs.router, results.router, views.router):
         app.include_router(router, prefix="/api")
     if WEB_DIR.is_dir():  # mounted last: every path that is not an API route serves the interface
         app.mount("/", StaticFiles(directory=WEB_DIR, html=True), name="web")
