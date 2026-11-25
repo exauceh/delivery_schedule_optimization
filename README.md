@@ -104,8 +104,8 @@ rien : tous ses chiffres viennent des tables de sortie d'une exécution, par les
 
 Le menu a deux entrées, **Nouveau calcul** et **Historique** ; les résultats s'ouvrent dans la page d'un scénario.
 
-- **Nouveau calcul** : on dépose les trois fichiers d'un coup (reconnus automatiquement), ou l'on choisit « Essayer avec
-  un exemple » (les fichiers du projet). La **qualité des données** s'affiche aussitôt à droite, avant tout calcul :
+- **Nouveau calcul** : on dépose les trois fichiers d'un coup (reconnus automatiquement). La **qualité des données**
+  s'affiche aussitôt à droite, avant tout calcul :
   besoins, fournisseurs, usines, données absentes, lignes retirées. S'il manque des poids, des volumes ou des distances,
   les réglages détaillés demandent comment les compléter (camion plein ou médiane ; plus longue distance ou distance
   médiane) et le calcul ne se lance qu'une fois ce choix fait. On nomme le scénario, on ajuste l'avance maximale et le
@@ -144,7 +144,7 @@ Toutes les routes sont sous `/api`.
 | `POST` | `/api/quality` | Qualité des données du planning et des distances déposés, sans rien enregistrer : contrôles et données absentes |
 | `GET` | `/api/quality/example`, `/api/runs/{run_id}/quality` | La même chose pour les fichiers de l'exemple, ou ceux d'une exécution |
 | `POST` | `/api/runs` | Importer les trois fichiers (+ `label` et un JSON `parameters` facultatifs) et lancer l'exécution en arrière-plan → `202` avec le `run_id` |
-| `POST` | `/api/runs/example` | Même chose avec les fichiers du projet (`DSO_EXAMPLE_*`) |
+| `POST` | `/api/runs/example` | Même chose avec les fichiers du projet (`DSO_EXAMPLE_*`), pour le développement et les tests |
 | `POST` | `/api/runs/{run_id}/rerun` | Nouvelle exécution sur les fichiers de `run_id`, avec d'autres paramètres (`source_run_id` dans le manifeste) |
 | `GET` | `/api/runs`, `/api/runs/{run_id}` | Liste des exécutions, statut et résultats d'une exécution |
 | `POST` | `/api/runs/{run_id}/cancel` | Arrêter une exécution en attente ou en cours (son processus et ceux du calcul parallèle) : elle finit `cancelled`, sans résultats |

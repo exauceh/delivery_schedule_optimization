@@ -56,7 +56,6 @@ const short = (iso) => iso.slice(8, 10) + "/" + iso.slice(5, 7);
 const S = {
   runs: [],
   sourceRun: null,
-  example: false,
   quality: null,
   qualityKey: null,
   qualityState: "idle",
@@ -307,16 +306,6 @@ function renderSource() {
     });
     return;
   }
-  if (S.example) {
-    box.innerHTML = `<div class="source-pick"><span class="ico">${FILE_ICON}</span><div><p class="f-lab">Données</p>
-      <b>Fichiers de l'exemple</b><span>planning de novembre 2026, distances et grille tarifaire du projet</span></div>
-      <button class="link" id="changeSource">Importer mes fichiers</button></div>`;
-    $("#changeSource").addEventListener("click", () => {
-      S.example = false;
-      renderLaunch();
-    });
-    return;
-  }
   box.innerHTML = `<p class="f-lab">Vos fichiers</p>
     <label class="drop-all" id="dropAll">
       <span class="ico">${FILE_ICON}</span>
@@ -333,7 +322,6 @@ function renderSource() {
     }).join("")}</div>`;
   const set = (key, file) => {
     S.files[key] = file;
-    S.example = false;
     renderLaunch();
   };
   // several files dropped anywhere in the box: each one goes to its slot; a single file dropped on a slot stays there
@@ -413,7 +401,6 @@ async function placeFiles(files) {
     placed.push(f.name);
   }
   S.sourceRun = null;
-  S.example = false;
   renderLaunch();
   const msg = [];
   if (unknown.length)
@@ -427,7 +414,7 @@ async function placeFiles(files) {
 
 function sourceReady() {
   return (
-    S.example || !!S.sourceRun || IMPORT_FILES.every(([key]) => S.files[key])
+    !!S.sourceRun || IMPORT_FILES.every(([key]) => S.files[key])
   );
 }
 // the missing data of the import, and whether the user has chosen how to complete each kind
@@ -457,9 +444,7 @@ function renderLaunch() {
   const src = S.runs.find((r) => r.run_id === S.sourceRun);
   $("#goTitle").textContent = src
     ? "Relancer l'optimisation"
-    : S.example
-      ? "Lancer l'optimisation sur l'exemple"
-      : "Importer et lancer l'optimisation";
+    : "Importer et lancer l'optimisation";
   let note;
   if (!sourceReady())
     note =
@@ -475,12 +460,10 @@ function renderLaunch() {
   else note = "Les données sont prêtes : un clic suffit.";
   $("#goNote").textContent = note;
   $("#composeBtn").disabled = !canLaunch();
-  $("#exampleBtn").hidden = S.example;
 }
 
 // ----------------------------------------------------------------------------- data quality of the import
 function sourceKey() {
-  if (S.example) return "example";
   if (S.sourceRun) return "run:" + S.sourceRun;
   const { schedule, distances, rates } = S.files;
   if (!schedule || !distances) return null;
@@ -506,8 +489,7 @@ async function refreshQuality() {
   S.qualityState = "loading";
   try {
     let q;
-    if (key === "example") q = await api("/quality/example");
-    else if (S.sourceRun) q = await api(`/runs/${S.sourceRun}/quality`);
+    if (S.sourceRun) q = await api(`/runs/${S.sourceRun}/quality`);
     else {
       const fd = new FormData();
       fd.append("released_schedule", S.files.schedule);
@@ -738,7 +720,6 @@ function reuseRun(id) {
     prep = (run.parameters && run.parameters.preparation) || {};
   S.sourceRun = id;
   S.files = {};
-  S.example = false;
   F.anticipation = p.max_advance_days ?? DEFAULT_F.anticipation;
   F.smoothing = p.smoothing_budget ?? DEFAULT_F.smoothing;
   const load =
@@ -888,19 +869,17 @@ async function launch() {
     const fd = new FormData();
     fd.append(
       "label",
-      $("#f-label").value.trim() || (S.example ? "Exemple" : "Scénario"),
+      $("#f-label").value.trim() || "Scénario",
     );
     fd.append("parameters", JSON.stringify(runParameters()));
     let path = "/runs";
-    if (S.example) path = "/runs/example";
-    else if (S.sourceRun) path = `/runs/${S.sourceRun}/rerun`;
+    if (S.sourceRun) path = `/runs/${S.sourceRun}/rerun`;
     else
       IMPORT_FILES.forEach(([key, , , field]) =>
         fd.append(field, S.files[key]),
       );
     const run = await api(path, { method: "POST", body: fd });
     S.files = {};
-    S.example = false;
     S.sourceRun = null;
     startRunning(run);
   } catch (err) {
@@ -919,13 +898,6 @@ $("#sourceBox").addEventListener("drop", (e) => {
   e.preventDefault();
   const files = [...e.dataTransfer.files];
   if (files.length) placeFiles(files);
-});
-// the example is a source like the dropped files: its data quality shows, then the user launches
-$("#exampleBtn").addEventListener("click", () => {
-  S.example = true;
-  S.sourceRun = null;
-  S.files = {};
-  renderLaunch();
 });
 
 // settings of the form -> parameters of the planner (POST /api/runs, field "parameters")
