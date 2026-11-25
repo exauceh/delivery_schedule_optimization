@@ -74,7 +74,7 @@ function renderCrumbs(view) {
     $("#crumbs").innerHTML = `<a href="#/historique" data-view="historique">Historique</a>${sep}<span>${esc(S.run ? S.run.label : "Scénario")}</span>${sep}<b aria-current="page">${CRUMBS[view]}</b>`;
   else $("#crumbs").innerHTML = `<b aria-current="page">${CRUMBS[view] || ""}</b>`;
 }
-function show(view) {
+function show(view, opts = {}) {
   if (!VIEWS.includes(view)) view = "accueil";
   if (RESULT_VIEWS.includes(view) && !S.summary) view = "accueil";
   S.view = view;
@@ -89,6 +89,15 @@ function show(view) {
     else history.replaceState(null, "", routeOf(view));
   }
   window.scrollTo({ top: 0 });
+  if (view !== "calendrier") hideDrawer();   // the drawer belongs to the planning; its state is kept for the return
+  if (view === "camions") {
+    $("#backToPlanning").hidden = !opts.fromPlanning;
+    if (!opts.fromPlanning && S.trucksFromPlanning) {   // opened from its tab: the usual Camions page, unfiltered
+      S.trucksFromPlanning = false; S.planReturn = null;
+      ["#tf-plant", "#tf-supplier", "#tf-day"].forEach((id) => ($(id).value = ""));
+      S.trucksPage = 0; S.selectedTruck = null;
+    }
+  }
   const render = { accueil: renderLaunch, historique: renderHistory, apercu: renderOverview, calendrier: renderCalendarView,
                    profils: renderProfiles, camions: renderTrucks, fournisseurs: renderSuppliers }[view];
   if (render) render();
@@ -277,29 +286,63 @@ const SHORT = { "Quantité nulle": "Sans besoin (quantité 0)", "Quantité néga
   "Date de cumul en fin de planning": "Cumul de fin de planning", "Ligne plus grande qu'un camion": "Plus grandes qu'un camion",
   "Besoin un week-end": "Besoins un week-end", "Besoin un jour férié": "Besoins un jour férié", "Fournisseur en double dans les distances": "Fournisseurs en double" };
 
+const Q_ICONS = {
+  data: '<svg viewBox="0 0 24 24"><ellipse cx="12" cy="6" rx="7" ry="3"/><path d="M5 6v6c0 1.7 3.1 3 7 3s7-1.3 7-3V6M5 12v6c0 1.7 3.1 3 7 3s7-1.3 7-3v-6"/></svg>',
+  rows: '<svg viewBox="0 0 24 24"><path d="m12 4 8 4-8 4-8-4z"/><path d="m4 12 8 4 8-4M4 16l8 4 8-4"/></svg>',
+  ok: '<svg viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>',
+  warn: '<svg viewBox="0 0 24 24"><path d="M12 4 2.8 19.5h18.4z"/><path d="M12 10v4.5M12 17.2v.1"/></svg>',
+  ko: '<svg viewBox="0 0 24 24"><path d="M7 7l10 10M17 7 7 17"/></svg>',
+};
+// level of the data from the share of valid rows (score out of 100)
+function qualityLevel(score) {
+  if (score >= 85) return ["good", "Bon niveau", "Les données sont globalement de bonne qualité et peuvent être utilisées pour l'optimisation."];
+  if (score >= 70) return ["fair", "Niveau correct", "Les données sont utilisables : une partie des lignes est rejetée ou doit être complétée."];
+  return ["poor", "À surveiller", "Beaucoup de lignes sont rejetées ou incomplètes : vérifiez les fichiers avant de vous fier aux résultats."];
+}
+function scoreRing(score) {
+  const r = 34, c = 2 * Math.PI * r;
+  return `<svg class="q-ring" viewBox="0 0 84 84" aria-hidden="true"><circle cx="42" cy="42" r="${r}" class="q-ring-bg"/>
+    <circle cx="42" cy="42" r="${r}" class="q-ring-fg" stroke-dasharray="${(c * score / 100).toFixed(1)} ${c.toFixed(1)}" transform="rotate(-90 42 42)"/></svg>`;
+}
+
 function renderQuality() {
   const box = $("#qualityPanel"), q = S.quality;
-  const head = (badge = "") => `<div class="q-head"><h3>Qualité des données</h3>${badge}</div>`;
-  if (S.qualityState === "idle") { box.innerHTML = head() + `<p class="q-empty">S'affiche dès l'import des fichiers.</p>`; return; }
-  if (S.qualityState === "loading") { box.innerHTML = head() + `<p class="q-empty q-loading">Analyse des fichiers…</p>`; return; }
-  if (S.qualityState === "error") { box.innerHTML = head(`<span class="q-badge ko">Erreur</span>`) + `<p class="q-error">${esc(S.qualityError)}</p>`; return; }
-  const m = q.missing, need = missingKinds(), done = choicesDone();
-  const badge = !q.has_missing ? `<span class="q-badge">Complètes</span>` : done ? `<span class="q-badge">Prêtes</span>` : `<span class="q-badge todo">À compléter</span>`;
-  const row = (label, value, pill = "") => `<li><span class="q-l">${label}</span>${pill}<b>${value}</b></li>`;
-  const pill = (text, todo) => `<em class="q-pill ${todo ? "todo" : ""}">${text}</em>`;
-  const loadPill = F.missing_load ? pill(F.missing_load === "full_truck" ? "camion plein" : "médiane") : pill("à choisir", true);
-  const distPill = F.missing_distance ? pill(km(F.missing_distance === "max" ? m.distance_max : m.distance_median)) : pill("à choisir", true);
-  const absent = [m.weight.rows ? row("Poids", num(m.weight.rows), loadPill) : "", m.volume.rows ? row("Volumes", num(m.volume.rows), loadPill) : "",
-    need.distance ? row(`Distances <small>${m.suppliers_without_distance.map(esc).join(", ")}</small>`, num(m.suppliers_without_distance.length), distPill) : ""].filter(Boolean);
-  const list = (rules) => q.checks.filter((c) => c.count && rules.includes(c.rule)).map((c) => row(esc(SHORT[c.label] || c.label), num(c.count)));
-  const removed = list(["DQ01", "DQ03", "DQ05"]), flagged = list(["DQ02", "DQ06"]);
-  const group = (title, rows, todo = false) => rows.length ? `<div class="q-group ${todo ? "todo" : ""}"><p class="q-sub">${title}</p><ul class="q-list">${rows.join("")}</ul></div>` : "";
-  box.innerHTML = head(badge) + `
-    <div class="q-kpis"><div><b>${num(q.lines)}</b><span>besoins</span></div><div><b>${num(q.suppliers)}</b><span>fournisseurs</span></div>
-      <div><b>${num(q.plants)}</b><span>usines</span></div></div>
-    <p class="q-period">${fmtDate(q.first_date)} → ${fmtDate(q.last_date, true)} · ${num(q.couples)} couples · ${num(q.rows_raw)} lignes lues</p>
-    ${group("Données absentes", absent, !done)}${group("Lignes retirées", removed)}${group("Signalé", flagged)}
-    ${absent.length + removed.length + flagged.length ? "" : `<p class="q-empty">Aucune anomalie.</p>`}`;
+  const head = `<div class="q-head"><span class="q-head-ico">${Q_ICONS.data}</span><h3>Qualité des données chargées</h3></div>`;
+  if (S.qualityState === "idle") { box.innerHTML = head + `<p class="q-empty">S'affiche dès l'import des fichiers.</p>`; return; }
+  if (S.qualityState === "loading") { box.innerHTML = head + `<p class="q-empty q-loading">Analyse des fichiers…</p>`; return; }
+  if (S.qualityState === "error") { box.innerHTML = head + `<p class="q-error">${esc(S.qualityError)}</p>`; return; }
+  const [level, levelLabel, levelText] = qualityLevel(q.score);
+  const pct = (n) => (100 * n) / Math.max(1, q.rows_raw);
+  const pctTxt = (n) => `${nf1.format(pct(n))} %`;
+  const tiles = [["rows", num(q.rows_raw), "Lignes importées"], ["ok", num(q.rows_valid), "Validées"],
+    ["warn", num(q.rows_to_impute), "À imputer"], ["ko", num(q.rows_rejected), "Rejetées"]];
+  const bar = [["ok", q.rows_valid], ["warn", q.rows_to_impute], ["ko", q.rows_rejected]].filter(([, n]) => n > 0)
+    .map(([kind, n]) => `<span class="q-seg ${kind}" style="flex:${n}" title="${pctTxt(n)}">${pct(n) >= 6 ? pctTxt(n) : ""}</span>`).join("");
+  // what each status means for THIS import (the missing data and the rejection reasons found)
+  const m = q.missing, need = missingKinds();
+  const missing = [m.weight.rows ? "poids" : "", m.volume.rows ? "volume" : "", need.distance ? "distance" : ""].filter(Boolean);
+  const chosen = choicesDone();
+  const imputeText = q.rows_to_impute
+    ? `${missing.length ? missing.join(", ").replace(/, ([^,]*)$/, " ou $1").replace(/^./, (s) => s.toUpperCase()) : "Donnée"} manquant${missing.length > 1 ? "s" : ""}.
+       <em class="${chosen ? "done" : "todo"}">${chosen ? "Méthode choisie dans les réglages." : "Méthode à choisir dans les réglages."}</em>`
+    : "Aucune ligne incomplète.";
+  const REJECTED = { "Quantité nulle": "quantité = 0", "Quantité négative": "quantité négative", "Quantité manquante": "quantité manquante",
+    "Date de cumul en fin de planning": "cumul de fin de planning", "Ligne plus grande qu'un camion": "plus grande qu'un camion" };
+  const reasons = q.checks.filter((c) => c.count && ["DQ01", "DQ03", "DQ05"].includes(c.rule))
+    .map((c) => `${REJECTED[c.label] || c.label.toLowerCase()} (${num(c.count)})`);
+  box.innerHTML = head + `
+    <div class="q-score">
+      <div class="q-ring-wrap">${scoreRing(q.score)}<div class="q-ring-txt"><b>${q.score}</b><span>/100</span></div></div>
+      <div class="q-level ${level}"><span class="q-level-tag">${levelLabel}</span><p>${levelText}</p></div>
+    </div>
+    <div class="q-tiles">${tiles.map(([kind, value, label]) => `<div class="q-tile ${kind}"><span class="q-tile-ico">${Q_ICONS[kind]}</span><b>${value}</b><span>${label}</span></div>`).join("")}</div>
+    <p class="q-sub">Répartition des lignes par statut</p>
+    <div class="q-bar">${bar}</div>
+    <ul class="q-legend">
+      <li><span class="q-dot ok">${Q_ICONS.ok}</span><b>Validées</b><span>Lignes complètes, prêtes pour l'optimisation.</span></li>
+      <li><span class="q-dot warn">${Q_ICONS.warn}</span><b>À imputer</b><span>${imputeText}</span></li>
+      <li><span class="q-dot ko">${Q_ICONS.ko}</span><b>Rejetées</b><span>${reasons.length ? reasons.join(", ").replace(/^./, (s) => s.toUpperCase()) + "." : "Aucune."}</span></li>
+    </ul>`;
 }
 
 function renderMissing() {
@@ -308,12 +351,13 @@ function renderMissing() {
   box.hidden = !visible;
   if (!visible) return;
   const m = q.missing, need = missingKinds();
-  const loadHint = { full_truck: "Prudent : la ligne voyage seule.", material_median: "Médiane par pièce du matériel, sinon du fournisseur." };
+  const loadHint = { full_truck: "Prudent : la ligne voyage seule.",
+    couple_median: `Médiane des lignes du même fournisseur × usine${m.weight.full_truck ? ` ; ${num(m.weight.full_truck)} lignes sans référence restent en camion plein` : ""}.` };
   const distanceHint = { max: "Prudent : chiffré au plus cher.", median: "Distance typique du planning." };
   box.classList.toggle("off", !choicesDone());
   box.innerHTML = `<p class="f-lab">Compléter les données absentes</p>
     ${need.load ? `<div class="m-row"><p class="m-q">Poids et volumes <span class="muted">${num(Math.max(m.weight.rows, m.volume.rows))} lignes</span></p>
-      <div class="chips" data-choice="missing_load"><button type="button" data-v="full_truck">Camion plein</button><button type="button" data-v="material_median">Médiane</button></div>
+      <div class="chips" data-choice="missing_load"><button type="button" data-v="full_truck">Camion plein</button><button type="button" data-v="couple_median">Médiane fournisseur × usine</button></div>
       ${F.missing_load ? `<p class="m-hint">${loadHint[F.missing_load]}</p>` : ""}</div>` : ""}
     ${need.distance ? `<div class="m-row"><p class="m-q">Distances <span class="muted">${m.suppliers_without_distance.map(esc).join(", ")}</span></p>
       <div class="chips" data-choice="missing_distance"><button type="button" data-v="max">La plus longue · ${km(m.distance_max)}</button><button type="button" data-v="median">Médiane · ${km(m.distance_median)}</button></div>
@@ -334,7 +378,8 @@ function reuseRun(id) {
   S.sourceRun = id; S.files = {}; S.example = false;
   F.anticipation = p.max_advance_days ?? DEFAULT_F.anticipation;
   F.smoothing = p.smoothing_budget ?? DEFAULT_F.smoothing;
-  S.pendingChoices = { missing_load: prep.missing_load, missing_distance: prep.missing_distance };   // applied once its quality is known
+  const load = prep.missing_load === "material_median" ? "couple_median" : prep.missing_load;   // former method of the median
+  S.pendingChoices = { missing_load: load, missing_distance: prep.missing_distance };   // applied once its quality is known
   $("#f-label").value = `${run.label} (bis)`.slice(0, 60);
   show("accueil");
 }
@@ -451,7 +496,7 @@ function renderForm() {
   const changed = Object.keys(DEFAULT_F).some((k) => F[k] !== DEFAULT_F[k]);
   $("#tuningSum").textContent = changed ? [`${F.anticipation} j d'avance`,
     F.smoothing ? `lissage ${pctTxt(F.smoothing)}` : "lissage gratuit"].join(" · ") : "par défaut : coût minimal";
-  if (F.missing_load === "material_median" || F.missing_distance === "median")   // a choice of the user: no longer "by default"
+  if (F.missing_load === "couple_median" || F.missing_distance === "median")   // a choice of the user: no longer "by default"
     $("#tuningSum").textContent = $("#tuningSum").textContent.replace("par défaut : ", "") + " · médiane si absent";
   const w = $("#tuningWarn"), warnings = [];
   if (F.anticipation !== DEFAULT_F.anticipation)
@@ -701,6 +746,7 @@ async function openRun(id, view) {
   S.summary = await api(`/runs/${id}/views/summary`);
   try { S.sit = await api(`/runs/${id}/views/situation`); } catch (_) { S.sit = null; }
   S.current = id; S.trucksPage = 0; S.selectedTruck = null; S.suppliers = [];
+  resetPlanning();
   S.run = S.runs.find((r) => r.run_id === id);
   fillFilters(); renderRunBar();
   show(view || "apercu");
@@ -867,7 +913,7 @@ function stamp(label, value, target, ok, r) {
 
 function imputationChips(run) {   // how the missing data were completed, when the user chose the medians
   const prep = (run && run.parameters && run.parameters.preparation) || {};
-  return [prep.missing_load === "material_median" ? "poids absents : médiane" : null, prep.missing_distance === "median" ? "distance absente : médiane" : null];
+  return [["couple_median", "material_median"].includes(prep.missing_load) ? "poids absents : médiane" : null, prep.missing_distance === "median" ? "distance absente : médiane" : null];
 }
 function settingsChips(run) {
   const p = planner(run), freq = p.allowed_frequencies ? Math.max(...p.allowed_frequencies) : 5;
@@ -964,18 +1010,237 @@ function imputedNote(k) {
   return `<b>${num(k.imputed_trucks)} camions</b> transportent une ligne dont le poids ou le volume manquait : ces lignes sont comptées comme un camion plein, avant comme après.`;
 }
 
+// ============================================================================= planning (GILBERT-UI-02)
+// State of the planning: selected plant ("" = every plant), week index in the horizon, open day panel.
+// It belongs to the active scenario (reset in openRun) and is restored when coming back from a truck.
+const MOIS = ["janvier", "février", "mars", "avril", "mai", "juin", "juillet", "août", "septembre", "octobre", "novembre", "décembre"];
+const JOURS_LONG = ["Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi"];
+const TRUCK_ICON = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 6h11v10H2zM13 9h4l4 4v3h-8z"/><circle cx="6" cy="18" r="2"/><circle cx="17" cy="18" r="2"/></svg>';
+function resetPlanning() {
+  S.plan = { plant: "", week: 0, drawer: null };
+  S.dayCache = new Map(); S.planToken = (S.planToken || 0) + 1; S.drawerToken = (S.drawerToken || 0) + 1;
+  S.planReturn = null; S.trucksFromPlanning = false;
+}
+const addDays = (iso, n) => { const d = new Date(iso + "T12:00:00"); d.setDate(d.getDate() + n); return d.toISOString().slice(0, 10); };
+const mondayOf = (iso) => addDays(iso, -((new Date(iso + "T12:00:00").getDay() + 6) % 7));
+const isoWeek = (iso) => {
+  const d = new Date(iso + "T12:00:00"), t = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
+  t.setUTCDate(t.getUTCDate() + 3 - ((t.getUTCDay() + 6) % 7));
+  const jan4 = new Date(Date.UTC(t.getUTCFullYear(), 0, 4));
+  return 1 + Math.round(((t - jan4) / 864e5 - 3 + ((jan4.getUTCDay() + 6) % 7)) / 7);
+};
+const longDate = (iso) => { const d = new Date(iso + "T12:00:00"); return `${JOURS_LONG[(d.getDay() + 6) % 7] || ""} ${d.getDate()} ${MOIS[d.getMonth()]} ${d.getFullYear()}`; };
+function planWeeks() { return [...new Set(S.summary.calendar.days.map(mondayOf))].sort(); }
+// trucks of one plant on one day, from the calendar of the results (null = outside the horizon)
+function dayCount(plant, iso) {
+  const cal = S.summary.calendar, r = cal.plants.indexOf(plant), c = cal.days.indexOf(iso);
+  return r < 0 || c < 0 ? null : cal.trucks[r][c];
+}
+// same rule as the heatmap: the busiest day of the plant, unless the plant is flat (more than two days at its maximum)
+function isPeak(plant, iso) {
+  const cal = S.summary.calendar, row = cal.trucks[cal.plants.indexOf(plant)];
+  if (!row) return false;
+  const max = Math.max(...row), v = dayCount(plant, iso);
+  return !!v && v === max && row.filter((x) => x === max).length <= 2;
+}
+// every truck of a plant on a day: the trucks endpoint is paginated, so the pages are read until the total
+function fetchDayTrucks(plant, day) {
+  const run = S.current, key = `${run}|${plant}|${day}`;
+  if (!S.dayCache.has(key)) {
+    const job = (async () => {
+      const rows = [];
+      for (let offset = 0, total = Infinity; offset < total; offset += 500) {
+        const p = new URLSearchParams({ plant, day, limit: 500, offset });
+        const res = await api(`/runs/${run}/views/trucks?${p}`);
+        total = res.total; rows.push(...res.rows);
+        if (!res.rows.length) break;
+      }
+      return rows;
+    })();
+    job.catch(() => S.dayCache.delete(key));   // a failed request is not kept
+    S.dayCache.set(key, job);
+  }
+  return S.dayCache.get(key);
+}
+
+function renderPlantTabs() {
+  const plants = S.summary.calendar.plants, cur = S.plan.plant;
+  $("#plantTabs").innerHTML = [["", "Toutes les usines"], ...plants.map((p) => [p, p])].map(([v, l]) =>
+    `<button type="button" role="tab" data-plant="${esc(v)}" aria-selected="${v === cur}" class="${v === cur ? "on" : ""}">${esc(l)}</button>`).join("");
+}
+function selectPlant(plant) {
+  if (plant === S.plan.plant) return;
+  S.plan.plant = plant; S.planToken++;
+  renderCalendarView({ keepScroll: true });
+}
+$("#plantTabs").addEventListener("click", (e) => { const b = e.target.closest("button[data-plant]"); if (b) selectPlant(b.dataset.plant); });
+$("#plantTabs").addEventListener("keydown", (e) => {   // arrows move between the tabs
+  if (!["ArrowLeft", "ArrowRight"].includes(e.key)) return;
+  const tabs = $$("#plantTabs button"), i = tabs.indexOf(document.activeElement);
+  if (i < 0) return;
+  const next = tabs[(i + (e.key === "ArrowRight" ? 1 : -1) + tabs.length) % tabs.length];
+  next.focus(); selectPlant(next.dataset.plant);
+});
+
 function renderCalendarView() {
   const sm = S.summary;
-  setTimeout(() => countUp($("#peaks")), 0);
-  $("#calendarBig").innerHTML = calendarSvg(sm.calendar) +
-    `<div class="legend" style="margin-top:1rem"><span class="l-scale">peu à beaucoup de camions</span><span class="l-peak">jour de pointe de l'usine</span></div>`;
-  const maxAll = Math.max(...sm.plants.map((p) => p.peak));
-  $("#peaks").innerHTML = sm.plants.map((p) => {
-    const r = sm.calendar.trucks[sm.calendar.plants.indexOf(p.plant)], d = sm.calendar.days[r.indexOf(p.peak)];
-    return `<div class="peak ${p.peak === maxAll ? "hot" : ""}"><p class="label">${p.plant}</p><div class="pk-n">${counter(p.peak)} camions</div>
-      <div class="meta" style="margin:0">au plus, le ${dayLabel(d)} · ${num(p.trucks_after)} sur l'horizon</div></div>`;
-  }).join("");
+  if (!S.plan) resetPlanning();
+  renderPlantTabs();
+  const global = !S.plan.plant;
+  $("#planGlobal").hidden = !global; $("#planWeek").hidden = global;
+  const pane = global ? $("#planGlobal") : $("#planWeek");
+  pane.classList.remove("in"); void pane.offsetWidth; pane.classList.add("in");   // short fade between the views
+  if (global) {
+    setTimeout(() => countUp($("#peaks")), 0);
+    $("#calendarBig").innerHTML = calendarSvg(sm.calendar) +
+      `<div class="legend" style="margin-top:1rem"><span class="l-scale">peu à beaucoup de camions</span><span class="l-peak">jour de pointe de l'usine</span></div>`;
+    const maxAll = Math.max(...sm.plants.map((p) => p.peak));
+    $("#peaks").innerHTML = sm.plants.map((p) => {
+      const r = sm.calendar.trucks[sm.calendar.plants.indexOf(p.plant)], d = sm.calendar.days[r.indexOf(p.peak)];
+      return `<div class="peak ${p.peak === maxAll ? "hot" : ""}" role="button" tabindex="0" data-plant="${esc(p.plant)}" aria-label="Voir le planning de ${esc(p.plant)}">
+        <p class="label">${p.plant}</p><div class="pk-n">${counter(p.peak)} camions</div>
+        <div class="meta" style="margin:0">au plus, le ${dayLabel(d)} · ${num(p.trucks_after)} sur l'horizon</div></div>`;
+    }).join("");
+  } else renderWeek();
+  if (S.plan.drawer) openDayDrawer(S.plan.drawer.plant, S.plan.drawer.day);   // restored context
 }
+// peak cards
+$("#peaks").addEventListener("click", (e) => { const c = e.target.closest(".peak[data-plant]"); if (c) selectPlant(c.dataset.plant); });
+$("#peaks").addEventListener("keydown", (e) => {
+  const c = e.target.closest(".peak[data-plant]");
+  if (c && (e.key === "Enter" || e.key === " ")) { e.preventDefault(); selectPlant(c.dataset.plant); }
+});
+
+// ---- weekly planning of one plant
+function truckCard(t) {
+  return `<button type="button" class="truck-card" data-truck="${esc(t.id)}" data-plant="${esc(t.plant)}" data-day="${t.date}" data-supplier="${esc(t.supplier)}">
+    <span class="tc-ico">${TRUCK_ICON}</span>
+    <span class="tc-body"><b>${esc(t.supplier)}</b><span class="tc-id">${esc(t.id)}</span>
+      <span class="tc-meta">${num(t.kg)} kg · ${nf1.format(t.fill)} % de remplissage</span>
+      <span class="tc-bar"><i style="width:${Math.min(100, t.fill).toFixed(1)}%"></i></span></span></button>`;
+}
+function renderWeek() {
+  const plant = S.plan.plant, weeks = planWeeks();
+  S.plan.week = Math.max(0, Math.min(weeks.length - 1, S.plan.week));
+  const mon = weeks[S.plan.week], days = [0, 1, 2, 3, 4].map((k) => addDays(mon, k));
+  const counts = days.map((d) => dayCount(plant, d)), total = counts.reduce((a, v) => a + (v || 0), 0);
+  const d0 = new Date(days[0] + "T12:00:00"), d4 = new Date(days[4] + "T12:00:00");
+  const range = d0.getMonth() === d4.getMonth() ? `${d0.getDate()} – ${d4.getDate()} ${MOIS[d4.getMonth()]} ${d4.getFullYear()}`
+    : `${d0.getDate()} ${MOIS[d0.getMonth()]} – ${d4.getDate()} ${MOIS[d4.getMonth()]} ${d4.getFullYear()}`;
+  $("#planWeek").innerHTML = `<div class="ed-card week-card">
+    <div class="week-head">
+      <div><h2>${esc(plant)} — Semaine ${isoWeek(mon)}</h2><p class="ed-muted">${num(total)} camion${total > 1 ? "s" : ""} attendu${total > 1 ? "s" : ""} cette semaine</p></div>
+      <div class="week-nav">
+        <button type="button" class="ed-btn small" id="weekPrev" aria-label="Semaine précédente" ${S.plan.week === 0 ? "disabled" : ""}>‹</button>
+        <span class="week-range">${range}</span>
+        <button type="button" class="ed-btn small" id="weekNext" aria-label="Semaine suivante" ${S.plan.week >= weeks.length - 1 ? "disabled" : ""}>›</button>
+      </div>
+    </div>
+    <div class="week-scroll"><div class="week-grid">${days.map((d, k) => {
+      const v = counts[k], out = v === null, peak = !out && isPeak(plant, d);
+      return `<div class="day-col ${out ? "out" : ""}" data-day="${d}">
+        <div class="day-head ${peak ? "peak" : ""}"><b>${JOURS_LONG[k]} ${new Date(d + "T12:00:00").getDate()}</b>
+          <span>${out ? "hors horizon" : `${num(v)} camion${v > 1 ? "s" : ""}`}</span>${peak ? '<em>jour de pointe</em>' : ""}</div>
+        <div class="day-body">${out ? '<p class="day-empty">Hors de l\'horizon du planning</p>' : v === 0 ? '<p class="day-empty">Aucune réception prévue</p>'
+          : Array.from({ length: Math.min(3, v) }, () => '<span class="tc-skel"></span>').join("")}</div></div>`;
+    }).join("")}</div></div></div>`;
+  $("#weekPrev").onclick = () => { S.plan.week--; S.planToken++; renderCalendarView(); };
+  $("#weekNext").onclick = () => { S.plan.week++; S.planToken++; renderCalendarView(); };
+  const token = ++S.planToken;
+  days.forEach(async (d, k) => {
+    if (!counts[k]) return;
+    const body = $(`#planWeek .day-col[data-day="${d}"] .day-body`);
+    try {
+      const rows = await fetchDayTrucks(plant, d);
+      if (token !== S.planToken || !body.isConnected) return;   // an older answer: the user has moved on
+      const more = rows.length - 3;
+      body.innerHTML = rows.slice(0, 3).map(truckCard).join("") +
+        (more > 0 ? `<button type="button" class="day-more" data-plant="${esc(plant)}" data-day="${d}">${more > 1 ? `Voir les ${more} autres camions` : "Voir 1 autre camion"}</button>` : "");
+    } catch (err) {
+      if (token === S.planToken && body.isConnected) body.innerHTML = `<p class="day-empty err">Camions indisponibles : ${esc(err.message)}</p>`;
+    }
+  });
+}
+$("#planWeek").addEventListener("click", (e) => {
+  const card = e.target.closest(".truck-card"), more = e.target.closest(".day-more");
+  if (card) openTruckFromPlanning(card.dataset.truck, card.dataset.plant, card.dataset.day, card.dataset.supplier);
+  else if (more) openDayDrawer(more.dataset.plant, more.dataset.day);
+});
+
+// ---- day panel: every truck of a plant on one day ("Voir les X autres camions")
+let drawerLastFocus = null;
+async function openDayDrawer(plant, day) {
+  const v = dayCount(plant, day);
+  if (v === null) return;   // outside the horizon: no panel
+  S.plan.drawer = { plant, day };
+  const box = $("#dayDrawer"), token = ++S.drawerToken;
+  if (box.hidden) drawerLastFocus = document.activeElement;
+  box.hidden = false; requestAnimationFrame(() => box.classList.add("on"));
+  $("#ddPlant").textContent = plant;
+  $("#ddTitle").textContent = `${plant} — Réceptions attendues`;
+  $("#ddDate").textContent = longDate(day);
+  const peak = isPeak(plant, day);
+  $("#ddSummary").innerHTML = `<b>${num(v)} camion${v > 1 ? "s" : ""}</b>${peak ? '<span class="dd-peak">Jour de pointe de l\'usine</span>' : ""}`;
+  $("#ddList").innerHTML = v === 0 ? '<p class="day-empty">Aucune réception prévue</p>' : '<p class="dd-loading">Chargement des camions…</p>';
+  $("#ddClose").focus();
+  if (v === 0) return;
+  try {
+    const rows = await fetchDayTrucks(plant, day);
+    if (token !== S.drawerToken) return;
+    S.drawerRows = rows; renderDrawerList();
+  } catch (err) {
+    if (token === S.drawerToken) $("#ddList").innerHTML = `<p class="day-empty err">Impossible de charger les camions : ${esc(err.message)}</p>`;
+  }
+}
+function renderDrawerList() {
+  const rows = S.drawerRows || [];
+  $("#ddList").innerHTML = (rows.length ? rows.map((t) => `<button type="button" class="dd-row" data-truck="${esc(t.id)}" data-plant="${esc(t.plant)}" data-day="${t.date}" data-supplier="${esc(t.supplier)}">
+      <span class="tc-ico">${TRUCK_ICON}</span>
+      <span class="dd-main"><b>${esc(t.id)}</b><span>${esc(t.supplier)} · ${num(t.lines)} ligne${t.lines > 1 ? "s" : ""}</span></span>
+      <span class="dd-nums"><span>${num(t.kg)} kg · ${nf1.format(t.m3)} m³</span><span>${nf1.format(t.fill)} % · ${eur(t.price, 2)}</span></span></button>`).join("")
+      : '<p class="day-empty">Aucune réception prévue</p>');
+}
+function hideDrawer() {
+  const box = $("#dayDrawer");
+  if (box.hidden) return;
+  box.classList.remove("on"); box.hidden = true; S.drawerToken++;
+}
+function closeDayDrawer() {
+  S.plan.drawer = null; hideDrawer();
+  if (drawerLastFocus && drawerLastFocus.isConnected) drawerLastFocus.focus();
+}
+$("#ddClose").addEventListener("click", closeDayDrawer);
+$("#dayDrawer").addEventListener("click", (e) => { if (e.target.id === "dayDrawer") closeDayDrawer(); });   // click outside the panel
+document.addEventListener("keydown", (e) => { if (e.key === "Escape" && !$("#dayDrawer").hidden) closeDayDrawer(); });
+$("#ddList").addEventListener("click", (e) => { const r = e.target.closest(".dd-row"); if (r) openTruckFromPlanning(r.dataset.truck, r.dataset.plant, r.dataset.day, r.dataset.supplier); });
+
+// ---- from the planning to the delivery note of a truck, and back
+async function openTruckFromPlanning(id, plant, day, supplier = "") {
+  S.planReturn = { run: S.current, plan: JSON.parse(JSON.stringify(S.plan)), scrollY: window.scrollY };
+  // the Camions table filtered on this plant and day; the page that holds the truck is looked up (it may not be the first)
+  // the Camions table shows this truck only: filtered on its plant, its day and its supplier
+  $("#tf-plant").value = plant; $("#tf-supplier").value = supplier; $("#tf-day").value = day;
+  if ($("#tf-supplier").value !== supplier) $("#tf-supplier").value = "";   // supplier missing from the list: plant and day only
+  let page = 0;
+  try {
+    for (let k = 0; ; k++) {
+      const res = await api(`/runs/${S.current}/views/trucks?${new URLSearchParams({ plant, day, ...($("#tf-supplier").value ? { supplier } : {}), limit: 60, offset: k * 60 })}`);
+      if (res.rows.some((r) => r.id === id)) { page = k; break; }
+      if ((k + 1) * 60 >= res.total) break;
+    }
+  } catch (_) { /* the table will show the first page */ }
+  S.trucksPage = page; S.selectedTruck = id; S.trucksFromPlanning = true;
+  show("camions", { fromPlanning: true });
+  await openTruck(id);
+  const ticket = $("#ticket");
+  if (ticket && ticket.getBoundingClientRect().top > window.innerHeight * 0.6) ticket.scrollIntoView({ behavior: "smooth", block: "start" });
+}
+$("#backToPlanning").addEventListener("click", () => {
+  const ret = S.planReturn;
+  if (ret && ret.run === S.current) S.plan = ret.plan;   // plant, week, open day panel and its search
+  show("calendrier");
+  if (ret && ret.run === S.current) requestAnimationFrame(() => window.scrollTo({ top: ret.scrollY }));
+});
 
 function table(cols, rows, { onRow, selected } = {}) {
   const head = cols.map((c) => `<th class="${c.num ? "num" : ""}">${c.label}</th>`).join("");

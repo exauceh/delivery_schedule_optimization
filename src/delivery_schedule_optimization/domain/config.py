@@ -11,7 +11,7 @@ DAY_NAMES = ("lundi", "mardi", "mercredi", "jeudi", "vendredi")
 COUPLE = ["supplier_id", "plant"]
 
 # How missing data are completed (DQ04, DQ07). The first value of each is the prudent choice of Milestone 1 (H05, H06).
-MissingLoad = Literal["full_truck", "material_median"]  # a full truck / quantity x median per piece of the same material
+MissingLoad = Literal["full_truck", "couple_median"]  # a full truck / median line of the same supplier x plant couple
 MissingDistance = Literal["max", "median"]  # longest / median distance of the planning suppliers
 
 
@@ -53,8 +53,9 @@ class PreparationConfig:
     """
 
     # DQ04: missing or non-positive weight / volume of a line. "full_truck" = the capacity of one truck (the line travels
-    # alone); "material_median" = quantity x median weight (volume) per piece of the same material on its known lines,
-    # else the median line of its supplier, else a full truck; never more than one truck.
+    # alone); "couple_median" = the median weight (volume) of the known lines of the same supplier x plant couple, else a
+    # full truck. (The weight of a line is not proportional to its quantity, and most materials with a missing weight
+    # have no known weight at all: the couple is the reference.)
     missing_load: MissingLoad = "full_truck"
     # DQ07: supplier of the planning without a distance. "max" = the longest, "median" = the median distance of the
     # planning suppliers that have one.

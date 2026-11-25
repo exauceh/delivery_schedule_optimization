@@ -158,8 +158,12 @@
   <section class="view" id="view-calendrier">
     <div class="view-head"><div><p class="kicker">Planning</p><h2>Les camions reçus par usine, jour par jour</h2>
       <p class="meta">Chaque case est une usine un jour donné. Le jour le plus chargé de chaque usine ressort en orange.</p></div></div>
-    <div class="panel"><div id="calendarBig"></div></div>
-    <div class="peaks" id="peaks"></div>
+    <div class="plant-tabs" id="plantTabs" role="tablist" aria-label="Choisir une usine"></div>
+    <div class="plan-pane" id="planGlobal">
+      <div class="panel"><div id="calendarBig"></div></div>
+      <div class="peaks" id="peaks"></div>
+    </div>
+    <div class="plan-pane" id="planWeek" hidden></div>
   </section>
 
   <!-- ======================================================== PROFILES -->
@@ -180,7 +184,8 @@
 
   <!-- ======================================================== TRUCKS -->
   <section class="view" id="view-camions">
-    <div class="view-head"><div><p class="kicker">Détail des camions</p><h2>Ce que contient chaque camion</h2></div></div>
+    <div class="view-head"><div><button type="button" class="ed-btn small back-plan" id="backToPlanning" hidden>← Retour au planning</button>
+      <p class="kicker">Détail des camions</p><h2>Ce que contient chaque camion</h2></div></div>
     <div class="split trucks-split">
       <div class="panel">
         <div class="filters">
@@ -213,6 +218,16 @@
 
 <div class="tooltip" id="tooltip" role="tooltip"></div>
 <div class="toast" id="toast" role="status"></div>
+<div class="drawer" id="dayDrawer" hidden>
+  <aside class="drawer-panel" role="dialog" aria-modal="true" aria-labelledby="ddTitle">
+    <div class="dd-head">
+      <div><p class="ed-eyebrow" id="ddPlant"></p><h2 id="ddTitle">Réceptions attendues</h2><p class="dd-date" id="ddDate"></p></div>
+      <button type="button" class="dd-close" id="ddClose" aria-label="Fermer le panneau">×</button>
+    </div>
+    <div class="dd-summary" id="ddSummary"></div>
+    <div class="dd-list" id="ddList" aria-live="polite"></div>
+  </aside>
+</div>
 <script src="app.js"></script>
 </body>
 </html>

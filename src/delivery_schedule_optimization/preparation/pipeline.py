@@ -9,7 +9,7 @@ import pandas as pd
 
 from ..domain.config import PlannerConfig, PreparationConfig
 from .cleaning import KEY_COLUMNS, check_unique_needs, clean_distances, drop_larger_than_truck, drop_tail, drop_without_need, flag_non_working_days
-from .imputation import impute_full_truck, impute_material_median, supplier_distances
+from .imputation import impute_couple_median, impute_full_truck, supplier_distances
 from .quality import AnomalyRegister, accuracy
 
 logger = logging.getLogger(__name__)
@@ -28,7 +28,7 @@ class PreparedData:
 def prepare(schedule_raw: pd.DataFrame, distances_raw: pd.DataFrame, planner: PlannerConfig, config: PreparationConfig) -> PreparedData:
     """Clean the raw planning, complete the missing values and join the distances.
 
-    Steps (Milestone 1): DQ01 needs only, DQ03 cumulative tail, DQ02 flags, DQ04 imputation (full truck or material
+    Steps (Milestone 1): DQ01 needs only, DQ03 cumulative tail, DQ02 flags, DQ04 imputation (full truck or couple
     median, `config.missing_load`), DQ05 lines larger than a truck, DQ06 / DQ07 distances (`config.missing_distance`).
     The consolidated dataset keeps the line identity,
     the quantity, the load and the distance.
@@ -38,7 +38,7 @@ def prepare(schedule_raw: pd.DataFrame, distances_raw: pd.DataFrame, planner: Pl
     schedule = drop_without_need(schedule, register)
     schedule = drop_tail(schedule, config, register)
     flag_non_working_days(schedule, planner, register)  # after DQ03: the cumulative date is not a delivery day
-    impute = impute_full_truck if config.missing_load == "full_truck" else impute_material_median
+    impute = impute_full_truck if config.missing_load == "full_truck" else impute_couple_median
     schedule = impute(schedule, "weight", planner.truck_kg, register)
     schedule = impute(schedule, "volume", planner.truck_m3, register)
     schedule = drop_larger_than_truck(schedule, planner, register)

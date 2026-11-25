@@ -309,8 +309,8 @@ ANOMALIES: list[tuple[str, str, str, str, str]] = [
     ("DQ02", "flagged and kept (no delivery on", "Besoin un jour férié", "gardé : livré un jour ouvré avant", "info"),
     ("DQ03", "no cumulative date", "Date de cumul en fin de planning", "aucune", "info"),
     ("DQ03", "dropped (date", "Date de cumul en fin de planning", "lignes retirées : besoins cumulés après l'horizon", "corrige"),
-    ("DQ04", "weight imputed (material median", "Poids manquant ou nul", "complété par la médiane du même matériel", "corrige"),
-    ("DQ04", "volume imputed (material median", "Volume manquant ou nul", "complété par la médiane du même matériel", "corrige"),
+    ("DQ04", "weight imputed (couple median", "Poids manquant ou nul", "complété par la médiane du couple fournisseur × usine", "corrige"),
+    ("DQ04", "volume imputed (couple median", "Volume manquant ou nul", "complété par la médiane du couple fournisseur × usine", "corrige"),
     ("DQ04", "weight imputed", "Poids manquant ou nul", "complété par un camion plein (24 500 kg)", "corrige"),
     ("DQ04", "volume imputed", "Volume manquant ou nul", "complété par un camion plein (110,4 m³)", "corrige"),
     ("DQ05", "dropped", "Ligne plus grande qu'un camion", "lignes retirées", "corrige"),
@@ -340,7 +340,7 @@ def rules(manifest: RunManifest) -> list[str]:
     preparation = manifest.parameters.get("preparation")
     preparation = preparation if isinstance(preparation, dict) else {}
     load = ("complété par un camion plein : la ligne voyage seule" if preparation.get("missing_load", "full_truck") == "full_truck"
-            else "complété par la quantité × la médiane par pièce du même matériel (à défaut, la ligne médiane du fournisseur)")
+            else "complété par la médiane des lignes du même couple fournisseur × usine (à défaut, un camion plein)")
     distance = "la plus longue" if preparation.get("missing_distance", "max") == "max" else "la distance médiane"
     return [
         "Les lignes à quantité nulle, négative ou manquante sont retirées : elles ne portent aucun besoin.",

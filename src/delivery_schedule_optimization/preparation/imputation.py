@@ -1,7 +1,7 @@
 """Imputation of the missing values (Milestone 1, DQ04 and DQ07).
 
 The prudent choice (H05, H06): a full truck and the longest distance. The alternative, chosen by the user: medians of the
-known values (per piece of the same material for a load, of the planning suppliers for a distance).
+known values (lines of the same supplier x plant couple for a load, planning suppliers for a distance).
 """
 
 from __future__ import annotations
@@ -10,7 +10,7 @@ import logging
 
 import pandas as pd
 
-from ..domain.config import MissingDistance
+from ..domain.config import COUPLE, MissingDistance
 from .quality import AnomalyRegister
 
 logger = logging.getLogger(__name__)
@@ -30,30 +30,24 @@ def impute_full_truck(schedule: pd.DataFrame, column: str, capacity: float, regi
     return result
 
 
-def impute_material_median(schedule: pd.DataFrame, column: str, capacity: float, register: AnomalyRegister) -> pd.DataFrame:
-    """DQ04, median variant: a missing or non-positive weight or volume becomes quantity x the median per piece of the
-    same material on its known lines; a material without any known line gets the median line of its supplier, and a
-    supplier without any, a full truck. Never more than one truck.
+def impute_couple_median(schedule: pd.DataFrame, column: str, capacity: float, register: AnomalyRegister) -> pd.DataFrame:
+    """DQ04, median variant: a missing or non-positive weight or volume becomes the median of the known lines of the same
+    supplier x plant couple; a couple without any known line gets a full truck.
 
     Adds `<column>_imputed` (True on the completed rows).
     """
     result = schedule.copy()
     needs = result[column].isna() | (result[column] <= 0)
     known = result.loc[~needs]
-    per_piece = (known[column] / known["schedule_quantity"]).groupby(known["material"]).median()
-    supplier_line = known.groupby("supplier_id")[column].median()
-    from_material = result["material"].map(per_piece) * result["schedule_quantity"]
-    from_supplier = result["supplier_id"].map(supplier_line)
-    value = from_material.fillna(from_supplier).fillna(capacity).clip(upper=capacity)
-    by_material = needs & from_material.notna()
-    by_supplier = needs & from_material.isna() & from_supplier.notna()
-    full_truck = needs & ~by_material & ~by_supplier
-    result.loc[needs, column] = value[needs]
+    couple_line = known.groupby(COUPLE)[column].median()
+    from_couple = pd.Series(pd.MultiIndex.from_frame(result[COUPLE]).map(couple_line.to_dict()), index=result.index, dtype=float)
+    by_couple = needs & from_couple.notna()
+    full_truck = needs & ~by_couple
+    result.loc[needs, column] = from_couple.fillna(capacity).clip(upper=capacity)[needs]
     result[f"{column}_imputed"] = needs
-    register.missing_loads[column] = {"material": int(by_material.sum()), "supplier": int(by_supplier.sum()), "full_truck": int(full_truck.sum())}
+    register.missing_loads[column] = {"couple": int(by_couple.sum()), "full_truck": int(full_truck.sum())}
     register.add("DQ04", "schedule", "warning", int(needs.sum()),
-                 f"{column} imputed (material median: {int(by_material.sum())} rows, supplier median: {int(by_supplier.sum())}, "
-                 f"full truck: {int(full_truck.sum())})")
+                 f"{column} imputed (couple median: {int(by_couple.sum())} rows, full truck: {int(full_truck.sum())})")
     return result
 
 

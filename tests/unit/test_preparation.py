@@ -12,7 +12,7 @@ from delivery_schedule_optimization.domain.config import PlannerConfig, Preparat
 from delivery_schedule_optimization.io.readers import read_distances, read_schedule
 from delivery_schedule_optimization.io.schemas import InputName
 from delivery_schedule_optimization.preparation.cleaning import tail_date
-from delivery_schedule_optimization.preparation.imputation import impute_full_truck, impute_material_median, supplier_distances
+from delivery_schedule_optimization.preparation.imputation import impute_couple_median, impute_full_truck, supplier_distances
 from delivery_schedule_optimization.preparation.pipeline import prepare
 from delivery_schedule_optimization.preparation.quality import AnomalyRegister
 
@@ -52,19 +52,22 @@ def test_missing_distance_gets_the_longest_planning_distance() -> None:
     assert result.loc["C", "distance"] == 80.0 and bool(result.loc["C", "distance_imputed"])
 
 
-def test_missing_load_from_the_median_of_the_material() -> None:
-    """Material median, else the median line of the supplier, else a full truck; never more than one truck."""
+def test_missing_load_from_the_median_of_the_couple() -> None:
+    """Median of the known lines of the same supplier x plant couple (whatever the material and the quantity), else a
+    full truck; never more than one truck."""
     schedule = pd.DataFrame({
-        "supplier_id": ["S", "S", "S", "S", "S", "T", "S"],
-        "material": ["A", "A", "A", "B", "C", "D", "A"],
-        "schedule_quantity": [10.0, 30.0, 5.0, 4.0, 1.0, 2.0, 100_000.0],
-        "weight": [20.0, 30.0, np.nan, np.nan, 100.0, 0.0, np.nan],  # A: 2 and 1 kg per piece, median 1.5
+        "supplier_id": ["S", "S", "S", "S", "S", "S", "T", "U"],
+        "plant": ["P", "P", "P", "P", "Q", "Q", "P", "P"],
+        "material": ["A", "B", "C", "A", "A", "B", "D", "E"],
+        "schedule_quantity": [10.0, 30.0, 5.0, 4.0, 1.0, 2.0, 7.0, 3.0],
+        "weight": [20.0, 30.0, 100.0, np.nan, 50_000.0, 0.0, np.nan, 12.0],
     })
     register = AnomalyRegister()
-    result = impute_material_median(schedule, "weight", 24_500.0, register)
-    assert result["weight"].tolist() == [20.0, 30.0, 7.5, 30.0, 100.0, 24_500.0, 24_500.0]  # B: median line of S (20, 30, 100)
-    assert result["weight_imputed"].tolist() == [False, False, True, True, False, True, True]
-    assert register.missing_loads["weight"] == {"material": 2, "supplier": 1, "full_truck": 1}
+    result = impute_couple_median(schedule, "weight", 24_500.0, register)
+    # S x P: median of 20, 30, 100; S x Q: its only known line, capped at one truck; T x P: no known line, a full truck
+    assert result["weight"].tolist() == [20.0, 30.0, 100.0, 30.0, 50_000.0, 24_500.0, 24_500.0, 12.0]
+    assert result["weight_imputed"].tolist() == [False, False, False, True, False, True, True, False]
+    assert register.missing_loads["weight"] == {"couple": 2, "full_truck": 1}
 
 
 def test_missing_distance_can_get_the_median_distance() -> None:

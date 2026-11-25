@@ -18,7 +18,7 @@ class AnomalyRegister:
 
     entries: list[dict[str, object]] = field(default_factory=list)
     # missing data and how they were completed (shown by the data quality report of the interface)
-    missing_loads: dict[str, dict[str, int]] = field(default_factory=dict)  # column -> rows per source (material, supplier, full_truck)
+    missing_loads: dict[str, dict[str, int]] = field(default_factory=dict)  # column -> rows per source (couple, full_truck)
     missing_distances: list[str] = field(default_factory=list)  # suppliers of the planning without a distance
     distance_fallbacks: dict[str, float] = field(default_factory=dict)  # "max" and "median" distance of the planning suppliers (km)
 

@@ -89,6 +89,24 @@ def test_trucks_profiles_and_suppliers(client: TestClient, run_id: str) -> None:
     assert sum(s["saving"] for s in suppliers) == pytest.approx(client.get(f"{base}/summary").json()["kpi"]["saving"])
 
 
+def test_planning_cells_match_the_trucks(client: TestClient, run_id: str) -> None:
+    """Planning per plant: every calendar cell = the trucks the API returns for that plant and day, read page by page
+    (the weekly totals and the day panel of the interface are built from these two sources)."""
+    base = f"/api/runs/{run_id}/views"
+    calendar = client.get(f"{base}/summary").json()["calendar"]
+    for r, plant in enumerate(calendar["plants"]):
+        for c, day in enumerate(calendar["days"]):
+            rows: list[dict] = []
+            total, offset = None, 0
+            while total is None or offset < total:
+                page = client.get(f"{base}/trucks", params={"plant": plant, "day": day, "limit": 7, "offset": offset}).json()
+                total, offset = page["total"], offset + 7
+                rows += page["rows"]
+            assert len(rows) == total == calendar["trucks"][r][c], (plant, day)
+            assert len({t["id"] for t in rows}) == len(rows)
+            assert all(t["plant"] == plant and t["date"] == day for t in rows)
+
+
 def test_excel_report(client: TestClient, run_id: str) -> None:
     response = client.get(f"/api/runs/{run_id}/excel")
     assert response.status_code == 200
@@ -136,6 +154,8 @@ def test_data_quality_before_the_launch(client: TestClient, run_id: str, small_i
     assert quality == client.get("/api/quality/example").json() == client.get(f"/api/runs/{run_id}/quality").json()  # same files
     run = client.get(f"/api/runs/{run_id}").json()
     assert quality["lines"] == run["kpis"]["lines"] and quality["rows_raw"] > quality["lines"]
+    assert quality["rows_valid"] + quality["rows_to_impute"] + quality["rows_rejected"] == quality["rows_raw"]
+    assert quality["rows_to_impute"] >= 1 and 0 <= quality["score"] <= 100  # SUP_00130 has no distance
     missing = quality["missing"]
     assert missing["suppliers_without_distance"] == ["SUP_00130"] and quality["has_missing"]
     assert missing["distance_median"] <= missing["distance_max"]
@@ -147,7 +167,7 @@ def test_data_quality_before_the_launch(client: TestClient, run_id: str, small_i
 
 def test_run_with_the_median_imputation(client: TestClient, run_id: str) -> None:
     response = client.post(f"/api/runs/{run_id}/rerun", data={
-        "label": "Médianes", "parameters": json.dumps({"preparation": {"missing_load": "material_median", "missing_distance": "median"}})})
+        "label": "Médianes", "parameters": json.dumps({"preparation": {"missing_load": "couple_median", "missing_distance": "median"}})})
     rerun = response.json()
     assert rerun["status"] == "succeeded" and rerun["checks_passed"], rerun.get("error")  # H06 checks the median distance
     assert rerun["parameters"]["preparation"]["missing_distance"] == "median"

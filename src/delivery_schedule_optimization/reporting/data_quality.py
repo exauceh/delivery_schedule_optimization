@@ -24,9 +24,8 @@ class LoadSources(BaseModel):
     """How the missing loads (weight or volume) of one column would be completed with the median method."""
 
     rows: int  # lines without this value
-    material: int  # completed by the median per piece of the same material
-    supplier: int  # by the median line of the supplier (no known line of the material)
-    full_truck: int  # by a full truck (no known line of the supplier either)
+    couple: int  # completed by the median line of the same supplier x plant couple
+    full_truck: int  # by a full truck (no known line for the couple)
 
 
 class MissingData(BaseModel):
@@ -44,6 +43,11 @@ class MissingData(BaseModel):
 class DataQuality(BaseModel):
     rows_raw: int  # rows of the released schedule
     lines: int  # needs kept after the preparation
+    # every imported row is in exactly one status: valid, to impute (kept, a weight, volume or distance is missing), rejected
+    rows_valid: int
+    rows_to_impute: int
+    rows_rejected: int  # no need (quantity 0 or less), cumulative tail, larger than a truck
+    score: int  # share of valid rows, out of 100
     suppliers: int
     plants: int
     couples: int
@@ -57,15 +61,14 @@ class DataQuality(BaseModel):
 
 def _sources(loads: dict[str, dict[str, int]], column: str) -> LoadSources:
     median = loads.get(column, {})
-    return LoadSources(rows=sum(median.values()), material=median.get("material", 0), supplier=median.get("supplier", 0),
-                       full_truck=median.get("full_truck", 0))
+    return LoadSources(rows=sum(median.values()), couple=median.get("couple", 0), full_truck=median.get("full_truck", 0))
 
 
 def data_quality(schedule_raw: pd.DataFrame, distances_raw: pd.DataFrame, planner: PlannerConfig | None = None) -> DataQuality:
     """Quality report of the raw schedule and distances (raises ValueError when nothing can be planned)."""
     planner = planner or PlannerConfig()
     prudent = prepare(schedule_raw, distances_raw, planner, PreparationConfig())
-    median = prepare(schedule_raw, distances_raw, planner, PreparationConfig(missing_load="material_median", missing_distance="median"))
+    median = prepare(schedule_raw, distances_raw, planner, PreparationConfig(missing_load="couple_median", missing_distance="median"))
     lines = prudent.consolidated
     register = median.register
     missing = MissingData(weight=_sources(register.missing_loads, "weight"), volume=_sources(register.missing_loads, "volume"),
@@ -78,8 +81,11 @@ def data_quality(schedule_raw: pd.DataFrame, distances_raw: pd.DataFrame, planne
         if found.rule in ("DQ04", "DQ07") and found.count:  # the treatment depends on the choice of the user
             found = found.model_copy(update={"treatment": TO_CHOOSE})
         checks.append(found)
+    to_impute = int(prudent.accuracy.get("rows_modified", 0.0))
     report = DataQuality(
-        rows_raw=len(schedule_raw), lines=len(lines), suppliers=int(lines["supplier_id"].nunique()), plants=int(lines["plant"].nunique()),
+        rows_raw=len(schedule_raw), lines=len(lines), rows_valid=len(lines) - to_impute, rows_to_impute=to_impute,
+        rows_rejected=len(schedule_raw) - len(lines), score=round(100 * (len(lines) - to_impute) / max(1, len(schedule_raw))),
+        suppliers=int(lines["supplier_id"].nunique()), plants=int(lines["plant"].nunique()),
         couples=len(lines.drop_duplicates(COUPLE)), materials=int(lines["material"].nunique()),
         first_date=pd.Timestamp(lines["date"].min()).date().isoformat(), last_date=pd.Timestamp(lines["date"].max()).date().isoformat(),
         checks=checks, missing=missing, has_missing=missing.any,

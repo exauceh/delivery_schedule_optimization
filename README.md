@@ -172,7 +172,7 @@ uv run main.py run ... --parameters parameters.json
 Les principaux : `max_advance_days` (RG03), `allowed_frequencies` (RG05), `smoothing` et `smoothing_budget` (RG09),
 `overflow_first` (ajouter des jours plutôt que des camions), `strict_coverage` (RG06), `holiday_country` (RG10), `tail_date` (dernière date
 du planning qui cumule les besoins, détectée automatiquement), `missing_load` (poids ou volume absent : `full_truck`, un camion
-plein, par défaut, ou `material_median`, quantité × médiane par pièce du même matériel) et `missing_distance` (distance absente :
+plein, par défaut, ou `couple_median`, médiane des lignes du même couple fournisseur × usine) et `missing_distance` (distance absente :
 `max`, la plus longue du planning, par défaut, ou `median`). La marge et la surcharge diesel (RG11) n'en font pas
 partie : elles sont lues dans la grille du transporteur. Le plan commence toujours `max_advance_days` avant
 le premier besoin (réponse client) : les premiers besoins peuvent partir en avance comme les autres. Les réglages techniques (dossier des exécutions,

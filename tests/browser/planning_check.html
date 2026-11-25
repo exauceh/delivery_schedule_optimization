@@ -1,0 +1,166 @@
+<!doctype html><html><head><meta charset="utf-8"><title>check</title></head>
+<!-- Test navigateur du planning (GILBERT-UI-02). Copier ce fichier dans src/delivery_schedule_optimization/web/, lancer l application, ouvrir /planning_check.html : les parcours A a D s affichent a gauche. Supprimer la copie ensuite. -->
+<body style="margin:0;font:13px monospace">
+<pre id="out" style="position:fixed;left:0;top:0;width:640px;max-height:100vh;overflow:auto;background:#fff;z-index:9;margin:0;padding:8px;border:1px solid #ccc"></pre>
+<iframe id="f" src="/" style="position:absolute;left:660px;top:0;width:1440px;height:900px;border:0"></iframe>
+<script>
+// temporary test page (GILBERT-UI-02): drives the real application in the iframe; ?mode=shotN leaves a given state for a screenshot
+const mode = new URLSearchParams(location.search).get("mode") || "test";
+const out = document.getElementById("out"), f = document.getElementById("f");
+if (mode !== "test") { out.style.display = "none"; f.style.left = "0"; }
+let ok = 0, ko = 0;
+const log = (t) => (out.textContent += t + "\n");
+const check = (name, cond, extra = "") => { cond ? ok++ : ko++; log(`${cond ? "OK  " : "ÉCHEC"} ${name}${extra ? " · " + extra : ""}`); };
+const wait = (ms) => new Promise((r) => setTimeout(r, ms));
+async function until(fn, ms = 6000) { const t = Date.now(); while (Date.now() - t < ms) { try { if (fn()) return true; } catch (_) {} await wait(60); } return false; }
+
+f.onload = async () => {
+  const w = f.contentWindow, d = f.contentDocument, $ = (s) => d.querySelector(s), $$ = (s) => [...d.querySelectorAll(s)];
+  const S = () => w.eval("S");
+  // the results live in the page of a scenario: open the latest succeeded run on its Planning tab
+  await until(() => S().runs && S().runs.some((r) => r.status === "succeeded"));
+  w.eval('openRun(S.runs.find((r) => r.status === "succeeded").run_id, "calendrier")');
+  await until(() => S().summary && $("#calendarBig svg"));
+  const cal = () => S().summary.calendar;
+  const count = (p, day) => w.eval(`dayCount(${JSON.stringify(p)}, ${JSON.stringify(day)})`);
+  const clickCell = (p, day) => w.eval(`openDayDrawer(${JSON.stringify(p)}, ${JSON.stringify(day)})`);   // the day panel (the heatmap cells are not clickable)
+  const drawerOpen = () => !$("#dayDrawer").hidden;
+  // busiest plant-day of the scenario, and an empty one
+  let best = null, empty = null;
+  cal().plants.forEach((p, r) => cal().days.forEach((day, c) => { const v = cal().trucks[r][c]; if (!best || v > best.v) best = { p, day, v }; if (v === 0 && !empty) empty = { p, day }; }));
+  try {
+    if (mode === "shot1") return;
+    if (mode === "shot3") { clickCell(best.p, best.day); return; }
+    if (mode === "shot2" || mode === "shot4") {
+      $(`#plantTabs button[data-plant="${best.p}"]`).click();
+      const wk = w.eval(`planWeeks()`).indexOf(w.eval(`mondayOf("${best.day}")`));
+      for (let k = 0; k < wk; k++) { await until(() => $("#weekNext") && !$("#weekNext").disabled); $("#weekNext").click(); }
+      if (mode === "shot4") { await until(() => $(".day-more")); $(".day-more").click(); }
+      return;
+    }
+    if (mode === "shot5") {
+      clickCell(best.p, best.day); await until(() => $$("#ddList .dd-row").length > 5);
+      $$("#ddList .dd-row")[5].click(); await until(() => $(".ticket .t-id")); return;
+    }
+
+    log(`Scénario : ${S().run.label} · usines ${cal().plants.join(", ")} · ${cal().days.length} jours`);
+    // ---------------- Parcours A
+    log("\nParcours A — vue globale");
+    check("« Toutes les usines » sélectionné par défaut", $("#plantTabs button").getAttribute("aria-selected") === "true" && $("#plantTabs button").dataset.plant === "");
+    check("onglets générés depuis les usines du scénario", $$("#plantTabs button").length === cal().plants.length + 1);
+    check("heatmap conservée, cases non cliquables", $$("#calendarBig .cal-cell").length === cal().plants.length * cal().days.length && $$("#calendarBig .cal-cell[data-day]").length === 0);
+    clickCell(best.p, best.day);
+    check("panneau des réceptions ouvert", await until(drawerOpen));
+    await until(() => $$("#ddList .dd-row").length > 0);
+    const rows = $$("#ddList .dd-row");
+    check(`liste complète : ${rows.length} camions = case de la heatmap (${best.v})`, rows.length === best.v);
+    check("tous les camions de la liste sont de cette usine et de ce jour", rows.every((r) => r.dataset.plant === best.p && r.dataset.day === best.day));
+    check("jour de pointe signalé si c'est le pic de l'usine", !!$("#ddSummary .dd-peak") === w.eval(`isPeak("${best.p}", "${best.day}")`));
+    const target = rows[Math.min(4, rows.length - 1)].dataset.truck;
+    check("pas de recherche ni de bouton planning dans le panneau", !$("#ddSearch") && !$("#ddWeek"));
+    const listed = S().drawerRows.find((t) => t.id === target);
+    $(`#ddList .dd-row[data-truck="${target}"]`).click();
+    check("clic sur un camion : page Camions", await until(() => S().view === "camions"));
+    check(`fiche du camion ${target} chargée`, await until(() => $(".ticket .t-id") && $(".ticket .t-id").textContent === target));
+    check("camion sélectionné dans le tableau", await until(() => $("#trucksTable tr.sel") && $("#trucksTable tr.sel td").textContent === target));
+    const detail = await (await fetch(`/api/runs/${S().current}/views/trucks/${encodeURIComponent(target)}`)).json();
+    check("données de la liste = fiche camion (poids, prix, fournisseur)", Math.abs(detail.kg - listed.kg) < 1e-6 && Math.abs(detail.price - listed.price) < 1e-6 && detail.supplier === listed.supplier);
+    check("bouton « Retour au planning » visible", !$("#backToPlanning").hidden);
+    $("#backToPlanning").click();
+    check("retour : page Planning", await until(() => S().view === "calendrier"));
+    check("retour : vue globale conservée", S().plan.plant === "" && !$("#planGlobal").hidden);
+    check("retour : panneau rouvert sur la même usine et le même jour", await until(drawerOpen) && S().plan.drawer.plant === best.p && S().plan.drawer.day === best.day);
+    d.dispatchEvent(new w.KeyboardEvent("keydown", { key: "Escape", bubbles: true }));
+    check("Échap ferme le panneau sans changer la vue", await until(() => !drawerOpen()) && S().plan.plant === "" && S().view === "calendrier");
+
+    // ---------------- Parcours B
+    log("\nParcours B — planning par usine");
+    const P2 = cal().plants[1];
+    $(`#plantTabs button[data-plant="${P2}"]`).click();
+    check(`${P2} sélectionné, vue semaine affichée`, await until(() => !$("#planWeek").hidden) && $("#planGlobal").hidden && $(".week-head h2").textContent.startsWith(P2));
+    const checkWeek = async (label) => {
+      const cols = $$("#planWeek .day-col");
+      const counts = cols.map((c) => count(P2, c.dataset.day));
+      const total = counts.reduce((a, v) => a + (v || 0), 0);
+      const headTotal = parseInt($(".week-head .ed-muted").textContent.replace(/\s/g, ""));
+      check(`${label} : 5 colonnes lundi → vendredi`, cols.length === 5 && cols.every((c, k) => new Date(c.dataset.day + "T12:00:00").getDay() === k + 1));
+      check(`${label} : total hebdomadaire ${headTotal} = somme des jours (${total})`, headTotal === total);
+      await until(() => cols.every((c, k) => !counts[k] || c.querySelectorAll(".truck-card").length === Math.min(3, counts[k])));
+      const good = cols.every((c, k) => {
+        const v = counts[k], cards = c.querySelectorAll(".truck-card").length, more = c.querySelector(".day-more");
+        const headN = v === null ? null : parseInt(c.querySelector(".day-head span").textContent.replace(/\s/g, ""));
+        if (v === null) return c.classList.contains("out") && !cards;
+        if (v === 0) return headN === 0 && c.querySelector(".day-empty") && !cards;
+        return headN === v && cards === Math.min(3, v) && (v > 3 ? more && more.textContent.includes(String(v - 3)) : !more);
+      });
+      check(`${label} : en-têtes, 3 premières cartes et « Voir les X autres » cohérents`, good);
+      check(`${label} : les cartes sont de ${P2} et du bon jour`, $$("#planWeek .truck-card").every((c) => c.dataset.plant === P2 && c.closest(".day-col").dataset.day === c.dataset.day));
+    };
+    await checkWeek("semaine 1");
+    check("première semaine : flèche précédente désactivée", $("#weekPrev").disabled);
+    const firstTitle = $(".week-head h2").textContent;
+    $("#weekNext").click(); await until(() => $(".week-head h2").textContent !== firstTitle);
+    await checkWeek("semaine 2");
+    $("#weekPrev").click(); check("retour à la semaine précédente", await until(() => $(".week-head h2").textContent === firstTitle));
+    $("#weekNext").click(); await until(() => S().plan.week === 1);
+    const P3 = cal().plants[2];
+    $(`#plantTabs button[data-plant="${P3}"]`).click();
+    check(`changement d'usine (${P3}) : semaine conservée`, await until(() => $(".week-head h2").textContent.startsWith(P3)) && S().plan.week === 1);
+    const nW = w.eval("planWeeks()").length;
+    for (let k = 1; k < nW - 1; k++) { $("#weekNext").click(); await wait(30); }   // fast clicks
+    check("dernière semaine : flèche suivante désactivée", await until(() => $("#weekNext").disabled) && S().plan.week === nW - 1);
+    await until(() => $$("#planWeek .tc-skel").length === 0, 8000);
+    check("clics rapides : les cartes affichées sont celles de la semaine finale", $$("#planWeek .truck-card").every((c) => $$("#planWeek .day-col").map((x) => x.dataset.day).includes(c.dataset.day)));
+    const outCols = $$("#planWeek .day-col.out").length;
+    log(`     dernière semaine : ${outCols} jour(s) hors horizon (semaine partielle)`);
+
+    // ---------------- Parcours C
+    log("\nParcours C — journée chargée");
+    $(`#plantTabs button[data-plant="${best.p}"]`).click();
+    const wk = w.eval("planWeeks()").indexOf(w.eval(`mondayOf("${best.day}")`));
+    S().plan.week = wk; w.eval("renderCalendarView()");
+    await until(() => $(`#planWeek .day-more[data-day="${best.day}"]`));
+    $(`#planWeek .day-more[data-day="${best.day}"]`).click();
+    check("« Voir les X autres camions » ouvre le panneau partagé", await until(drawerOpen) && S().plan.drawer.day === best.day);
+    await until(() => $$("#ddList .dd-row").length === best.v);
+    check(`tous les camions consultables (${$$("#ddList .dd-row").length}/${best.v})`, $$("#ddList .dd-row").length === best.v);
+    const last = $$("#ddList .dd-row").at(-1).dataset.truck;
+    // page of this truck in the unfiltered Camions table (60 per page)
+    let unfilteredPage = -1;
+    for (let k = 0; k < 30 && unfilteredPage < 0; k++) { const r = await (await fetch(`/api/runs/${S().current}/views/trucks?limit=60&offset=${k * 60}`)).json(); if (r.rows.some((x) => x.id === last)) unfilteredPage = k; if ((k + 1) * 60 >= r.total) break; }
+    $$("#ddList .dd-row").at(-1).click();
+    check(`dernier camion de la journée (${last}, page ${unfilteredPage + 1} du tableau complet) : fiche ouverte et sélectionnée`,
+      await until(() => $(".ticket .t-id") && $(".ticket .t-id").textContent === last && $("#trucksTable tr.sel") && $("#trucksTable tr.sel td").textContent === last));
+    $("#backToPlanning").click();
+    check("retour : même usine, même semaine, panneau rouvert", await until(() => S().view === "calendrier" && drawerOpen()) && S().plan.plant === best.p && S().plan.week === wk && !$("#planWeek").hidden);
+    d.dispatchEvent(new w.KeyboardEvent("keydown", { key: "Escape", bubbles: true })); await until(() => !drawerOpen());
+
+    // ---------------- Parcours D
+    log("\nParcours D — cas limites");
+    $(`#plantTabs button[data-plant=""]`).click(); await until(() => !$("#planGlobal").hidden);
+    if (empty) { clickCell(empty.p, empty.day); check(`journée sans camion (${empty.p} ${empty.day}) : « Aucune réception prévue »`, await until(() => drawerOpen() && $("#ddList").textContent.includes("Aucune réception prévue"))); }
+    $("#dayDrawer").dispatchEvent(new w.MouseEvent("click", { bubbles: true }));
+    check("clic à l'extérieur ferme le panneau", await until(() => !drawerOpen()));
+    w.eval(`openDayDrawer("${cal().plants[0]}", "2099-01-05")`);
+    await wait(150); check("date hors horizon : pas de panneau", !drawerOpen());
+    $('.runbar-tabs button[data-view="camions"]').click();
+    check("page Camions depuis son onglet : pas de bouton retour, filtres remis à zéro", await until(() => S().view === "camions") && $("#backToPlanning").hidden && $("#tf-plant").value === "" && $("#tf-day").value === "");
+    // scenario change
+    const other = S().runs.find((r) => r.status === "succeeded" && r.run_id !== S().current);
+    if (other) {
+      $('.runbar-tabs button[data-view="calendrier"]').click(); await until(() => S().view === "calendrier");
+      $(`#plantTabs button[data-plant="${cal().plants[1]}"]`).click(); await until(() => S().plan.plant !== "");
+      const before = S().current;
+      w.eval(`openRun("${other.run_id}", "calendrier")`);   // another scenario, opened from the history
+      await until(() => S().current === other.run_id);
+      check(`changement de scénario (${other.label}) : planning remis sur « Toutes les usines », cache vidé`, await until(() => S().plan.plant === "") && S().dayCache.size === 0 && before !== S().current);
+      const c2 = S().summary.calendar; let b2 = null; c2.plants.forEach((p, r) => c2.days.forEach((day, c) => { if (!b2 || c2.trucks[r][c] > b2.v) b2 = { p, day, v: c2.trucks[r][c] }; }));
+      clickCell(b2.p, b2.day); await until(() => $$("#ddList .dd-row").length === b2.v);
+      check(`nouveau scénario : la liste correspond à sa propre heatmap (${b2.v})`, $$("#ddList .dd-row").length === b2.v);
+      d.dispatchEvent(new w.KeyboardEvent("keydown", { key: "Escape", bubbles: true }));
+    }
+  } catch (e) { ko++; log("ERREUR " + e.message); }
+  log(`\n${ok} OK, ${ko} ÉCHEC`);
+  document.title = "done";
+};
+</script></body></html>
