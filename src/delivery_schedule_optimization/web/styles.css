@@ -832,3 +832,89 @@ body:not([data-view="apercu"]) #scenarioSwitch { display: none !important; }
 .running .gather { position: absolute; inset: 0; height: auto; z-index: 0; }
 .running .running-text { grid-column: 2; position: relative; z-index: 1; }
 @media (max-width: 1100px) { .running { min-height: 640px; align-items: end; } .running .running-text { grid-column: 1; } }
+
+/* ================================================================== planning interactif (GILBERT-UI-02) */
+/* menu des usines */
+.plant-tabs { display: inline-flex; flex-wrap: wrap; gap: 4px; padding: 4px; margin: 0 0 1.1rem; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; }
+.plant-tabs button { height: 36px; padding: 0 1rem; border: 0; border-radius: 9px; background: transparent; color: var(--ink-2); font-weight: 600; font-size: .9rem; cursor: pointer;
+  transition: background .15s, color .15s; }
+.plant-tabs button:hover { background: var(--surface-2); color: var(--ink); }
+.plant-tabs button.on { background: var(--emerald); color: #fff; }
+.plant-tabs button:focus-visible { outline: 2px solid var(--emerald); outline-offset: 2px; }
+.plan-pane.in { animation: plan-in .25s var(--ease); }
+@keyframes plan-in { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+
+.peak[data-plant] { cursor: pointer; }
+.peak[data-plant]:focus-visible { outline: 2px solid var(--emerald); outline-offset: 2px; }
+
+/* semaine d'une usine */
+.week-card { padding: 1.3rem 1.4rem 1.4rem; }
+.week-head { display: flex; justify-content: space-between; align-items: center; gap: 1rem; flex-wrap: wrap; margin-bottom: 1.1rem; }
+.week-head h2 { font-family: var(--display); font-size: 1.25rem; font-weight: 700; margin: 0; }
+.week-head .ed-muted { margin: .2rem 0 0; }
+.week-nav { display: inline-flex; align-items: center; gap: .6rem; }
+.week-nav .ed-btn { width: 38px; padding: 0; justify-content: center; font-size: 1.15rem; }
+.week-nav .ed-btn:disabled { opacity: .35; cursor: not-allowed; }
+.week-range { min-width: 15rem; text-align: center; font-weight: 600; }
+.week-scroll { overflow-x: auto; padding-bottom: .2rem; }
+.week-grid { display: grid; grid-template-columns: repeat(5, minmax(170px, 1fr)); gap: .7rem; min-width: 900px; }
+.day-col { display: flex; flex-direction: column; gap: .5rem; min-width: 0; }
+.day-head { border-radius: 10px; padding: .6rem .75rem; background: var(--mint); color: var(--emerald); display: flex; flex-direction: column; gap: .05rem; }
+.day-head b { font-weight: 700; color: var(--ink); }
+.day-head span { font-size: .86rem; font-weight: 600; }
+.day-head em { font-style: normal; font-size: .74rem; font-weight: 700; color: var(--orange-dark); }
+.day-head.peak { background: #FDEBDD; color: var(--orange-dark); }
+.day-col.out .day-head { background: repeating-linear-gradient(135deg, var(--surface-2) 0 6px, #fff 6px 12px); color: var(--muted); }
+.day-col.out .day-head b { color: var(--muted); }
+.day-body { display: flex; flex-direction: column; gap: .45rem; }
+.day-empty { margin: .3rem 0; padding: .7rem; border: 1px dashed var(--line-strong); border-radius: 10px; font-size: .84rem; color: var(--muted); text-align: center; }
+.day-empty.err { border-color: var(--red); color: var(--red); }
+
+/* carte d'un camion (semaine) et ligne d'un camion (panneau) */
+.truck-card, .dd-row {
+  display: flex; align-items: flex-start; gap: .65rem; width: 100%; text-align: left; cursor: pointer; font: inherit; color: var(--ink);
+  background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: .6rem .7rem;
+  transition: border-color .15s, background .15s, box-shadow .15s;
+}
+.truck-card:hover, .dd-row:hover { border-color: var(--emerald); background: #F7FBF8; box-shadow: 0 6px 16px -12px rgba(16, 91, 72, .5); }
+.truck-card:focus-visible, .dd-row:focus-visible { outline: 2px solid var(--emerald); outline-offset: 2px; }
+.tc-ico { width: 30px; height: 30px; border-radius: 8px; background: var(--mint); color: var(--emerald); display: grid; place-items: center; flex: none; }
+.tc-ico svg { width: 17px; height: 17px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.tc-body { display: flex; flex-direction: column; gap: .05rem; min-width: 0; flex: 1; }
+.tc-body b { font-weight: 700; font-size: .92rem; }
+.tc-id { font-family: var(--mono); font-size: .78rem; color: var(--muted); }
+.tc-meta { font-size: .8rem; color: var(--ink-2); margin-top: .15rem; }
+.tc-bar { display: block; height: 4px; border-radius: 999px; background: var(--surface-2); overflow: hidden; margin-top: .35rem; }
+.tc-bar i { display: block; height: 100%; background: var(--emerald-3, #1FA77A); border-radius: 999px; }
+.tc-skel { display: block; height: 74px; border-radius: 10px; background: linear-gradient(90deg, var(--surface-2), #fff, var(--surface-2)); background-size: 200% 100%; animation: skel 1.2s linear infinite; }
+@keyframes skel { from { background-position: 200% 0; } to { background-position: -200% 0; } }
+.day-more { margin-top: .1rem; height: 36px; border-radius: 10px; border: 1px solid var(--line); background: var(--surface-2); color: var(--emerald); font-weight: 600; font-size: .85rem; cursor: pointer; }
+.day-more:hover { border-color: var(--emerald); background: var(--mint); }
+.day-more:focus-visible { outline: 2px solid var(--emerald); outline-offset: 2px; }
+
+/* panneau latéral des réceptions d'une journée */
+.drawer { position: fixed; inset: 0; z-index: 70; background: rgba(25, 45, 37, .28); opacity: 0; transition: opacity .2s ease; }
+.drawer.on { opacity: 1; }
+.drawer[hidden] { display: none; }
+.drawer-panel { position: absolute; top: 0; right: 0; bottom: 0; width: min(540px, 100vw); background: var(--surface); border-left: 1px solid var(--line);
+  box-shadow: -24px 0 50px -30px rgba(25, 45, 37, .55); display: flex; flex-direction: column; transform: translateX(24px); transition: transform .25s var(--ease); }
+.drawer.on .drawer-panel { transform: none; }
+.dd-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; padding: 1.5rem 1.5rem .6rem; }
+.dd-head h2 { font-family: var(--display); font-size: 1.25rem; font-weight: 700; margin: .2rem 0 0; }
+.dd-date { margin: .3rem 0 0; color: var(--muted); }
+.dd-close { width: 36px; height: 36px; border-radius: 10px; border: 1px solid var(--line); background: var(--surface); font-size: 1.3rem; line-height: 1; cursor: pointer; color: var(--ink-2); flex: none; }
+.dd-close:hover { background: var(--surface-2); }
+.dd-summary { display: flex; align-items: center; gap: .7rem; padding: 0 1.5rem .45rem; }
+.dd-summary b { font-family: var(--display); font-size: 1.6rem; font-weight: 800; letter-spacing: -.02em; }
+.dd-peak { font-size: .78rem; font-weight: 700; color: var(--orange-dark); background: #FDEBDD; border-radius: 999px; padding: .15rem .6rem; }
+.dd-list { flex: 1; overflow-y: auto; padding: .35rem 1.5rem 1.5rem; display: flex; flex-direction: column; gap: .45rem; }
+.dd-count, .dd-loading { margin: 0 0 .2rem; font-size: .82rem; color: var(--muted); }
+.dd-main { display: flex; flex-direction: column; gap: .05rem; min-width: 0; flex: 1; }
+.dd-main b { font-family: var(--mono); font-size: .88rem; font-weight: 600; }
+.dd-main span { font-size: .84rem; color: var(--ink-2); }
+.dd-nums { display: flex; flex-direction: column; align-items: flex-end; gap: .05rem; font-size: .8rem; color: var(--ink-2); white-space: nowrap; }
+
+/* page Camions : retour au planning */
+.back-plan { margin-bottom: .9rem; }
+.back-plan[hidden] { display: none; }
+@media (max-width: 760px) { .week-range { min-width: 0; } .drawer-panel { width: 100vw; } }

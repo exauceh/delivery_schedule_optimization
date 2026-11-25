@@ -86,6 +86,24 @@ def test_trucks_profiles_and_suppliers(client: TestClient, run_id: str) -> None:
     assert sum(s["saving"] for s in suppliers) == pytest.approx(client.get(f"{base}/summary").json()["kpi"]["saving"])
 
 
+def test_planning_cells_match_the_trucks(client: TestClient, run_id: str) -> None:
+    """Planning per plant: every calendar cell = the trucks the API returns for that plant and day, read page by page
+    (the weekly totals and the day panel of the interface are built from these two sources)."""
+    base = f"/api/runs/{run_id}/views"
+    calendar = client.get(f"{base}/summary").json()["calendar"]
+    for r, plant in enumerate(calendar["plants"]):
+        for c, day in enumerate(calendar["days"]):
+            rows: list[dict] = []
+            total, offset = None, 0
+            while total is None or offset < total:
+                page = client.get(f"{base}/trucks", params={"plant": plant, "day": day, "limit": 7, "offset": offset}).json()
+                total, offset = page["total"], offset + 7
+                rows += page["rows"]
+            assert len(rows) == total == calendar["trucks"][r][c], (plant, day)
+            assert len({t["id"] for t in rows}) == len(rows)
+            assert all(t["plant"] == plant and t["date"] == day for t in rows)
+
+
 def test_excel_report(client: TestClient, run_id: str) -> None:
     response = client.get(f"/api/runs/{run_id}/excel")
     assert response.status_code == 200
