@@ -296,7 +296,10 @@ class Situation(BaseModel):
     anomalies: list[Anomaly]
     rules: list[str]
     calendar: Calendar
-    heatmap: Heatmap
+    heatmap: Heatmap  # current trucks on the rate sheet
+    heatmap_after: Heatmap  # trucks of the plan on the same rate sheet
+    fill_before: list[int]  # trucks per fill bracket of 10 % (0-10 %, ..., 90-100 %), today
+    fill_after: list[int]  # same, with the plan
 
 
 # (rule, part of the action written by the preparation) -> label, treatment, kind; the first match wins
@@ -363,16 +366,29 @@ def bracket_labels(bounds: np.ndarray, unit: str) -> list[str]:
     return [f"> {thousands(values[i - 1])} {unit}" if np.isinf(b) else f"≤ {thousands(b)} {unit}" for i, b in enumerate(values)]
 
 
-def situation(output_dir: Path, manifest: RunManifest, tariff: Tariff) -> Situation:
-    """Current situation of the run's data: indicators, anomaly register, rules, calendar and trucks on the rate sheet."""
-    deliveries, trucks = table(output_dir, OutputName.CURRENT_DELIVERIES), table(output_dir, OutputName.CURRENT_TRUCKS)
-    register = table(output_dir, OutputName.ANOMALIES)
+def rate_heatmap(trucks: pd.DataFrame, tariff: Tariff) -> Heatmap:
+    """Trucks and their cost per cell of the rate sheet (distance bracket x weight bracket)."""
     row = np.searchsorted(tariff.km, trucks["distance"].to_numpy(float), side="left")
     col = np.searchsorted(tariff.kg, trucks["weight"].to_numpy(float), side="left")
     counts = np.zeros((len(tariff.km), len(tariff.kg)), dtype=int)
     costs = np.zeros((len(tariff.km), len(tariff.kg)))
     np.add.at(counts, (row, col), 1)
     np.add.at(costs, (row, col), trucks["cost"].to_numpy(float))
+    return Heatmap(km=bracket_labels(tariff.km, "km"), kg=bracket_labels(tariff.kg, "kg"), trucks=counts.tolist(),
+                   cost=np.round(costs, 2).tolist(), price=np.round(tariff.prices, 2).tolist())
+
+
+def fill_histogram(trucks: pd.DataFrame) -> list[int]:
+    """Trucks per fill bracket of 10 % (a full truck counts in the last bracket)."""
+    brackets = np.clip((trucks["fill"].to_numpy(float) * 10).astype(int), 0, 9)
+    return np.bincount(brackets, minlength=10).tolist()
+
+
+def situation(output_dir: Path, manifest: RunManifest, tariff: Tariff) -> Situation:
+    """Current situation of the run's data: indicators, anomaly register, rules, calendar, trucks on the rate sheet (today and with
+    the plan) and the fill of the trucks."""
+    deliveries, trucks = table(output_dir, OutputName.CURRENT_DELIVERIES), table(output_dir, OutputName.CURRENT_TRUCKS)
+    register, plan = table(output_dir, OutputName.ANOMALIES), table(output_dir, OutputName.TRUCKS)
     return Situation(
         kpi=SituationKpi(first=min(days_iso(deliveries, "date")), last=max(days_iso(deliveries, "date")),
                          lines=int(deliveries["lines"].sum()), deliveries=len(deliveries), trucks=len(trucks),
@@ -381,8 +397,10 @@ def situation(output_dir: Path, manifest: RunManifest, tariff: Tariff) -> Situat
                    for rule, action, rows in zip(strs(register, "rule"), strs(register, "action"), ints(register, "rows"))],
         rules=rules(manifest),
         calendar=calendar(deliveries, "date", "trucks"),
-        heatmap=Heatmap(km=bracket_labels(tariff.km, "km"), kg=bracket_labels(tariff.kg, "kg"), trucks=counts.tolist(),
-                        cost=np.round(costs, 2).tolist(), price=np.round(tariff.prices, 2).tolist()),
+        heatmap=rate_heatmap(trucks, tariff),
+        heatmap_after=rate_heatmap(plan, tariff),
+        fill_before=fill_histogram(trucks),
+        fill_after=fill_histogram(plan),
     )
 
 

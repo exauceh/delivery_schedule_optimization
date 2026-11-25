@@ -68,6 +68,11 @@ def test_situation_matches_the_current_cost(client: TestClient, run_id: str) -> 
     assert situation["kpi"]["cost"] == pytest.approx(summary["kpi"]["cost_before"])
     assert sum(map(sum, situation["heatmap"]["trucks"])) == situation["kpi"]["trucks"] == summary["kpi"]["trucks_before"]
     assert len(situation["heatmap"]["price"]) == len(situation["heatmap"]["km"]) == 14
+    # the plan on the same rate sheet, and the fill of the trucks today and with the plan
+    assert sum(map(sum, situation["heatmap_after"]["trucks"])) == summary["kpi"]["trucks_after"]
+    assert sum(map(sum, situation["heatmap_after"]["cost"])) == pytest.approx(summary["kpi"]["cost_after"], abs=1)
+    assert sum(situation["fill_before"]) == summary["kpi"]["trucks_before"] and len(situation["fill_before"]) == 10
+    assert sum(situation["fill_after"]) == summary["kpi"]["trucks_after"] and len(situation["fill_after"]) == 10
     assert {a["rule"] for a in situation["anomalies"]} >= {"DQ01", "DQ04", "DQ07"}
     assert all(a["label"] and not a["label"].startswith(("dropped", "flagged")) for a in situation["anomalies"])  # French labels
     assert len(situation["rules"]) >= 8

@@ -52,12 +52,12 @@ document.addEventListener("mousemove", (e) => {
 window.addEventListener("scroll", () => $(".topbar").classList.toggle("scrolled", window.scrollY > 8));
 
 // ----------------------------------------------------------------------------- navigation
-const VIEWS = ["accueil", "historique", "running", "apercu", "calendrier", "profils", "camions", "fournisseurs", "qualite"];
-const RESULT_VIEWS = ["apercu", "calendrier", "profils", "camions", "fournisseurs", "qualite"];   // the screens of ONE scenario
+const VIEWS = ["accueil", "historique", "running", "apercu", "calendrier", "profils", "camions", "fournisseurs", "analyses", "qualite"];
+const RESULT_VIEWS = ["apercu", "calendrier", "profils", "camions", "fournisseurs", "analyses", "qualite"];   // the screens of ONE scenario
 const CRUMBS = { accueil: "Nouveau calcul", historique: "Historique", running: "Calcul en cours", apercu: "Synthèse", calendrier: "Planning", profils: "Profils",
-                 camions: "Camions", fournisseurs: "Fournisseurs", qualite: "Tests & qualité" };
+                 camions: "Camions", fournisseurs: "Fournisseurs", analyses: "Analyses détaillées", qualite: "Tests & qualité" };
 // address of a screen: #/nouveau, #/historique, or #/runs/<run id>/<tab> for the results of one scenario (back button, reload, bookmark)
-const SLUGS = { apercu: "synthese", calendrier: "planning", profils: "profils", camions: "camions", fournisseurs: "fournisseurs", qualite: "qualite" };
+const SLUGS = { apercu: "synthese", calendrier: "planning", profils: "profils", camions: "camions", fournisseurs: "fournisseurs", analyses: "analyses", qualite: "qualite" };
 const VIEW_OF_SLUG = Object.fromEntries(Object.entries(SLUGS).map(([view, slug]) => [slug, view]));
 function routeOf(view) {
   if (RESULT_VIEWS.includes(view) && S.current) return `#/runs/${S.current}/${SLUGS[view]}`;
@@ -99,7 +99,7 @@ function show(view, opts = {}) {
     }
   }
   const render = { accueil: renderLaunch, historique: renderHistory, apercu: renderOverview, calendrier: renderCalendarView,
-                   profils: renderProfiles, camions: renderTrucks, fournisseurs: renderSuppliers, qualite: renderQualityTab }[view];
+                   profils: renderProfiles, camions: renderTrucks, fournisseurs: renderSuppliers, analyses: renderAnalyses, qualite: renderQualityTab }[view];
   if (render) render();
 }
 document.addEventListener("click", (e) => {
@@ -512,11 +512,11 @@ $$(".stepper [data-step]").forEach((b) => b.addEventListener("click", () => {
 }));
 
 // ----------------------------------------------------------------------------- current situation, shown with the results
-function heatmapSvg(full) {
-  const last = full.trucks.reduce((a, row, i) => (row.some((v) => v) ? i : a), 0) + 1;   // no empty distance rows at the bottom
+function heatmapSvg(full, scaleMax, last) {
+  last = last || full.trucks.reduce((a, row, i) => (row.some((v) => v) ? i : a), 0) + 1;   // no empty distance rows at the bottom
   const h = { ...full, km: full.km.slice(0, last), trucks: full.trucks.slice(0, last), cost: full.cost.slice(0, last), price: full.price.slice(0, last) };
   const rows = h.km.length, cols = h.kg.length, cw = 58, ch = 30, L = 92, T = 46;
-  const W = L + cols * cw + 4, H = T + rows * ch + 4, max = Math.max(...h.trucks.flat());
+  const W = L + cols * cw + 4, H = T + rows * ch + 4, max = scaleMax || Math.max(...h.trucks.flat());
   const tone = (v) => {
     if (!v) return [C.empty, C.muted];
     const r = Math.sqrt(v / max);
@@ -566,31 +566,6 @@ function renderCompare() {   // second row: trucks, deliveries, fill rate (real 
     <div class="ed-bar-row"><span>Plan Gilbert</span><b>${eur(k.cost_after)}</b></div>
     <div class="ed-bar"><i class="after" style="width:${(100 * k.cost_after / max).toFixed(2)}%"></i></div>
     <p class="ed-foot">${saved >= 0 ? `${eur(saved)} économisés à périmètre identique.` : `Surcoût de ${eur(-saved)} à périmètre identique.`}</p>`;
-}
-
-function renderSituationBlock() {
-  renderCompare();
-  const st = S.sit;
-  $("#situationBlock").hidden = !st;
-  if (!st) return;
-  renderSitTab("heat");
-}
-
-function renderSitTab(key) {
-  S.sitTab = key;
-  const st = S.sit;
-  if (key === "calendar") {
-    $("#sitPanelTitle").textContent = "Planning actuel des livraisons";
-    $("#sitCaption").textContent = "Camions reçus par usine et par jour quand chaque ligne est livrée le jour de son besoin. À comparer avec l'onglet Planning.";
-    $("#sitBody").innerHTML = calendarSvg(st.calendar) + `<div class="legend" style="margin-top:1rem"><span class="l-scale">peu à beaucoup de camions</span><span class="l-peak">jour de pointe de l'usine</span></div>`;
-    const cal = $("#sitBody svg"); if (cal) cal.style.maxWidth = cal.viewBox.baseVal.width * 1.15 + "px";
-  } else {
-    const h = heatmapSvg(st.heatmap), light = st.heatmap.trucks.reduce((a, row) => a + row[0] + row[1], 0);
-    $("#sitPanelTitle").textContent = "Camions actuels sur la grille tarifaire";
-    $("#sitCaption").textContent = `Chaque case est une case de la grille (distance × poids chargé)${h.hidden ? `, sans les ${h.hidden} tranches de distance vides` : ""}. ` +
-      `${num(light)} camions sur ${num(st.kpi.trucks)} (${Math.round(100 * light / st.kpi.trucks)} %) partent avec moins de 100 kg : c'est là que le regroupement fait gagner.`;
-    $("#sitBody").innerHTML = `<div class="heat-wrap">${h.svg}</div>`;
-  }
 }
 
 // ----------------------------------------------------------------------------- running
@@ -926,27 +901,13 @@ function renderOverview() {
     <div class="ed-hero-value">${counter(k.saving, "eur", 1200)}</div>
     <span class="ed-hero-pct">${signed(-k.saving_pct, " %", 1)} de coût de transport</span>
     <p class="ed-hero-ctx">Horizon complet · ${smoothing}</p>`;
-  renderSituationBlock();   // second row and the detailed sections below
+  renderCompare();   // second row
 
   // third row: daily load of the plants
   renderLoadCalendar();
   $("#loadLegend").innerHTML = `<span class="ed-scale">Peu <i style="background:${C.g1}"></i><i style="background:${C.g2}"></i><i style="background:${C.g3}"></i><i style="background:${C.g4}"></i><i style="background:${C.g6}"></i> Beaucoup de camions</span>
     <span class="ed-peak"><i></i>Jour de pointe</span><span class="ed-range">${frDate(days[0])} – ${frDate(days[days.length - 1], true)}</span>`;
 
-  // detailed sections
-  $("#plantsSum").textContent = `${sm.plants.length} usines`;
-  $("#plantsBody").innerHTML = `<p class="meta small">Situation actuelle (vert) et plan Gilbert (orange), par usine. Le pourcentage indique l'économie.</p>
-    <div class="legend" style="justify-content:flex-end"><span class="l-before">aujourd'hui</span><span class="l-after">avec Gilbert</span></div>${plantBars(sm.plants, 1240, 330)}`;
-  const smoothCost = sm.smoothing.reduce((a, s) => a + s.extra_cost, 0), maxPeak = Math.max(1, ...sm.smoothing.map((s) => Math.max(s.peak_before, s.peak_after)));
-  $("#smoothSum").textContent = `surcoût ${eur(smoothCost)}`;
-  $("#smoothBody").innerHTML = `<p class="meta small">Camions reçus le jour le plus chargé de chaque usine, avant et après le lissage des arrivées entre les jours.</p>
-    <div style="max-width:760px">${sm.smoothing.map((s, i) => `<div class="peakrow"><span class="p">${s.plant}</span><span class="bars">
-      <i class="before" style="width:${(100 * s.peak_before) / maxPeak}%;--d:${0.1 * i}s"></i><i class="after" style="width:${(100 * s.peak_after) / maxPeak}%;--d:${0.1 * i + 0.25}s"></i></span>
-      <span class="v">${s.peak_before === s.peak_after ? "" : `<s>${s.peak_before}</s> → `}${s.peak_after} camions</span></div>`).join("")}
-      <div class="legend" style="margin-top:.6rem"><span class="l-before">avant lissage</span><span class="l-after">après lissage</span></div></div>
-    <p class="ed-note"><b>${num(k.frequency_changes)} couples</b> changent de profil au lissage ; ${num(Math.max(0, k.weekday_changes - k.frequency_changes))} autres changent seulement de jours.</p>
-    <p class="ed-note">${imputedNote(k)}</p>
-    <button class="btn small" data-view="camions">Ouvrir les camions</button>`;
   countUp($("#view-apercu"));
 }
 
@@ -1300,6 +1261,105 @@ async function renderSuppliers() {
   ], rows);
 }
 $("#sf-q").addEventListener("input", () => S.summary && renderSuppliers());
+
+// ----------------------------------------------------------------------------- detailed analyses of a scenario
+// two bars per group (today in green, with Gilbert in orange); rows: { label, sub, before, after }
+function pairBars(rows, { W = 560, H = 300, unit = "camion", tip = (v) => `${num(v)} ${unit}${v > 1 ? "s" : ""}` } = {}) {
+  const top = Math.max(1, ...rows.flatMap((r) => [r.before, r.after]));
+  const step = top <= 10 ? 2 : top <= 50 ? 10 : top <= 150 ? 25 : top <= 500 ? 100 : top <= 1500 ? 250 : 500;
+  const L = 44, B = 46, T = 22, max = Math.ceil((top * 1.08) / step) * step;
+  const gw = (W - L) / rows.length, bw = Math.min(26, gw * 0.34), y = (v) => T + (H - T - B) * (1 - v / max);
+  let s = "";
+  for (let v = 0; v <= max; v += step) s += `<g class="axis"><line x1="${L}" x2="${W}" y1="${y(v)}" y2="${y(v)}"/></g><text x="${L - 8}" y="${y(v) + 4}" text-anchor="end">${num(v)}</text>`;
+  rows.forEach((r, i) => {
+    const cx = L + gw * i + gw / 2;
+    const bar = (v, x, fill, who, d) => `<rect x="${x}" y="${y(v)}" width="${bw}" height="${Math.max(0, H - B - y(v))}" rx="4" class="bar" style="--d:${d}s" fill="${fill}" data-tip="${esc(r.label)}${r.sub ? " " + esc(r.sub) : ""} · ${who}<br><b>${tip(v)}</b>"/>`;
+    s += bar(r.before, cx - bw - 1.5, C.before, "aujourd'hui", (0.04 * i).toFixed(2)) + bar(r.after, cx + 1.5, C.after, "avec Gilbert", (0.04 * i + 0.15).toFixed(2));
+    s += `<text x="${cx}" y="${H - B + 18}" text-anchor="middle" style="font-weight:700;fill:${C.label};font-size:12px">${esc(r.label)}</text>`;
+    if (r.sub) s += `<text x="${cx}" y="${H - B + 33}" text-anchor="middle" style="font-size:10.5px">${esc(r.sub)}</text>`;
+  });
+  return svg(W, H, s);
+}
+// one series of bars (orange): rows { label, value }
+function singleBars(rows, { W = 560, H = 300, tip = (v) => num(v) } = {}) {
+  const top = Math.max(1, ...rows.map((r) => r.value));
+  const step = top <= 10 ? 2 : top <= 50 ? 10 : top <= 150 ? 25 : top <= 500 ? 100 : top <= 1500 ? 250 : 500;
+  const L = 44, B = 30, T = 22, max = Math.ceil((top * 1.08) / step) * step;
+  const gw = (W - L) / rows.length, bw = Math.min(42, gw * 0.6), y = (v) => T + (H - T - B) * (1 - v / max);
+  let s = "";
+  for (let v = 0; v <= max; v += step) s += `<g class="axis"><line x1="${L}" x2="${W}" y1="${y(v)}" y2="${y(v)}"/></g><text x="${L - 8}" y="${y(v) + 4}" text-anchor="end">${num(v)}</text>`;
+  rows.forEach((r, i) => {
+    const cx = L + gw * i + gw / 2;
+    s += `<rect x="${cx - bw / 2}" y="${y(r.value)}" width="${bw}" height="${Math.max(0, H - B - y(r.value))}" rx="4" class="bar" style="--d:${(0.05 * i).toFixed(2)}s" fill="${C.after}" data-tip="${esc(r.label)}<br><b>${tip(r.value)}</b>"/>`;
+    s += `<text x="${cx}" y="${y(r.value) - 6}" text-anchor="middle" class="val fade" style="font-size:11px;--d:${(0.05 * i + 0.4).toFixed(2)}s">${num(r.value)}</text>`;
+    s += `<text x="${cx}" y="${H - B + 18}" text-anchor="middle" style="font-weight:700;fill:${C.label};font-size:12px">${esc(r.label)}</text>`;
+  });
+  return svg(W, H, s);
+}
+
+function renderAnalyses() {
+  const sm = S.summary, k = sm.kpi, st = S.sit;
+  $("#an-sub").textContent = `${num(k.trucks_before)} camions aujourd'hui, ${num(k.trucks_after)} avec Gilbert · ${eur(k.saving)} économisés`;
+  const legend = `<div class="legend"><span class="l-before">aujourd'hui</span><span class="l-after">avec Gilbert</span></div>`;
+
+  // indicators and the rate sheet (only with the current situation of the run)
+  $("#an-sit").hidden = !st;
+  if (st) {
+    const light = (h) => h.trucks.reduce((a, row) => a + row[0] + row[1], 0);   // first two weight brackets: under 100 kg
+    const half = (f) => f.slice(5).reduce((a, v) => a + v, 0);
+    const card = (label, before, after, fmt, goodWhenDown, foot) => {
+      const d = pctChange(before, after);
+      return `<div class="ed-card ed-kpi"><p class="ed-label">${label}</p><div class="ed-kpi-value">${fmt(after)}</div>
+        <div class="ed-kpi-foot"><span>Avant : ${fmt(before)}</span><b class="ed-delta ${goodWhenDown === null ? "flat" : deltaClass(d, goodWhenDown)}">${signed(d, " %")}</b></div>
+        <p class="an-foot">${foot}</p></div>`;
+    };
+    $("#an-kpis").innerHTML =
+      card("Camions de moins de 100 kg", light(st.heatmap), light(st.heatmap_after), num, true, "les camions presque vides, les plus chers au kilo") +
+      card("Coût moyen d'un camion", k.cost_before / Math.max(1, k.trucks_before), k.cost_after / Math.max(1, k.trucks_after), (v) => eur(v), null, "un camion mieux rempli coûte plus, mais il en faut beaucoup moins") +
+      card("Camions remplis à plus de 50 %", half(st.fill_before), half(st.fill_after), num, false, "au poids ou au volume, le plus contraignant des deux");
+    renderRateSheet(S.anHeat || "after");
+    $("#an-fill").innerHTML = legend + pairBars(st.fill_before.map((v, i) => ({ label: `${i * 10}-${i * 10 + 10}`, sub: "%", before: v, after: st.fill_after[i] })), { W: 600, H: 300 });
+  }
+
+  // advance: lines delivered N days before their need
+  const adv = sm.advance.slice().sort((a, b) => a.days - b.days);
+  const total = adv.reduce((a, r) => a + r.lines, 0), onTime = (adv.find((r) => r.days === 0) || { lines: 0 }).lines;
+  $("#an-advance").innerHTML = `<p class="an-cap">${nf1.format((100 * onTime) / Math.max(1, total))} % des lignes arrivent le jour même de leur besoin ; les autres sont livrées en avance, jamais en retard.</p>` +
+    singleBars(adv.map((r) => ({ label: r.days ? `J−${r.days}` : "Jour J", value: r.lines })), { W: 600, H: 300, tip: (v) => `${num(v)} ligne${v > 1 ? "s" : ""}` });
+
+  // cost per plant
+  $("#an-plants").innerHTML = legend + plantBars(sm.plants, 1240, 330);
+
+  // smoothing of the receptions
+  const smoothCost = sm.smoothing.reduce((a, s) => a + s.extra_cost, 0), maxPeak = Math.max(1, ...sm.smoothing.map((s) => Math.max(s.peak_before, s.peak_after)));
+  $("#an-smoothSum").textContent = `surcoût ${eur(smoothCost)}`;
+  $("#an-smooth").innerHTML = `<p class="an-cap">Camions reçus le jour le plus chargé de chaque usine, avant et après le lissage des arrivées entre les jours.</p>
+    <div>${sm.smoothing.map((s, i) => `<div class="peakrow"><span class="p">${s.plant}</span><span class="bars">
+      <i class="before" style="width:${(100 * s.peak_before) / maxPeak}%;--d:${0.1 * i}s"></i><i class="after" style="width:${(100 * s.peak_after) / maxPeak}%;--d:${0.1 * i + 0.25}s"></i></span>
+      <span class="v">${s.peak_before === s.peak_after ? "" : `<s>${s.peak_before}</s> → `}${s.peak_after} camions</span></div>`).join("")}
+      <div class="legend" style="margin-top:.6rem"><span class="l-before">avant lissage</span><span class="l-after">après lissage</span></div></div>
+    <p class="ed-note"><b>${num(k.frequency_changes)} couples</b> changent de profil au lissage ; ${num(Math.max(0, k.weekday_changes - k.frequency_changes))} autres changent seulement de jours.</p>
+    <p class="ed-note">${imputedNote(k)}</p>`;
+}
+
+// rate sheet of today or of the plan, on the same rows and the same colour scale so that the two can be compared
+function renderRateSheet(which) {
+  S.anHeat = which;
+  const st = S.sit, k = S.summary.kpi;
+  const lastOf = (h) => h.trucks.reduce((a, row, i) => (row.some((v) => v) ? i : a), 0) + 1;
+  const last = Math.max(lastOf(st.heatmap), lastOf(st.heatmap_after));
+  const max = Math.max(...st.heatmap.trucks.flat(), ...st.heatmap_after.trucks.flat());
+  const h = which === "before" ? st.heatmap : st.heatmap_after;
+  $$("#an-heatToggle button").forEach((b) => b.classList.toggle("active", b.dataset.heat === which));
+  const trucks = which === "before" ? k.trucks_before : k.trucks_after, cost = which === "before" ? k.cost_before : k.cost_after;
+  $("#an-heatCap").textContent = `${which === "before" ? "Aujourd'hui" : "Avec Gilbert"} : ${num(trucks)} camions pour ${eur(cost)}. ` +
+    "Chaque case est une case de la grille du transporteur (distance × poids chargé) ; même échelle de couleur pour les deux plans.";
+  $("#an-heat").innerHTML = `<div class="heat-wrap">${heatmapSvg(h, max, last).svg}</div>`;
+}
+document.addEventListener("click", (e) => {
+  const b = e.target.closest("#an-heatToggle button");
+  if (b && S.sit) renderRateSheet(b.dataset.heat);
+});
 
 // ----------------------------------------------------------------------------- tests & quality of a scenario
 // what each data-quality rule of the preparation says (Milestone 1)

@@ -42,7 +42,7 @@
     </div>
     <nav class="runbar-tabs" aria-label="Résultats du scénario">
       <button data-view="apercu">Synthèse</button><button data-view="calendrier">Planning</button><button data-view="profils">Profils</button>
-      <button data-view="camions">Camions</button><button data-view="fournisseurs">Fournisseurs</button><button data-view="qualite">Tests &amp; qualité</button>
+      <button data-view="camions">Camions</button><button data-view="fournisseurs">Fournisseurs</button><button data-view="analyses">Analyses détaillées</button><button data-view="qualite">Tests &amp; qualité</button>
     </nav>
   </div>
   <!-- ======================================================== NEW CALCULATION -->
@@ -133,15 +133,36 @@
       <div class="ed-legend" id="loadLegend"></div>
     </div>
 
-    <h3 class="ed-section">Analyses détaillées</h3>
-    <details class="fold panel"><summary><span>Coût de transport par usine</span><span class="t-sum" id="plantsSum"></span></summary><div id="plantsBody"></div></details>
-    <details class="fold panel"><summary><span>Lissage des réceptions</span><span class="t-sum" id="smoothSum"></span></summary><div id="smoothBody"></div></details>
-    <div id="situationBlock">
-      <details class="fold panel sit-panel"><summary><span id="sitPanelTitle">Grille tarifaire de la situation actuelle</span><span class="t-sum">distance × poids chargé</span></summary>
-        <p class="meta small" id="sitCaption"></p>
-        <div id="sitBody"></div>
-      </details>
+  </section>
+
+  <!-- ======================================================== DETAILED ANALYSES -->
+  <section class="view ed" id="view-analyses">
+    <div class="ed-head">
+      <div>
+        <p class="ed-eyebrow">Analyses détaillées</p>
+        <h1 class="ed-title">D'où vient l'économie ?</h1>
+        <p class="ed-sub" id="an-sub"></p>
+      </div>
     </div>
+
+    <div id="an-sit">
+      <div class="ed-row ed-three" id="an-kpis"></div>
+      <div class="ed-card an-card">
+        <div class="ed-card-head">
+          <div><h2>Camions sur la grille tarifaire</h2><p id="an-heatCap"></p></div>
+          <div class="seg" id="an-heatToggle" role="group" aria-label="Plan affiché"><button data-heat="before">Avant</button><button data-heat="after">Après</button></div>
+        </div>
+        <div id="an-heat"></div>
+      </div>
+    </div>
+
+    <div class="ed-row an-two">
+      <div class="ed-card an-card" id="an-fillCard"><div class="ed-card-head"><div><h2>Remplissage des camions</h2><p>Nombre de camions par tranche de remplissage</p></div></div><div id="an-fill"></div></div>
+      <div class="ed-card an-card"><div class="ed-card-head"><div><h2>Avance de livraison</h2><p>Lignes livrées N jours avant leur besoin</p></div></div><div id="an-advance"></div></div>
+    </div>
+
+    <div class="ed-card an-card"><div class="ed-card-head"><div><h2>Coût de transport par usine</h2><p>Situation actuelle et plan Gilbert ; le pourcentage indique l'économie</p></div></div><div id="an-plants"></div></div>
+    <div class="ed-card an-card"><div class="ed-card-head"><div><h2>Lissage des réceptions</h2></div><span class="ed-chip" id="an-smoothSum"></span></div><div id="an-smooth"></div></div>
   </section>
 
   <!-- ======================================================== TESTS & QUALITY -->
