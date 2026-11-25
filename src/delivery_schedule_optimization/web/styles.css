@@ -670,8 +670,7 @@ main {
 /* ================================================================== new calculation */
 .home-grid {
   display: grid;
-  grid-template-columns: minmax(0, 1fr);
-  max-width: 860px;
+  grid-template-columns: minmax(0, 1.35fr) minmax(300px, 1fr); /* the launch card, the data quality on the right */
   gap: 1.2rem;
   align-items: start;
 }
