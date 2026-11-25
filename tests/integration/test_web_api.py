@@ -86,6 +86,18 @@ def test_trucks_profiles_and_suppliers(client: TestClient, run_id: str) -> None:
     assert sum(s["saving"] for s in suppliers) == pytest.approx(client.get(f"{base}/summary").json()["kpi"]["saving"])
 
 
+def test_top_savings_explain_the_price(client: TestClient, run_id: str) -> None:
+    """The largest savings come with their trucks and the contract terms, so the screen can show base price x margin x diesel."""
+    summary = client.get(f"/api/runs/{run_id}/views/summary").json()
+    top, terms = summary["top_savings"], summary["price_terms"]
+    assert [t["saving"] for t in top] == sorted((t["saving"] for t in top), reverse=True) and len(top) >= 2
+    rows = {(r["supplier"], r["plant"]): r for r in client.get(f"/api/runs/{run_id}/views/suppliers").json()}
+    for t in top:
+        row = rows[(t["supplier"], t["plant"])]
+        assert (t["trucks_before"], t["trucks_after"]) == (row["trucks_before"], row["trucks_after"])
+    assert terms["margin"] > 0 and terms["diesel_surcharge"] >= 1
+
+
 def test_excel_report(client: TestClient, run_id: str) -> None:
     response = client.get(f"/api/runs/{run_id}/excel")
     assert response.status_code == 200

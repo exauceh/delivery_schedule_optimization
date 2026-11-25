@@ -193,12 +193,24 @@
   <!-- ======================================================== SUPPLIERS -->
   <section class="view" id="view-fournisseurs">
     <div class="view-head"><div><p class="kicker">Économies par fournisseur</p><h2>Où se font les économies</h2></div></div>
-    <div class="split">
-      <div class="panel"><h3>Les 15 plus grosses économies</h3><div id="lollipop"></div></div>
-      <div class="panel">
-        <div class="filters"><input id="sf-q" type="search" placeholder="Chercher un fournisseur ou une usine"></div>
-        <div class="table-wrap" id="suppliersTable"></div>
+    <div class="panel top-savings">
+      <div class="panel-head">
+        <h3 id="topTitle">Les plus grosses économies</h3>
+        <label class="top-pick">Afficher les
+          <select id="sf-top">
+            <option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5" selected>5</option>
+            <option value="6">6</option><option value="7">7</option><option value="8">8</option><option value="9">9</option><option value="10">10</option>
+          </select> meilleurs couples</label>
       </div>
+      <div class="top-grid">
+        <div><div id="topChart"></div>
+          <div class="legend" style="margin-top:.4rem"><span class="l-before">coût actuel (référence)</span><span class="l-after">coût avec Gilbert</span></div></div>
+        <div class="top-cards" id="topCards"></div>
+      </div>
+    </div>
+    <div class="panel" style="margin-top:1.2rem">
+      <div class="filters"><input id="sf-q" type="search" placeholder="Chercher un fournisseur ou une usine"></div>
+      <div class="table-wrap" id="suppliersTable"></div>
     </div>
   </section>
 
