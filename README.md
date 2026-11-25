@@ -102,21 +102,28 @@ graphiques SVG faits main, logo et polices hébergés avec l'application) est se
 rien : tous ses chiffres viennent des tables de sortie d'une exécution, par les routes `/api/runs/{run_id}/views/...`
 (`reporting/dashboard.py`).
 
+Le menu a deux entrées, **Nouveau calcul** et **Historique** ; les résultats s'ouvrent dans la page d'un scénario.
+
 - **Nouveau calcul** : on dépose les trois fichiers d'un coup (reconnus automatiquement), ou l'on choisit « Essayer avec
   un exemple » (les fichiers du projet). La **qualité des données** s'affiche aussitôt à droite, avant tout calcul :
-  besoins à planifier, période, fournisseurs, usines, contrôles appliqués (lignes retirées, dates de cumul, lignes plus
-  grandes qu'un camion…) et **données absentes**. S'il manque des poids, des volumes ou des distances, les réglages
-  détaillés demandent comment les compléter (camion plein ou médiane du même matériel ; plus longue distance ou distance
-  médiane du planning) et le calcul ne se lance qu'une fois ce choix fait. On nomme le scénario, on ajuste l'avance
-  maximale et le surcoût accepté pour lisser, puis on lance. Pendant le calcul, « Arrêter le calcul » l'annule.
-- **Synthèse** : économie, coût, camions, livraisons et remplissage avant / après, charge quotidienne des usines,
-  conformité, puis en détail le coût par usine, le lissage, la situation actuelle sur la grille tarifaire, les règles
-  appliquées aux données, le registre des anomalies, les contrôles, les tests de sortie et le journal du calcul.
-  « Exporter le rapport » donne le rapport Excel, les sorties en CSV ou le zip de toutes les tables.
-- **Planning, Profils, Camions, Fournisseurs** : le détail des sorties 1 à 3, avec filtres et le bon de livraison de
-  chaque camion.
-- **Scénarios** : tous les calculs côte à côte (économie, camions, pics par usine, réglages, durée). Chaque calcul se
-  relance sur les mêmes fichiers avec d'autres réglages, ou se supprime.
+  besoins, fournisseurs, usines, données absentes, lignes retirées. S'il manque des poids, des volumes ou des distances,
+  les réglages détaillés demandent comment les compléter (camion plein ou médiane ; plus longue distance ou distance
+  médiane) et le calcul ne se lance qu'une fois ce choix fait. On nomme le scénario, on ajuste l'avance maximale et le
+  surcoût accepté pour lisser, puis on lance ; « Arrêter le calcul » l'annule.
+- **Historique** : tous les calculs, avec leurs données d'entrée (fichiers, besoins), leurs paramètres et leur résultat
+  (économie, camions) ou leur statut. Une ligne ouvre ses résultats ; ⟳ remplit le formulaire avec les mêmes fichiers
+  et les mêmes paramètres, pour en changer un et relancer ; × supprime le calcul.
+- **Page d'un scénario** : on n'y entre qu'en ouvrant un calcul (à la fin du calcul, ou depuis l'historique), si bien
+  que les résultats affichés sont toujours ceux d'un scénario identifié. Le fil d'Ariane (« Historique / Médianes /
+  Planning ») et l'en-tête rappellent le scénario (nom, date, paramètres), avec le retour à l'historique et l'export
+  (rapport Excel, sorties en CSV, zip de toutes les tables). Les résultats sont des onglets ; l'adresse de la page
+  (`#/runs/<run_id>/planning`) désigne le scénario et l'onglet, si bien que « précédent », le rafraîchissement et les
+  favoris y ramènent.
+  - **Synthèse** : économie, coût, camions, livraisons et remplissage avant / après, charge quotidienne des usines,
+    conformité, puis en détail le coût par usine, le lissage, la situation actuelle sur la grille tarifaire, les règles
+    appliquées aux données, le registre des anomalies, les contrôles, les tests de sortie et le journal du calcul.
+  - **Planning, Profils, Camions, Fournisseurs** : le détail des sorties 1 à 3, avec filtres et le bon de livraison de
+    chaque camion.
 
 Un lissage avec surcoût est plus long que le lissage gratuit : environ 50 secondes pour 0,5 % sur le planning du projet,
 contre une dizaine de secondes (les usines sont lissées en parallèle, l'usine la plus lente fixe la durée). L'interface

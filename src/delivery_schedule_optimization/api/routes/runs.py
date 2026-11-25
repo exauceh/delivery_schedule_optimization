@@ -56,8 +56,10 @@ def _parameters(parameters: str | None) -> dict[str, JsonValue]:
 
 
 def _launch(repository: RunRepository, runner: JobRunner, contents: Mapping[InputName, bytes], parameters: str | None, label: str,
-            source_run_id: str | None = None) -> RunManifest:
+            file_names: Mapping[InputName, str], source_run_id: str | None = None) -> RunManifest:
     manifest = repository.create(contents, _parameters(parameters), app_version(), label=label.strip(), source_run_id=source_run_id)
+    # the names of the files, for the history of the interface (the content is identified by its SHA-256)
+    repository.save(manifest.model_copy(update={"input_files": {name.value: file_name for name, file_name in file_names.items()}}))
     runner.submit(manifest.run_id)
     return repository.get(manifest.run_id)
 
@@ -80,7 +82,8 @@ async def create_run(
         InputName.DISTANCES: await _content(distances, InputName.DISTANCES, max_bytes),
         InputName.RATE_SHEET: await _content(rate_sheet, InputName.RATE_SHEET, max_bytes),
     }
-    return _launch(repository, runner, contents, parameters, label)
+    uploads = {InputName.SCHEDULE: released_schedule, InputName.DISTANCES: distances, InputName.RATE_SHEET: rate_sheet}
+    return _launch(repository, runner, contents, parameters, label, {name: upload.filename or name.value for name, upload in uploads.items()})
 
 
 @router.post("/example", status_code=status.HTTP_202_ACCEPTED)
@@ -98,7 +101,8 @@ def create_example_run(
     if missing:
         logger.error("Example files not found: %s", missing)
         raise HTTPException(status.HTTP_404_NOT_FOUND, f"example files not found on the server: {', '.join(missing)}")
-    return _launch(repository, runner, {name: path.read_bytes() for name, path in paths.items()}, parameters, label)
+    return _launch(repository, runner, {name: path.read_bytes() for name, path in paths.items()}, parameters, label,
+                   {name: path.name for name, path in paths.items()})
 
 
 @router.post("/{run_id}/rerun", status_code=status.HTTP_202_ACCEPTED)
@@ -110,12 +114,13 @@ def rerun(
     label: LabelForm = "Scénario",
 ) -> RunManifest:
     """Launch a new run on the input files of `run_id`, with other parameters: a new scenario of the same planning."""
-    repository.get(run_id)
+    source = repository.get(run_id)
     try:
         contents = {name: repository.input_path(run_id, name).read_bytes() for name in InputName}
     except FileNotFoundError as exc:
         raise HTTPException(status.HTTP_409_CONFLICT, f"run {run_id} has no input files to reuse: {exc}") from exc
-    return _launch(repository, runner, contents, parameters, label, source_run_id=run_id)
+    names = {name: source.input_files.get(name.value, name.value) for name in InputName}
+    return _launch(repository, runner, contents, parameters, label, names, source_run_id=run_id)
 
 
 @router.get("")

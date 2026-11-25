@@ -10,34 +10,41 @@
 <body>
 <nav class="sidenav" id="sidenav" aria-label="Navigation">
   <div class="nav-head">
-    <a class="nav-logo" href="#accueil" data-view="accueil">
+    <a class="nav-logo" href="#/nouveau" data-view="accueil">
       <img class="logo-full" src="brand/gilbert-logo.svg" alt="Gilbert &amp; Co">
       <img class="logo-mark" src="brand/gilbert-mark.svg" alt="Gilbert &amp; Co">
     </a>
     <button class="nav-toggle" id="navToggle" aria-expanded="true" title="Replier ou déplier le menu">
       <svg viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></svg><span class="sr-only">Replier le menu</span></button>
   </div>
-  <p class="nav-group">Espace de travail</p>
   <button data-view="accueil" title="Nouveau calcul"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg><span>Nouveau calcul</span></button>
-  <p class="nav-group">Résultats</p>
-  <button data-view="apercu" class="needs-run" title="Résultats"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="8" height="10" rx="2"/><rect x="13" y="3" width="8" height="6" rx="2"/><rect x="13" y="11" width="8" height="10" rx="2"/><rect x="3" y="15" width="8" height="6" rx="2"/></svg><span>Synthèse</span></button>
-  <button data-view="calendrier" class="needs-run" title="Planning"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M3 10h18M8 3v4M16 3v4"/></svg><span>Planning</span></button>
-  <button data-view="profils" class="needs-run" title="Profils"><svg viewBox="0 0 24 24"><circle cx="6" cy="7" r="2.5"/><circle cx="18" cy="7" r="2.5"/><circle cx="12" cy="17" r="2.5"/><path d="M8.5 7h7M7.5 9l3 6M16.5 9l-3 6"/></svg><span>Profils</span></button>
-  <button data-view="camions" class="needs-run" title="Camions"><svg viewBox="0 0 24 24"><path d="M2 6h11v10H2zM13 9h4l4 4v3h-8z"/><circle cx="6" cy="18" r="2"/><circle cx="17" cy="18" r="2"/></svg><span>Camions</span></button>
-  <button data-view="fournisseurs" class="needs-run" title="Fournisseurs"><svg viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg><span>Fournisseurs</span></button>
-  <button data-view="scenarios" class="needs-run" title="Scénarios"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="7" height="16" rx="2"/><rect x="14" y="8" width="7" height="12" rx="2"/></svg><span>Scénarios</span></button>
-  <div class="nav-scenario" id="navScenario" hidden><b id="navScenarioName"></b><span id="navScenarioMeta"></span></div>
+  <button data-view="historique" title="Historique"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg><span>Historique</span></button>
 </nav>
 
 <header class="topbar">
-  <nav class="crumbs" aria-label="Fil d'Ariane"><span>Espace de travail</span><span class="sep" aria-hidden="true">/</span><b id="crumbCurrent" aria-current="page">Nouveau calcul</b></nav>
+  <nav class="crumbs" id="crumbs" aria-label="Fil d'Ariane"><b aria-current="page">Nouveau calcul</b></nav>
   <div class="topbar-right">
-    <label class="scenario-switch" id="scenarioSwitch" hidden>
-      <select id="scenarioSelect" aria-label="Scénario affiché"></select>
-    </label>  </div>
+  </div>
 </header>
 
 <main id="app">
+  <!-- the scenario shown by the result screens: name, parameters, back to the calculations, export -->
+  <div class="runbar" id="runBar" hidden>
+    <div class="runbar-top">
+      <button class="runbar-back" data-view="historique" title="Retour à l'historique">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg>Historique</button>
+      <div class="runbar-id"><b id="runBarName"></b><span id="runBarMeta"></span><div class="runbar-chips" id="runBarChips"></div></div>
+      <div class="ed-export">
+        <button class="ed-btn primary" id="exportBtn" aria-haspopup="true" aria-expanded="false" aria-controls="downloads">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v12m-5-5 5 5 5-5"/></svg>Exporter</button>
+        <div class="ed-menu" id="downloads" hidden></div>
+      </div>
+    </div>
+    <nav class="runbar-tabs" aria-label="Résultats du scénario">
+      <button data-view="apercu">Synthèse</button><button data-view="calendrier">Planning</button><button data-view="profils">Profils</button>
+      <button data-view="camions">Camions</button><button data-view="fournisseurs">Fournisseurs</button>
+    </nav>
+  </div>
   <!-- ======================================================== NEW CALCULATION -->
   <section class="view" id="view-accueil">
     <div class="view-head"><div><p class="kicker">Nouveau calcul</p><h2>Importer un planning</h2>
@@ -79,6 +86,14 @@
     </div>
   </section>
 
+  <!-- ======================================================== HISTORY -->
+  <section class="view" id="view-historique">
+    <div class="view-head"><div><p class="kicker">Historique</p><h2>Tous les calculs</h2>
+      <p class="meta">Ouvrez un calcul pour voir ses résultats, relancez-le avec d'autres réglages, ou supprimez-le.</p></div>
+      <span class="muted" id="historyCount"></span></div>
+    <div class="panel history"><div id="historyList" class="history-list"></div></div>
+  </section>
+
   <!-- ======================================================== RUNNING -->
   <section class="view" id="view-running">
     <div class="running">
@@ -100,14 +115,6 @@
         <p class="ed-eyebrow">Performance logistique</p>
         <h1 class="ed-title">Synthèse du plan optimisé</h1>
         <p class="ed-sub" id="ov-sub"></p>
-      </div>
-      <div class="ed-actions">
-        <button class="ed-btn" data-view="scenarios">Comparer les scénarios</button>
-        <div class="ed-export">
-          <button class="ed-btn primary" id="exportBtn" aria-haspopup="true" aria-expanded="false" aria-controls="downloads">
-            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v12m-5-5 5 5 5-5"/></svg>Exporter le rapport</button>
-          <div class="ed-menu" id="downloads" hidden></div>
-        </div>
       </div>
     </div>
 
@@ -200,13 +207,6 @@
     </div>
   </section>
 
-  <!-- ======================================================== SCENARIOS -->
-  <section class="view" id="view-scenarios">
-    <div class="view-head"><div><p class="kicker">Scénarios</p><h2>Comparer les calculs</h2>
-      <p class="meta">Changez un réglage dans « Nouveau calcul » et relancez : chaque calcul se range ici.</p></div></div>
-    <div class="panel" id="scenarioChart"></div>
-    <div class="cards" id="scenarioCards"></div>
-  </section>
 </main>
 
 

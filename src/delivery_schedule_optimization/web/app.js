@@ -52,21 +52,45 @@ document.addEventListener("mousemove", (e) => {
 window.addEventListener("scroll", () => $(".topbar").classList.toggle("scrolled", window.scrollY > 8));
 
 // ----------------------------------------------------------------------------- navigation
-const VIEWS = ["accueil", "running", "apercu", "calendrier", "profils", "camions", "fournisseurs", "scenarios"];
-const CRUMBS = { accueil: "Nouveau calcul", running: "Calcul en cours", apercu: "Synthèse", calendrier: "Planning", profils: "Profils",
-                 camions: "Camions", fournisseurs: "Fournisseurs", scenarios: "Scénarios" };
+const VIEWS = ["accueil", "historique", "running", "apercu", "calendrier", "profils", "camions", "fournisseurs"];
+const RESULT_VIEWS = ["apercu", "calendrier", "profils", "camions", "fournisseurs"];   // the screens of ONE scenario
+const CRUMBS = { accueil: "Nouveau calcul", historique: "Historique", running: "Calcul en cours", apercu: "Synthèse", calendrier: "Planning", profils: "Profils",
+                 camions: "Camions", fournisseurs: "Fournisseurs" };
+// address of a screen: #/nouveau, #/historique, or #/runs/<run id>/<tab> for the results of one scenario (back button, reload, bookmark)
+const SLUGS = { apercu: "synthese", calendrier: "planning", profils: "profils", camions: "camions", fournisseurs: "fournisseurs" };
+const VIEW_OF_SLUG = Object.fromEntries(Object.entries(SLUGS).map(([view, slug]) => [slug, view]));
+function routeOf(view) {
+  if (RESULT_VIEWS.includes(view) && S.current) return `#/runs/${S.current}/${SLUGS[view]}`;
+  return view === "historique" ? "#/historique" : "#/nouveau";
+}
+function parseRoute(hash) {
+  const m = /^#\/runs\/([\w-]+)\/(\w+)$/.exec(hash || "");
+  if (m) return { run: m[1], view: VIEW_OF_SLUG[m[2]] || "apercu" };
+  return { run: null, view: hash === "#/historique" ? "historique" : "accueil" };
+}
+function renderCrumbs(view) {
+  const sep = `<span class="sep" aria-hidden="true">/</span>`;
+  if (RESULT_VIEWS.includes(view))
+    $("#crumbs").innerHTML = `<a href="#/historique" data-view="historique">Historique</a>${sep}<span>${esc(S.run ? S.run.label : "Scénario")}</span>${sep}<b aria-current="page">${CRUMBS[view]}</b>`;
+  else $("#crumbs").innerHTML = `<b aria-current="page">${CRUMBS[view] || ""}</b>`;
+}
 function show(view) {
   if (!VIEWS.includes(view)) view = "accueil";
-  if (!["accueil", "running"].includes(view) && !S.summary && !(view === "scenarios" && S.runs.length)) view = "accueil";
+  if (RESULT_VIEWS.includes(view) && !S.summary) view = "accueil";
   S.view = view;
-  $("#crumbCurrent").textContent = CRUMBS[view] || "";
-  document.body.dataset.view = view;   // the scenario selector is only shown on the synthesis of a scenario
+  renderCrumbs(view);
+  document.body.dataset.view = view;
   $$(".view").forEach((v) => v.classList.toggle("active", v.id === "view-" + view));
-  $$(".sidenav button[data-view]").forEach((b) => b.classList.toggle("active", b.dataset.view === view));
-  if (location.hash !== "#" + view && view !== "running") history.replaceState(null, "", "#" + view);
+  $("#runBar").hidden = !RESULT_VIEWS.includes(view);
+  $$(".sidenav button[data-view], .runbar-tabs button").forEach((b) => b.classList.toggle("active", b.dataset.view === view));
+  if (view !== "running" && location.hash !== routeOf(view)) {
+    // a new screen is a new entry of the history (back button); a first address or an old one (#apercu) is replaced
+    if (location.hash.startsWith("#/")) history.pushState(null, "", routeOf(view));
+    else history.replaceState(null, "", routeOf(view));
+  }
   window.scrollTo({ top: 0 });
-  const render = { accueil: renderLaunch, apercu: renderOverview, calendrier: renderCalendarView, profils: renderProfiles, camions: renderTrucks,
-                   fournisseurs: renderSuppliers, scenarios: renderScenarios }[view];
+  const render = { accueil: renderLaunch, historique: renderHistory, apercu: renderOverview, calendrier: renderCalendarView,
+                   profils: renderProfiles, camions: renderTrucks, fournisseurs: renderSuppliers }[view];
   if (render) render();
 }
 document.addEventListener("click", (e) => {
@@ -74,10 +98,17 @@ document.addEventListener("click", (e) => {
   const b = e.target.closest("button[data-view], a[data-view]");
   if (b && !b.disabled) { e.preventDefault(); show(b.dataset.view); }
 });
-window.addEventListener("hashchange", () => show(location.hash.slice(1)));
-function updateDock() {
-  $$(".sidenav .needs-run").forEach((b) => (b.disabled = !S.summary));
+// back / forward buttons of the browser, or an address typed by hand
+async function route() {
+  if (S.view === "running") return;   // the waiting screen follows its run
+  const { run, view } = parseRoute(location.hash);
+  if (!run) { show(view); return; }
+  if (run === S.current) { show(view); return; }
+  const known = S.runs.find((r) => r.run_id === run && r.status === DONE);
+  if (known) await openRun(run, view);
+  else { toast("Ce calcul n'existe plus."); show("historique"); }
 }
+window.addEventListener("popstate", () => { route(); });
 
 // ----------------------------------------------------------------------------- new calculation: import + launch
 const IMPORT_FILES = [   // key, title, expected file, form field of POST /api/runs
@@ -96,7 +127,7 @@ function renderSource() {
     box.innerHTML = `<div class="source-pick"><span class="ico">${FILE_ICON}</span><div><p class="f-lab">Données</p>
       <b>Fichiers de « ${esc(src.label)} »</b><span>importés le ${fmtStamp(src.created_at)}${k.lines ? ` · ${num(k.lines)} lignes · ${num(k.couples)} couples` : ""}</span></div>
       <button class="link" id="changeSource">Importer d'autres fichiers</button></div>`;
-    $("#changeSource").addEventListener("click", () => { S.sourceRun = null; renderLaunch(); });
+    $("#changeSource").addEventListener("click", () => { S.sourceRun = null; S.pendingChoices = null; renderLaunch(); });
     return;
   }
   if (S.example) {
@@ -226,6 +257,12 @@ async function refreshQuality() {
     }
     if (S.qualityKey !== key) return;   // the source changed meanwhile
     S.quality = q; S.qualityState = "ready";
+    if (S.pendingChoices) {
+      const need = missingKinds();
+      if (need.load && S.pendingChoices.missing_load) F.missing_load = S.pendingChoices.missing_load;
+      if (need.distance && S.pendingChoices.missing_distance) F.missing_distance = S.pendingChoices.missing_distance;
+      S.pendingChoices = null;
+    }
     if (q.has_missing) $("#tuning").open = true;
   } catch (err) {
     if (S.qualityKey !== key) return;
@@ -289,10 +326,59 @@ function renderMissing() {
 }
 
 const STATUS = { queued: "En attente", running: "En cours", succeeded: "Terminé", failed: "Échec", cancelled: "Annulé" };
-// relaunch a run on the same files, with other settings (from the Scénarios page)
+// relaunch a run: the form takes its files and its parameters; the user changes a setting and launches
 function reuseRun(id) {
+  const run = S.runs.find((r) => r.run_id === id);
+  if (!run) return;
+  const p = planner(run), prep = (run.parameters && run.parameters.preparation) || {};
   S.sourceRun = id; S.files = {}; S.example = false;
-  show("accueil"); window.scrollTo({ top: 0, behavior: "smooth" });
+  F.anticipation = p.max_advance_days ?? DEFAULT_F.anticipation;
+  F.smoothing = p.smoothing_budget ?? DEFAULT_F.smoothing;
+  S.pendingChoices = { missing_load: prep.missing_load, missing_distance: prep.missing_distance };   // applied once its quality is known
+  $("#f-label").value = `${run.label} (bis)`.slice(0, 60);
+  show("accueil");
+}
+
+function errorText(run) {
+  const e = run.error || "";
+  if (/exited with code/.test(e)) return "Le calcul s'est arrêté de façon inattendue.";
+  if (/interrupted by a restart/.test(e)) return "Interrompu par un redémarrage du serveur.";
+  return e ? "Erreur pendant le calcul." : "";
+}
+
+function inputSummary(run) {
+  const names = run.input_files || {};
+  const files = ["released_schedule", "distances", "rate_sheet"].map((k) => names[k]).filter(Boolean);
+  const k = run.kpis || {};
+  return `${files.length ? files.map(esc).join(" · ") : "fichiers importés"}${k.lines ? `<br>${num(k.lines)} besoins · ${num(k.couples)} couples` : ""}`;
+}
+
+function renderHistory() {
+  const list = S.runs || [];
+  $("#historyCount").textContent = list.length ? `${list.length} calcul${list.length > 1 ? "s" : ""}` : "";
+  $("#historyList").innerHTML = list.length ? `<div class="h-row h-head"><span>Scénario</span><span>Données</span><span>Paramètres</span><span>Résultat</span><span></span></div>` +
+    list.map((r) => {
+      const ok = r.status === DONE, k = r.kpis || {};
+      const result = ok ? `<b class="h-saving">${eur(k.saving)}</b><span>${num(k.trucks_before)} → ${num(k.trucks_after)} camions</span>`
+        : `<b class="h-status ${r.status}">${STATUS[r.status] || r.status}</b>${r.error ? `<span title="${esc(r.error)}">${errorText(r)}</span>` : ""}`;
+      return `<div class="h-row ${ok ? "ok" : ""} ${r.run_id === S.current ? "current" : ""}" data-run="${r.run_id}">
+        <span class="h-name"><b>${esc(r.label)}</b><span>${fmtStamp(r.created_at)}</span></span>
+        <span class="h-data">${inputSummary(r)}</span>
+        <span class="h-params">${settingsChips(r)}</span>
+        <span class="h-result">${result}</span>
+        <span class="h-actions">${ok ? `<button class="btn ghost small" data-open-run="${r.run_id}">Voir</button>` : ""}
+          ${FINISHED.includes(r.status) ? `<button class="h-icon" data-reuse="${r.run_id}" title="Relancer avec les mêmes fichiers et paramètres" aria-label="Relancer">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 12a8 8 0 1 1-2.3-5.6M20 4v4.5h-4.5"/></svg></button>
+          <button class="h-icon" data-del-run="${r.run_id}" title="Supprimer" aria-label="Supprimer">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button>` : ""}</span>
+      </div>`;
+    }).join("") : `<p class="empty-note">Aucun calcul pour l'instant. <button class="link" data-view="accueil">Lancer un premier calcul</button></p>`;
+  $$("#historyList .h-row.ok").forEach((row) => row.addEventListener("click", (e) => {
+    if (!e.target.closest("button")) openRun(row.dataset.run, "apercu");
+  }));
+  $$("#historyList [data-open-run]").forEach((b) => b.addEventListener("click", () => openRun(b.dataset.openRun, "apercu")));
+  $$("#historyList [data-reuse]").forEach((b) => b.addEventListener("click", () => reuseRun(b.dataset.reuse)));
+  $$("#historyList [data-del-run]").forEach((b) => b.addEventListener("click", () => deleteRun(b.dataset.delRun)));
 }
 
 async function deleteRun(id) {
@@ -301,12 +387,8 @@ async function deleteRun(id) {
     await api("/runs/" + id, { method: "DELETE" });
     if (S.sourceRun === id) S.sourceRun = null;
     await refreshRuns();
-    if (id === S.current) {
-      const next = S.runs.find((r) => r.status === DONE);
-      if (next) await openRun(next.run_id, S.view === "accueil" ? "accueil" : "scenarios");
-      else { S.summary = null; S.current = null; updateDock(); show("accueil"); }
-    } else if (S.view === "scenarios") renderScenarios();
-    else renderLaunch();
+    if (id === S.current) { S.summary = null; S.current = null; S.run = null; }
+    show("historique");
   } catch (err) { toast(err.message); }
 }
 
@@ -612,28 +694,31 @@ $("#stopRunBtn").addEventListener("click", async () => {
 // ----------------------------------------------------------------------------- runs
 async function refreshRuns() {
   S.runs = await api("/runs");
-  const done = S.runs.filter((r) => r.status === DONE);
-  $("#scenarioSwitch").hidden = !done.length;
-  $("#scenarioSelect").innerHTML = done.map((r) => `<option value="${r.run_id}">${esc(r.label)} · ${eur(r.kpis.saving)}</option>`).join("");
-  if (S.current) $("#scenarioSelect").value = S.current;
+  if (S.view === "historique") renderHistory();
 }
-$("#scenarioSelect").addEventListener("change", (e) => openRun(e.target.value, S.view === "accueil" ? "apercu" : S.view));
 
 async function openRun(id, view) {
   S.summary = await api(`/runs/${id}/views/summary`);
   try { S.sit = await api(`/runs/${id}/views/situation`); } catch (_) { S.sit = null; }
   S.current = id; S.trucksPage = 0; S.selectedTruck = null; S.suppliers = [];
   S.run = S.runs.find((r) => r.run_id === id);
-  $("#scenarioSelect").value = id;
-  updateDock(); fillFilters(); renderNavScenario();
+  fillFilters(); renderRunBar();
   show(view || "apercu");
 }
 
-function renderNavScenario() {
-  const f = S.summary.filters;
-  $("#navScenario").hidden = false;
-  $("#navScenarioName").textContent = S.run ? S.run.label : "Scénario";
-  $("#navScenarioMeta").textContent = `${num(f.suppliers.length)} fournisseurs · ${num(f.plants.length)} usine${f.plants.length > 1 ? "s" : ""}`;
+function renderRunBar() {
+  const run = S.run, f = S.summary.filters;
+  $("#runBarName").textContent = run ? run.label : "Scénario";
+  $("#runBarMeta").textContent = `${run ? fmtStamp(run.created_at) + " · " : ""}${num(f.suppliers.length)} fournisseurs · ${num(f.plants.length)} usine${f.plants.length > 1 ? "s" : ""}`;
+  $("#runBarChips").innerHTML = settingsChips(run);
+  // export menu: the Excel report, the three outputs and the zip of every table
+  const base = `/api/runs/${S.current}`;
+  const files = [["/excel", "Rapport complet", "Excel · toutes les sorties, contrôles et tests"],
+    ["/files/sortie1_profils", "Jours de livraison par fournisseur", "CSV · profils (sortie 1)"],
+    ["/files/sortie2_contenu_camions", "Contenu des camions", "CSV · materials par camion (sortie 2)"],
+    ["/files/sortie3_saving", "Économies par fournisseur", "CSV · économies (sortie 3)"],
+    ["/download", "Tout télécharger", "Archive ZIP de toutes les tables"]];
+  $("#downloads").innerHTML = files.map(([path, title, what]) => `<a role="menuitem" href="${base}${path}" download><b>${title}</b><span>${what}</span></a>`).join("");
 }
 
 function fillFilters() {
@@ -773,18 +858,6 @@ function lollipop(rows) {
   }).join(""));
 }
 
-function scenarioBars(runs) {
-  const W = 900, rowH = 50, L = 200, R = 250, H = runs.length * rowH + 10, max = Math.max(1, ...runs.map((r) => r.kpis.saving));
-  const x = (v) => L + (W - L - R) * (Math.max(0, v) / max);
-  return svg(W, H, runs.map((r, i) => {
-    const y = 8 + i * rowH, cur = r.run_id === S.current;
-    return `<text x="0" y="${y + 22}" style="font-weight:700;font-size:13px;fill:${C.ink}">${esc(r.label).slice(0, 26)}</text>
-      <rect class="hbar" style="--d:${(0.08 * i).toFixed(2)}s" x="${L}" y="${y + 6}" width="${x(r.kpis.saving) - L}" height="26" rx="13" fill="${cur ? C.after : C.before}"/>
-      <text x="${x(r.kpis.saving) + 10}" y="${y + 24}" class="val">${eur(r.kpis.saving)}</text>
-      <text x="${x(r.kpis.saving) + 10}" y="${y + 40}">${num(r.kpis.trucks_after)} camions · pics ${Object.values(r.plant_peaks || {}).join(" / ")}</text>`;
-  }).join(""));
-}
-
 // ----------------------------------------------------------------------------- views
 const STAMP_DELAY = { i: 0, next() { return (0.45 + 0.12 * this.i++).toFixed(2); }, reset() { this.i = 0; } };
 function stamp(label, value, target, ok, r) {
@@ -792,14 +865,14 @@ function stamp(label, value, target, ok, r) {
     <div class="s-val">${value}</div><div class="s-target">cible ${target}</div></div>`;
 }
 
-function imputationChips(run) {
+function imputationChips(run) {   // how the missing data were completed, when the user chose the medians
   const prep = (run && run.parameters && run.parameters.preparation) || {};
   return [prep.missing_load === "material_median" ? "poids absents : médiane" : null, prep.missing_distance === "median" ? "distance absente : médiane" : null];
 }
 function settingsChips(run) {
   const p = planner(run), freq = p.allowed_frequencies ? Math.max(...p.allowed_frequencies) : 5;
   return [`${p.max_advance_days ?? 7} j d'avance`, p.smoothing_budget ? `lissage ${nf1.format(p.smoothing_budget * 100)} %` : "lissage gratuit",
-    freq < 5 ? `≤ ${freq} / semaine` : null, ...imputationChips(run), run && run.source_run_id ? "relance" : null].filter(Boolean)
+    freq < 5 ? `≤ ${freq} / semaine` : null, ...imputationChips(run)].filter(Boolean)
     .map((c) => `<span class="tag">${esc(c)}</span>`).join(" ");
 }
 
@@ -807,15 +880,6 @@ function renderOverview() {
   const sm = S.summary, k = sm.kpi, run = S.run, p = planner(run);
   const days = sm.calendar.days, first = k.first_need, last = k.last_need;
   $("#ov-sub").textContent = `${frDate(first)} — ${frDate(last, true)} · ${num(k.lines)} besoins · ${num(k.couples)} couples fournisseur–usine`;
-
-  // export menu: the Excel report, the three outputs and the zip of every table
-  const base = `/api/runs/${S.current}`;
-  const files = [["/excel", "Rapport complet", "Excel · toutes les sorties, contrôles et tests"],
-    ["/files/sortie1_profils", "Jours de livraison par fournisseur", "CSV · profils (sortie 1)"],
-    ["/files/sortie2_contenu_camions", "Contenu des camions", "CSV · materials par camion (sortie 2)"],
-    ["/files/sortie3_saving", "Économies par fournisseur", "CSV · économies (sortie 3)"],
-    ["/download", "Tout télécharger", "Archive ZIP de toutes les tables"]];
-  $("#downloads").innerHTML = files.map(([f, t, d]) => `<a role="menuitem" href="${base}${f}" download><b>${t}</b><span>${d}</span></a>`).join("");
 
   // first row: saving (emerald) and cost (bars on one scale)
   const smoothing = p.smoothing_budget ? `lissage avec ${nf1.format(100 * p.smoothing_budget)} % de surcoût accepté` : "lissage sans surcoût";
@@ -1003,28 +1067,6 @@ function renderControls() {
   $("#journal").innerHTML = table([{ key: "step", label: "Étape" }, { key: "value", label: "Valeur" }], sm.journal);
 }
 
-function renderScenarios() {
-  const done = S.runs.filter((r) => r.status === DONE);
-  $("#scenarioChart").innerHTML = done.length ? `<h3>Économies par scénario</h3>${scenarioBars(done)}` : "";
-  $("#scenarioCards").innerHTML = S.runs.map((r) => {
-    const ok = r.status === DONE;
-    return `<div class="card ${r.run_id === S.current ? "current" : ""} ${ok ? "" : "failed"}" data-run="${r.run_id}" data-ok="${ok}">
-      ${FINISHED.includes(r.status) ? `<button class="c-del" data-del="${r.run_id}" title="Supprimer">×</button>` : ""}
-      <div class="c-name">${esc(r.label)}</div><div class="c-date">${fmtStamp(r.created_at)}</div>
-      <div class="c-chips">${settingsChips(r)}</div>
-      ${ok ? `<div class="c-saving">${eur(r.kpis.saving)}</div><div class="c-meta">${num(r.kpis.trucks_after)} camions · pics ${Object.values(r.plant_peaks || {}).join(" / ")} · ${Math.round(runtime(r))} s</div>`
-           : `<div class="c-saving">${r.status === FAILED ? "Erreur : " + esc(r.error || "") : STATUS[r.status] || r.status}</div>`}
-      ${FINISHED.includes(r.status) ? `<button class="btn ghost small c-reuse" data-reuse="${r.run_id}" title="Relancer sur les mêmes fichiers, avec d'autres réglages">Relancer</button>` : ""}
-    </div>`;
-  }).join("");
-  $$("#scenarioCards .card").forEach((c) => c.addEventListener("click", (e) => {
-    if (e.target.closest("[data-del], [data-reuse]")) return;
-    if (c.dataset.ok === "true") openRun(c.dataset.run, "apercu");
-  }));
-  $$("#scenarioCards [data-reuse]").forEach((b) => b.addEventListener("click", () => reuseRun(b.dataset.reuse)));
-  $$("#scenarioCards [data-del]").forEach((b) => b.addEventListener("click", () => deleteRun(b.dataset.del)));
-}
-
 // ----------------------------------------------------------------------------- start
 (async function init() {
   try {   // default parameters of the planner, as the API applies them
@@ -1039,9 +1081,7 @@ function renderScenarios() {
     const done = S.runs.find((r) => r.status === DONE);
     $("#f-label").value = done ? `Scénario ${S.runs.length + 1}` : "Plan de référence";
     if (running) { startRunning(running); return; }
-    const want = location.hash.slice(1);
-    if (done) await openRun(done.run_id, want && want !== "running" ? want : "accueil");
-    else show("accueil");
+    await route();   // the address may name a scenario and a tab (reload, bookmark)
   } catch (err) { toast("Le serveur ne répond pas : " + err.message); show("accueil"); }
 })();
 

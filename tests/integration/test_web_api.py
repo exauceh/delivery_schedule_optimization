@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import io
 import json
+import re
 from collections.abc import Iterator
 from pathlib import Path
 
@@ -43,8 +44,10 @@ def run_id(client: TestClient) -> str:
 
 def test_the_interface_is_served(client: TestClient) -> None:
     page = client.get("/")
-    assert page.status_code == 200 and "Gilbert" in page.text and 'src="app.js"' in page.text
+    assert page.status_code == 200 and "Gilbert" in page.text
+    assert re.search(r'src="app\.js\?v=[0-9a-f]{12}"', page.text) and re.search(r'href="styles\.css\?v=[0-9a-f]{12}"', page.text)
     assert client.get("/app.js").status_code == 200 and client.get("/brand/gilbert-logo.svg").status_code == 200
+    assert client.get("/styles.css").headers["cache-control"] == "no-cache"  # a new version is never mixed with an old stylesheet
 
 
 def test_summary_adds_up(client: TestClient, run_id: str) -> None:
@@ -111,6 +114,7 @@ def test_rerun_keeps_the_files_and_changes_the_parameters(client: TestClient, ru
     rerun = response.json()
     source = client.get(f"/api/runs/{run_id}").json()
     assert rerun["source_run_id"] == run_id and rerun["inputs"] == source["inputs"] and rerun["label"] == "Sans lissage"
+    assert rerun["input_files"] == source["input_files"] and set(source["input_files"]) == {"released_schedule", "distances", "rate_sheet"}
     assert rerun["parameters"]["planner"]["smoothing"] is False and rerun["status"] == "succeeded"
     assert client.post(f"/api/runs/{run_id}/rerun", data={"parameters": '{"planner": {"speed": 1}}'}).status_code == 422
 
