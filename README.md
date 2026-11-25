@@ -119,11 +119,15 @@ Le menu a deux entrées, **Nouveau calcul** et **Historique** ; les résultats s
   (rapport Excel, sorties en CSV, zip de toutes les tables). Les résultats sont des onglets ; l'adresse de la page
   (`#/runs/<run_id>/planning`) désigne le scénario et l'onglet, si bien que « précédent », le rafraîchissement et les
   favoris y ramènent.
-  - **Synthèse** : économie, coût, camions, livraisons et remplissage avant / après, charge quotidienne des usines,
-    conformité, puis en détail le coût par usine, le lissage, la situation actuelle sur la grille tarifaire, les règles
-    appliquées aux données, le registre des anomalies, les contrôles, les tests de sortie et le journal du calcul.
-  - **Planning, Profils, Camions, Fournisseurs** : le détail des sorties 1 à 3, avec filtres et le bon de livraison de
-    chaque camion.
+  - **Synthèse** : économie, coût, camions, livraisons et remplissage avant / après, charge quotidienne des usines.
+  - **Planning** (toutes les usines, ou la semaine d'une usine avec ses camions), **Profils**, **Camions** (et le bon de
+    livraison de chaque camion), **Économies** (les plus grosses économies et le tableau par couple) : le détail des
+    sorties 1 à 3, avec filtres.
+  - **Analyses détaillées** : d'où vient l'économie (camions presque vides, coût moyen d'un camion, remplissage), les
+    camions sur la grille tarifaire avant / après, le remplissage par tranche, l'avance des livraisons, le coût par
+    usine et le lissage.
+  - **Tests & qualité** : la qualité des données du calcul, le registre des anomalies, les règles appliquées, les
+    contrôles du plan, les tests sur les sorties et le journal du calcul.
 
 Un lissage avec surcoût est plus long que le lissage gratuit : environ 50 secondes pour 0,5 % sur le planning du projet,
 contre une dizaine de secondes (les usines sont lissées en parallèle, l'usine la plus lente fixe la durée). L'interface

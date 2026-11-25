@@ -52,12 +52,12 @@ document.addEventListener("mousemove", (e) => {
 window.addEventListener("scroll", () => $(".topbar").classList.toggle("scrolled", window.scrollY > 8));
 
 // ----------------------------------------------------------------------------- navigation
-const VIEWS = ["accueil", "historique", "running", "apercu", "calendrier", "profils", "camions", "fournisseurs"];
-const RESULT_VIEWS = ["apercu", "calendrier", "profils", "camions", "fournisseurs"];   // the screens of ONE scenario
+const VIEWS = ["accueil", "historique", "running", "apercu", "calendrier", "profils", "camions", "fournisseurs", "analyses", "qualite"];
+const RESULT_VIEWS = ["apercu", "calendrier", "profils", "camions", "fournisseurs", "analyses", "qualite"];   // the screens of ONE scenario
 const CRUMBS = { accueil: "Nouveau calcul", historique: "Historique", running: "Calcul en cours", apercu: "Synthèse", calendrier: "Planning", profils: "Profils",
-                 camions: "Camions", fournisseurs: "Fournisseurs" };
+                 camions: "Camions", fournisseurs: "Économies", analyses: "Analyses détaillées", qualite: "Tests & qualité" };
 // address of a screen: #/nouveau, #/historique, or #/runs/<run id>/<tab> for the results of one scenario (back button, reload, bookmark)
-const SLUGS = { apercu: "synthese", calendrier: "planning", profils: "profils", camions: "camions", fournisseurs: "fournisseurs" };
+const SLUGS = { apercu: "synthese", calendrier: "planning", profils: "profils", camions: "camions", fournisseurs: "economies", analyses: "analyses", qualite: "qualite" };
 const VIEW_OF_SLUG = Object.fromEntries(Object.entries(SLUGS).map(([view, slug]) => [slug, view]));
 function routeOf(view) {
   if (RESULT_VIEWS.includes(view) && S.current) return `#/runs/${S.current}/${SLUGS[view]}`;
@@ -99,7 +99,7 @@ function show(view, opts = {}) {
     }
   }
   const render = { accueil: renderLaunch, historique: renderHistory, apercu: renderOverview, calendrier: renderCalendarView,
-                   profils: renderProfiles, camions: renderTrucks, fournisseurs: renderSuppliers }[view];
+                   profils: renderProfiles, camions: renderTrucks, fournisseurs: renderSuppliers, analyses: renderAnalyses, qualite: renderQualityTab }[view];
   if (render) render();
 }
 document.addEventListener("click", (e) => {
@@ -230,7 +230,7 @@ function renderLaunch() {
   let note;
   if (!sourceReady()) note = "Déposez le planning, les distances et la grille tarifaire pour commencer.";
   else if (S.qualityState === "loading") note = "Analyse des données en cours…";
-  else if (S.qualityState === "error") note = "Les fichiers ne peuvent pas être utilisés : voir la qualité des données.";
+  else if (S.qualityState === "error") note = `Les fichiers ne peuvent pas être utilisés : ${S.qualityError}`;
   else if (!choicesDone()) note = "Des données sont absentes : choisissez comment les compléter dans les réglages détaillés.";
   else if (src) note = `Sur les fichiers de « ${src.label} », avec les réglages ci-dessus.`;
   else note = "Les données sont prêtes : un clic suffit.";
@@ -305,43 +305,49 @@ function scoreRing(score) {
     <circle cx="42" cy="42" r="${r}" class="q-ring-fg" stroke-dasharray="${(c * score / 100).toFixed(1)} ${c.toFixed(1)}" transform="rotate(-90 42 42)"/></svg>`;
 }
 
+// quality of the dropped files, on the right of the Nouveau calcul page (the Tests & qualité tab shows it for a run)
 function renderQuality() {
   const box = $("#qualityPanel"), q = S.quality;
   const head = `<div class="q-head"><span class="q-head-ico">${Q_ICONS.data}</span><h3>Qualité des données chargées</h3></div>`;
   if (S.qualityState === "idle") { box.innerHTML = head + `<p class="q-empty">S'affiche dès l'import des fichiers.</p>`; return; }
   if (S.qualityState === "loading") { box.innerHTML = head + `<p class="q-empty q-loading">Analyse des fichiers…</p>`; return; }
   if (S.qualityState === "error") { box.innerHTML = head + `<p class="q-error">${esc(S.qualityError)}</p>`; return; }
+  const chosen = choicesDone();
+  box.innerHTML = head + qualityBody(q, chosen, chosen ? "Méthode choisie dans les réglages." : "Méthode à choisir dans les réglages.");
+}
+
+// body of the quality panel (score, counts, split by status and what each status means); `note`: how the missing data are completed
+function qualityBody(q, chosen, note) {
   const [level, levelLabel, levelText] = qualityLevel(q.score);
   const pct = (n) => (100 * n) / Math.max(1, q.rows_raw);
   const pctTxt = (n) => `${nf1.format(pct(n))} %`;
-  const tiles = [["rows", num(q.rows_raw), "Lignes importées"], ["ok", num(q.rows_valid), "Validées"],
-    ["warn", num(q.rows_to_impute), "À imputer"], ["ko", num(q.rows_rejected), "Rejetées"]];
-  const bar = [["ok", q.rows_valid], ["warn", q.rows_to_impute], ["ko", q.rows_rejected]].filter(([, n]) => n > 0)
-    .map(([kind, n]) => `<span class="q-seg ${kind}" style="flex:${n}" title="${pctTxt(n)}">${pct(n) >= 6 ? pctTxt(n) : ""}</span>`).join("");
-  // what each status means for THIS import (the missing data and the rejection reasons found)
-  const m = q.missing, need = missingKinds();
-  const missing = [m.weight.rows ? "poids" : "", m.volume.rows ? "volume" : "", need.distance ? "distance" : ""].filter(Boolean);
-  const chosen = choicesDone();
+  const m = q.missing;
+  const missing = [m.weight.rows ? "poids" : "", m.volume.rows ? "volume" : "", m.suppliers_without_distance.length ? "distance" : ""].filter(Boolean);
   const imputeText = q.rows_to_impute
     ? `${missing.length ? missing.join(", ").replace(/, ([^,]*)$/, " ou $1").replace(/^./, (s) => s.toUpperCase()) : "Donnée"} manquant${missing.length > 1 ? "s" : ""}.
-       <em class="${chosen ? "done" : "todo"}">${chosen ? "Méthode choisie dans les réglages." : "Méthode à choisir dans les réglages."}</em>`
+       <em class="${chosen ? "done" : "todo"}">${note}</em>`
     : "Aucune ligne incomplète.";
   const REJECTED = { "Quantité nulle": "quantité = 0", "Quantité négative": "quantité négative", "Quantité manquante": "quantité manquante",
     "Date de cumul en fin de planning": "cumul de fin de planning", "Ligne plus grande qu'un camion": "plus grande qu'un camion" };
   const reasons = q.checks.filter((c) => c.count && ["DQ01", "DQ03", "DQ05"].includes(c.rule))
     .map((c) => `${REJECTED[c.label] || c.label.toLowerCase()} (${num(c.count)})`);
-  box.innerHTML = head + `
+  const tiles = [["rows", num(q.rows_raw), "Lignes importées"], ["ok", num(q.rows_valid), "Validées"],
+    ["warn", num(q.rows_to_impute), "À imputer"], ["ko", num(q.rows_rejected), "Rejetées"]];
+  const bar = [["ok", q.rows_valid], ["warn", q.rows_to_impute], ["ko", q.rows_rejected]].filter(([, n]) => n > 0)
+    .map(([kind, n]) => `<i class="${kind}" style="flex:${n}" data-tip="${pctTxt(n)} des lignes">${pct(n) >= 6 ? pctTxt(n) : ""}</i>`).join("");
+  const legend = (kind, name, n, text) => `<li><span class="q-mark ${kind}"></span><b>${name}</b><span class="q-pct">${pctTxt(n)}</span><span class="q-txt">${text}</span></li>`;
+  return `
     <div class="q-score">
       <div class="q-ring-wrap">${scoreRing(q.score)}<div class="q-ring-txt"><b>${q.score}</b><span>/100</span></div></div>
       <div class="q-level ${level}"><span class="q-level-tag">${levelLabel}</span><p>${levelText}</p></div>
     </div>
     <div class="q-tiles">${tiles.map(([kind, value, label]) => `<div class="q-tile ${kind}"><span class="q-tile-ico">${Q_ICONS[kind]}</span><b>${value}</b><span>${label}</span></div>`).join("")}</div>
-    <p class="q-sub">Répartition des lignes par statut</p>
+    <p class="ed-label q-sub">Répartition des lignes par statut</p>
     <div class="q-bar">${bar}</div>
     <ul class="q-legend">
-      <li><span class="q-dot ok">${Q_ICONS.ok}</span><b>Validées</b><span>Lignes complètes, prêtes pour l'optimisation.</span></li>
-      <li><span class="q-dot warn">${Q_ICONS.warn}</span><b>À imputer</b><span>${imputeText}</span></li>
-      <li><span class="q-dot ko">${Q_ICONS.ko}</span><b>Rejetées</b><span>${reasons.length ? reasons.join(", ").replace(/^./, (s) => s.toUpperCase()) + "." : "Aucune."}</span></li>
+      ${legend("ok", "Validées", q.rows_valid, "Lignes complètes, prêtes pour l'optimisation.")}
+      ${legend("warn", "À imputer", q.rows_to_impute, imputeText)}
+      ${legend("ko", "Rejetées", q.rows_rejected, reasons.length ? reasons.join(", ").replace(/^./, (s) => s.toUpperCase()) + "." : "Aucune.")}
     </ul>`;
 }
 
@@ -542,11 +548,11 @@ $$(".stepper [data-step]").forEach((b) => b.addEventListener("click", () => {
 }));
 
 // ----------------------------------------------------------------------------- current situation, shown with the results
-function heatmapSvg(full) {
-  const last = full.trucks.reduce((a, row, i) => (row.some((v) => v) ? i : a), 0) + 1;   // no empty distance rows at the bottom
+function heatmapSvg(full, scaleMax, last) {
+  last = last || full.trucks.reduce((a, row, i) => (row.some((v) => v) ? i : a), 0) + 1;   // no empty distance rows at the bottom
   const h = { ...full, km: full.km.slice(0, last), trucks: full.trucks.slice(0, last), cost: full.cost.slice(0, last), price: full.price.slice(0, last) };
   const rows = h.km.length, cols = h.kg.length, cw = 58, ch = 30, L = 92, T = 46;
-  const W = L + cols * cw + 4, H = T + rows * ch + 4, max = Math.max(...h.trucks.flat());
+  const W = L + cols * cw + 4, H = T + rows * ch + 4, max = scaleMax || Math.max(...h.trucks.flat());
   const tone = (v) => {
     if (!v) return [C.empty, C.muted];
     const r = Math.sqrt(v / max);
@@ -596,39 +602,6 @@ function renderCompare() {   // second row: trucks, deliveries, fill rate (real 
     <div class="ed-bar-row"><span>Plan Gilbert</span><b>${eur(k.cost_after)}</b></div>
     <div class="ed-bar"><i class="after" style="width:${(100 * k.cost_after / max).toFixed(2)}%"></i></div>
     <p class="ed-foot">${saved >= 0 ? `${eur(saved)} économisés à périmètre identique.` : `Surcoût de ${eur(-saved)} à périmètre identique.`}</p>`;
-}
-
-function renderSituationBlock() {
-  renderCompare();
-  const st = S.sit;
-  $("#situationBlock").hidden = !st;
-  if (!st) return;
-  renderSitTab("heat");
-  $("#foldRulesSum").textContent = `${st.rules.length} règles`;
-  $("#rulesList").innerHTML = st.rules.map((r, i) => `<li style="--d:${0.04 * i}s">${esc(r)}</li>`).join("");
-  const KIND = { corrige: ["corrigé", "ok"], info: ["information", "info"] };
-  const shown = st.anomalies.filter((a) => a.count);
-  $("#anomalyCount").textContent = `${shown.length} types détectés`;
-  $("#anomalyTable").innerHTML = `<table class="anomalies"><thead><tr><th>Anomalie</th><th class="num">Lignes</th><th>Règle</th><th>Traitement</th><th></th></tr></thead><tbody>
-    ${shown.map((a) => `<tr><td><b>${esc(a.label)}</b></td><td class="num">${num(a.count)}</td><td class="det">${esc(a.rule)}</td>
-      <td>${esc(a.treatment)}</td><td><span class="badge ${(KIND[a.kind] || KIND.info)[1]}">${(KIND[a.kind] || KIND.info)[0]}</span></td></tr>`).join("")}</tbody></table>`;
-}
-
-function renderSitTab(key) {
-  S.sitTab = key;
-  const st = S.sit;
-  if (key === "calendar") {
-    $("#sitPanelTitle").textContent = "Planning actuel des livraisons";
-    $("#sitCaption").textContent = "Camions reçus par usine et par jour quand chaque ligne est livrée le jour de son besoin. À comparer avec l'onglet Planning.";
-    $("#sitBody").innerHTML = calendarSvg(st.calendar) + `<div class="legend" style="margin-top:1rem"><span class="l-scale">peu à beaucoup de camions</span><span class="l-peak">jour de pointe de l'usine</span></div>`;
-    const cal = $("#sitBody svg"); if (cal) cal.style.maxWidth = cal.viewBox.baseVal.width * 1.15 + "px";
-  } else {
-    const h = heatmapSvg(st.heatmap), light = st.heatmap.trucks.reduce((a, row) => a + row[0] + row[1], 0);
-    $("#sitPanelTitle").textContent = "Camions actuels sur la grille tarifaire";
-    $("#sitCaption").textContent = `Chaque case est une case de la grille (distance × poids chargé)${h.hidden ? `, sans les ${h.hidden} tranches de distance vides` : ""}. ` +
-      `${num(light)} camions sur ${num(st.kpi.trucks)} (${Math.round(100 * light / st.kpi.trucks)} %) partent avec moins de 100 kg : c'est là que le regroupement fait gagner.`;
-    $("#sitBody").innerHTML = `<div class="heat-wrap">${h.svg}</div>`;
-  }
 }
 
 // ----------------------------------------------------------------------------- running
@@ -973,47 +946,14 @@ function renderOverview() {
     <div class="ed-hero-value">${counter(k.saving, "eur", 1200)}</div>
     <span class="ed-hero-pct">${signed(-k.saving_pct, " %", 1)} de coût de transport</span>
     <p class="ed-hero-ctx">Horizon complet · ${smoothing}</p>`;
-  renderSituationBlock();   // second row and the detailed sections below
+  renderCompare();   // second row
 
   // third row: daily load of the plants
   renderLoadCalendar();
   $("#loadLegend").innerHTML = `<span class="ed-scale">Peu <i style="background:${C.g1}"></i><i style="background:${C.g2}"></i><i style="background:${C.g3}"></i><i style="background:${C.g4}"></i><i style="background:${C.g6}"></i> Beaucoup de camions</span>
     <span class="ed-peak"><i></i>Jour de pointe</span><span class="ed-range">${frDate(days[0])} – ${frDate(days[days.length - 1], true)}</span>`;
 
-  // fourth row: plants and compliance
-  $("#plantCard").innerHTML = `<div class="ed-card-head line"><h2>Répartition par usine</h2><span class="ed-muted">Camions après optimisation</span></div>
-    <div class="ed-list">${sm.plants.map((pl) => `<div class="ed-list-row"><span>${esc(pl.plant)}</span><b>${num(pl.trucks_after)} camion${pl.trucks_after > 1 ? "s" : ""}</b><span class="ed-muted">Pic : ${num(pl.peak)}</span></div>`).join("")}</div>`;
-  const find = (rule) => sm.controls.find((c) => c.rule === rule);
-  const antCtl = find("RG03"), antDays = p.max_advance_days ?? 7;
-  const item = (c, title, okText) => {
-    const state = !c ? "unknown" : c.ok ? "ok" : "ko";
-    const icon = { ok: '<path d="m5 12 4.5 4.5L19 7"/>', ko: '<path d="M6 6l12 12M18 6 6 18"/>', unknown: '<path d="M12 17h.01M9.5 9a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .9-1 1.7"/>' }[state];
-    const text = { ok: okText, ko: "Contrôle non respecté : voir les contrôles détaillés", unknown: "Résultat indisponible pour ce calcul" }[state];
-    return `<div class="ed-check ${state}"><span class="ed-check-ico"><svg viewBox="0 0 24 24">${icon}</svg></span><div><b>${title}</b><span>${text}</span></div></div>`;
-  };
-  $("#complianceCard").innerHTML = `<div class="ed-card-head"><h2>Conformité du plan</h2></div>
-    ${item(find("RG02"), "Aucun retard", "Dates de besoin respectées")}
-    ${item(antCtl, `Anticipation ≤ ${antDays} jours`, "Fenêtre de livraison conforme")}
-    ${item(find("RG04"), "Capacités des camions", "Poids et volume respectés")}`;
-
-  // detailed sections
-  $("#plantsSum").textContent = `${sm.plants.length} usines`;
-  $("#plantsBody").innerHTML = `<p class="meta small">Situation actuelle (vert) et plan Gilbert (orange), par usine. Le pourcentage indique l'économie.</p>
-    <div class="legend" style="justify-content:flex-end"><span class="l-before">aujourd'hui</span><span class="l-after">avec Gilbert</span></div>${plantBars(sm.plants, 1240, 330)}`;
-  const smoothCost = sm.smoothing.reduce((a, s) => a + s.extra_cost, 0), maxPeak = Math.max(1, ...sm.smoothing.map((s) => Math.max(s.peak_before, s.peak_after)));
-  $("#smoothSum").textContent = `surcoût ${eur(smoothCost)}`;
-  $("#smoothBody").innerHTML = `<p class="meta small">Camions reçus le jour le plus chargé de chaque usine, avant et après le lissage des arrivées entre les jours.</p>
-    <div style="max-width:760px">${sm.smoothing.map((s, i) => `<div class="peakrow"><span class="p">${s.plant}</span><span class="bars">
-      <i class="before" style="width:${(100 * s.peak_before) / maxPeak}%;--d:${0.1 * i}s"></i><i class="after" style="width:${(100 * s.peak_after) / maxPeak}%;--d:${0.1 * i + 0.25}s"></i></span>
-      <span class="v">${s.peak_before === s.peak_after ? "" : `<s>${s.peak_before}</s> → `}${s.peak_after} camions</span></div>`).join("")}
-      <div class="legend" style="margin-top:.6rem"><span class="l-before">avant lissage</span><span class="l-after">après lissage</span></div></div>
-    <p class="ed-note"><b>${num(k.frequency_changes)} couples</b> changent de profil au lissage ; ${num(Math.max(0, k.weekday_changes - k.frequency_changes))} autres changent seulement de jours.</p>
-    <p class="ed-note">${imputedNote(k)}</p>
-    <button class="btn small" data-view="camions">Ouvrir les camions</button>`;
   countUp($("#view-apercu"));
-  renderControls();
-  const all = [...sm.controls, ...sm.output_tests];
-  $("#controlsSum").textContent = all.every((c) => c.ok) ? `${sm.controls.length} contrôles et ${sm.output_tests.length} tests, tous respectés` : "au moins une règle à revoir";
 }
 
 // daily load calendar: real pixel size (cells computed from the card width), redrawn on resize
@@ -1370,13 +1310,173 @@ async function renderSuppliers() {
 $("#sf-q").addEventListener("input", () => S.summary && renderSuppliers());
 $("#sf-top").addEventListener("change", () => S.summary && renderSuppliers());
 
-function renderControls() {
-  const sm = S.summary;
+// ----------------------------------------------------------------------------- detailed analyses of a scenario
+// two bars per group (today in green, with Gilbert in orange); rows: { label, sub, before, after }
+function pairBars(rows, { W = 560, H = 300, unit = "camion", tip = (v) => `${num(v)} ${unit}${v > 1 ? "s" : ""}` } = {}) {
+  const top = Math.max(1, ...rows.flatMap((r) => [r.before, r.after]));
+  const step = top <= 10 ? 2 : top <= 50 ? 10 : top <= 150 ? 25 : top <= 500 ? 100 : top <= 1500 ? 250 : 500;
+  const L = 44, B = 46, T = 22, max = Math.ceil((top * 1.08) / step) * step;
+  const gw = (W - L) / rows.length, bw = Math.min(26, gw * 0.34), y = (v) => T + (H - T - B) * (1 - v / max);
+  let s = "";
+  for (let v = 0; v <= max; v += step) s += `<g class="axis"><line x1="${L}" x2="${W}" y1="${y(v)}" y2="${y(v)}"/></g><text x="${L - 8}" y="${y(v) + 4}" text-anchor="end">${num(v)}</text>`;
+  rows.forEach((r, i) => {
+    const cx = L + gw * i + gw / 2;
+    const bar = (v, x, fill, who, d) => `<rect x="${x}" y="${y(v)}" width="${bw}" height="${Math.max(0, H - B - y(v))}" rx="4" class="bar" style="--d:${d}s" fill="${fill}" data-tip="${esc(r.label)}${r.sub ? " " + esc(r.sub) : ""} · ${who}<br><b>${tip(v)}</b>"/>`;
+    s += bar(r.before, cx - bw - 1.5, C.before, "aujourd'hui", (0.04 * i).toFixed(2)) + bar(r.after, cx + 1.5, C.after, "avec Gilbert", (0.04 * i + 0.15).toFixed(2));
+    s += `<text x="${cx}" y="${H - B + 18}" text-anchor="middle" style="font-weight:700;fill:${C.label};font-size:12px">${esc(r.label)}</text>`;
+    if (r.sub) s += `<text x="${cx}" y="${H - B + 33}" text-anchor="middle" style="font-size:10.5px">${esc(r.sub)}</text>`;
+  });
+  return svg(W, H, s);
+}
+// one series of bars (orange): rows { label, value }
+function singleBars(rows, { W = 560, H = 300, tip = (v) => num(v) } = {}) {
+  const top = Math.max(1, ...rows.map((r) => r.value));
+  const step = top <= 10 ? 2 : top <= 50 ? 10 : top <= 150 ? 25 : top <= 500 ? 100 : top <= 1500 ? 250 : 500;
+  const L = 44, B = 30, T = 22, max = Math.ceil((top * 1.08) / step) * step;
+  const gw = (W - L) / rows.length, bw = Math.min(42, gw * 0.6), y = (v) => T + (H - T - B) * (1 - v / max);
+  let s = "";
+  for (let v = 0; v <= max; v += step) s += `<g class="axis"><line x1="${L}" x2="${W}" y1="${y(v)}" y2="${y(v)}"/></g><text x="${L - 8}" y="${y(v) + 4}" text-anchor="end">${num(v)}</text>`;
+  rows.forEach((r, i) => {
+    const cx = L + gw * i + gw / 2;
+    s += `<rect x="${cx - bw / 2}" y="${y(r.value)}" width="${bw}" height="${Math.max(0, H - B - y(r.value))}" rx="4" class="bar" style="--d:${(0.05 * i).toFixed(2)}s" fill="${C.after}" data-tip="${esc(r.label)}<br><b>${tip(r.value)}</b>"/>`;
+    s += `<text x="${cx}" y="${y(r.value) - 6}" text-anchor="middle" class="val fade" style="font-size:11px;--d:${(0.05 * i + 0.4).toFixed(2)}s">${num(r.value)}</text>`;
+    s += `<text x="${cx}" y="${H - B + 18}" text-anchor="middle" style="font-weight:700;fill:${C.label};font-size:12px">${esc(r.label)}</text>`;
+  });
+  return svg(W, H, s);
+}
+
+function renderAnalyses() {
+  const sm = S.summary, k = sm.kpi, st = S.sit;
+  $("#an-sub").textContent = `${num(k.trucks_before)} camions aujourd'hui, ${num(k.trucks_after)} avec Gilbert · ${eur(k.saving)} économisés`;
+  const legend = `<div class="legend"><span class="l-before">aujourd'hui</span><span class="l-after">avec Gilbert</span></div>`;
+
+  // indicators and the rate sheet (only with the current situation of the run)
+  $("#an-sit").hidden = !st;
+  if (st) {
+    const light = (h) => h.trucks.reduce((a, row) => a + row[0] + row[1], 0);   // first two weight brackets: under 100 kg
+    const half = (f) => f.slice(5).reduce((a, v) => a + v, 0);
+    const card = (label, before, after, fmt, goodWhenDown, foot) => {
+      const d = pctChange(before, after);
+      return `<div class="ed-card ed-kpi"><p class="ed-label">${label}</p><div class="ed-kpi-value">${fmt(after)}</div>
+        <div class="ed-kpi-foot"><span>Avant : ${fmt(before)}</span><b class="ed-delta ${goodWhenDown === null ? "flat" : deltaClass(d, goodWhenDown)}">${signed(d, " %")}</b></div>
+        <p class="an-foot">${foot}</p></div>`;
+    };
+    $("#an-kpis").innerHTML =
+      card("Camions de moins de 100 kg", light(st.heatmap), light(st.heatmap_after), num, true, "les camions presque vides, les plus chers au kilo") +
+      card("Coût moyen d'un camion", k.cost_before / Math.max(1, k.trucks_before), k.cost_after / Math.max(1, k.trucks_after), (v) => eur(v), null, "un camion mieux rempli coûte plus, mais il en faut beaucoup moins") +
+      card("Camions remplis à plus de 50 %", half(st.fill_before), half(st.fill_after), num, false, "au poids ou au volume, le plus contraignant des deux");
+    renderRateSheet(S.anHeat || "after");
+    $("#an-fill").innerHTML = legend + pairBars(st.fill_before.map((v, i) => ({ label: `${i * 10}-${i * 10 + 10}`, sub: "%", before: v, after: st.fill_after[i] })), { W: 600, H: 300 });
+  }
+
+  // advance: lines delivered N days before their need
+  const adv = sm.advance.slice().sort((a, b) => a.days - b.days);
+  const total = adv.reduce((a, r) => a + r.lines, 0), onTime = (adv.find((r) => r.days === 0) || { lines: 0 }).lines;
+  $("#an-advance").innerHTML = `<p class="an-cap">${nf1.format((100 * onTime) / Math.max(1, total))} % des lignes arrivent le jour même de leur besoin ; les autres sont livrées en avance, jamais en retard.</p>` +
+    singleBars(adv.map((r) => ({ label: r.days ? `J−${r.days}` : "Jour J", value: r.lines })), { W: 600, H: 300, tip: (v) => `${num(v)} ligne${v > 1 ? "s" : ""}` });
+
+  // cost per plant
+  $("#an-plants").innerHTML = legend + plantBars(sm.plants, 1240, 330);
+
+  // smoothing of the receptions
+  const smoothCost = sm.smoothing.reduce((a, s) => a + s.extra_cost, 0), maxPeak = Math.max(1, ...sm.smoothing.map((s) => Math.max(s.peak_before, s.peak_after)));
+  $("#an-smoothSum").textContent = `surcoût ${eur(smoothCost)}`;
+  $("#an-smooth").innerHTML = `<p class="an-cap">Camions reçus le jour le plus chargé de chaque usine, avant et après le lissage des arrivées entre les jours.</p>
+    <div>${sm.smoothing.map((s, i) => `<div class="peakrow"><span class="p">${s.plant}</span><span class="bars">
+      <i class="before" style="width:${(100 * s.peak_before) / maxPeak}%;--d:${0.1 * i}s"></i><i class="after" style="width:${(100 * s.peak_after) / maxPeak}%;--d:${0.1 * i + 0.25}s"></i></span>
+      <span class="v">${s.peak_before === s.peak_after ? "" : `<s>${s.peak_before}</s> → `}${s.peak_after} camions</span></div>`).join("")}
+      <div class="legend" style="margin-top:.6rem"><span class="l-before">avant lissage</span><span class="l-after">après lissage</span></div></div>
+    <p class="ed-note"><b>${num(k.frequency_changes)} couples</b> changent de profil au lissage ; ${num(Math.max(0, k.weekday_changes - k.frequency_changes))} autres changent seulement de jours.</p>
+    <p class="ed-note">${imputedNote(k)}</p>`;
+}
+
+// rate sheet of today or of the plan, on the same rows and the same colour scale so that the two can be compared
+function renderRateSheet(which) {
+  S.anHeat = which;
+  const st = S.sit, k = S.summary.kpi;
+  const lastOf = (h) => h.trucks.reduce((a, row, i) => (row.some((v) => v) ? i : a), 0) + 1;
+  const last = Math.max(lastOf(st.heatmap), lastOf(st.heatmap_after));
+  const max = Math.max(...st.heatmap.trucks.flat(), ...st.heatmap_after.trucks.flat());
+  const h = which === "before" ? st.heatmap : st.heatmap_after;
+  $$("#an-heatToggle button").forEach((b) => b.classList.toggle("active", b.dataset.heat === which));
+  const trucks = which === "before" ? k.trucks_before : k.trucks_after, cost = which === "before" ? k.cost_before : k.cost_after;
+  $("#an-heatCap").textContent = `${which === "before" ? "Aujourd'hui" : "Avec Gilbert"} : ${num(trucks)} camions pour ${eur(cost)}. ` +
+    "Chaque case est une case de la grille du transporteur (distance × poids chargé) ; même échelle de couleur pour les deux plans.";
+  $("#an-heat").innerHTML = `<div class="heat-wrap">${heatmapSvg(h, max, last).svg}</div>`;
+}
+document.addEventListener("click", (e) => {
+  const b = e.target.closest("#an-heatToggle button");
+  if (b && S.sit) renderRateSheet(b.dataset.heat);
+});
+
+// ----------------------------------------------------------------------------- tests & quality of a scenario
+// what each data-quality rule of the preparation says (Milestone 1)
+const DQ_RULES = {
+  DQ01: "Une quantité nulle ne porte aucun besoin ; une quantité négative ou manquante est une erreur.",
+  DQ02: "Un besoin un week-end ou un jour férié est gardé et livré le jour ouvré précédent.",
+  DQ03: "La dernière date du planning cumule les besoins au-delà de l'horizon : ce n'est pas un besoin du jour.",
+  DQ04: "Un poids ou un volume manquant ou nul doit être complété pour charger les camions.",
+  DQ05: "Une ligne plus lourde ou plus volumineuse qu'un camion ne peut pas être livrée en une fois.",
+  DQ06: "Un fournisseur en double garde sa première distance ; une distance illisible ou négative est manquante.",
+  DQ07: "Un fournisseur sans distance ne peut pas être tarifé : sa distance est complétée.",
+};
+async function renderQualityTab() {
+  const sm = S.summary, run = S.current, st = S.sit;
+  const k = sm.kpi;
+  $("#qa-sub").textContent = `${num(k.lines)} besoins · ${num(k.couples)} couples · ${sm.controls.length} contrôles et ${sm.output_tests.length} tests sur le plan`;
+
+  // data quality of the input files of the run (computed once per scenario)
+  const head = `<div class="ed-card-head"><h2>Qualité des données chargées</h2></div>`;
+  const box = $("#qaQuality");
+  if (S.runQuality && S.runQuality.run === run) drawRunQuality();
+  else {
+    box.innerHTML = head + `<p class="q-empty q-loading">Analyse des fichiers du calcul…</p>`;
+    try { S.runQuality = { run, q: await api(`/runs/${run}/quality`) }; }
+    catch (err) { S.runQuality = { run, error: err.message }; }
+    if (S.current === run && S.view === "qualite") drawRunQuality();
+  }
+  function drawRunQuality() {
+    const rq = S.runQuality;
+    if (rq.error) { box.innerHTML = head + `<p class="q-error">${esc(rq.error)}</p>`; return; }
+    const prep = (S.run && S.run.parameters && S.run.parameters.preparation) || {};
+    const load = prep.missing_load && prep.missing_load !== "full_truck" ? "médiane du couple" : "camion plein";
+    const dist = prep.missing_distance === "median" ? "distance médiane" : "distance la plus longue";
+    box.innerHTML = head + qualityBody(rq.q, true, `Complétés au lancement : ${load}, ${dist}.`);
+  }
+
+  // anomaly register and rules applied (from the current situation of the run)
+  const KIND = { corrige: ["corrigé", "ok"], info: ["information", "info"] };
+  if (!st) {
+    $("#qaAnomalies").innerHTML = `<div class="ed-card-head"><h2>Registre des anomalies</h2></div><p class="q-empty">Non disponible pour ce calcul.</p>`;
+    $("#qaRules").innerHTML = "";
+  } else {
+    const shown = st.anomalies.filter((a) => a.count);
+    $("#qaAnomalies").innerHTML = `<div class="ed-card-head"><h2>Registre des anomalies</h2><span class="ed-chip">${shown.length} type${shown.length > 1 ? "s" : ""} détecté${shown.length > 1 ? "s" : ""}</span></div>
+      ${shown.length ? `<div class="table-wrap"><table class="anomalies"><thead><tr><th>Anomalie</th><th class="num">Lignes</th><th>Ce que dit la règle</th><th>Traitement</th><th></th></tr></thead><tbody>
+      ${shown.map((a) => `<tr><td><b>${esc(a.label)}</b></td><td class="num">${num(a.count)}</td><td class="det">${esc(DQ_RULES[a.rule] || "")}</td>
+        <td>${esc(a.treatment)}</td><td><span class="badge ${(KIND[a.kind] || KIND.info)[1]}">${(KIND[a.kind] || KIND.info)[0]}</span></td></tr>`).join("")}</tbody></table></div>`
+        : `<p class="q-empty">Aucune anomalie dans les données.</p>`}`;
+    $("#qaRules").innerHTML = `<div class="ed-card-head"><h2>Règles appliquées</h2><span class="ed-chip">${st.rules.length} règles</span></div>
+      <ol class="rules-list">${st.rules.map((r, i) => `<li style="--d:${0.04 * i}s">${esc(r)}</li>`).join("")}</ol>`;
+  }
+
+  // tests: controls of the plan, then the tests on the outputs grouped by suite
+  const okCount = (rows) => rows.filter((c) => c.ok).length;
+  const badge = (rows) => okCount(rows) === rows.length ? `<span class="q-badge">${rows.length} / ${rows.length} respectés</span>`
+    : `<span class="q-badge ko">${rows.length - okCount(rows)} en échec</span>`;
   const row = (ok, name, text) => `<div class="rule ${ok ? "" : "ko"}"><span class="mark">${ok ? "✓" : "✗"}</span>
     <div><div class="r-name">${esc(name)}</div><div>${esc(text)}</div></div></div>`;
-  $("#controlsList").innerHTML = sm.controls.map((c) => row(c.ok, c.rule, c.what)).join("") +
-    `<h3 style="margin-top:1rem">Tests des sorties (Milestone 4)</h3>` +
-    sm.output_tests.map((c) => row(c.ok, c.suite, `${c.test} : ${c.detail}`)).join("");
+  const all = [...sm.controls, ...sm.output_tests];
+  $("#qaTestsSum").innerHTML = okCount(all) === all.length
+    ? `<span class="qa-ok">✓</span><div><b>Plan validé</b><span>${sm.controls.length} contrôles et ${sm.output_tests.length} tests sur les sorties, tous respectés</span></div>`
+    : `<span class="qa-ok ko">✗</span><div><b>${all.length - okCount(all)} règle${all.length - okCount(all) > 1 ? "s" : ""} à revoir</b><span>voir le détail ci-dessous</span></div>`;
+  $("#qaTestsSum").classList.toggle("ko", okCount(all) !== all.length);
+  $("#qaControls").innerHTML = `<div class="q-head"><h3>Contrôles du plan</h3>${badge(sm.controls)}</div>` +
+    sm.controls.map((c) => row(c.ok, c.rule, c.what)).join("");
+  const suites = [...new Set(sm.output_tests.map((t) => t.suite))];
+  $("#qaOutputTests").innerHTML = `<div class="q-head"><h3>Tests sur les sorties</h3>${badge(sm.output_tests)}</div>` +
+    suites.map((s) => `<p class="q-sub qa-suite">${esc(s)}</p>` +
+      sm.output_tests.filter((t) => t.suite === s).map((t) => row(t.ok, t.test, t.detail)).join("")).join("");
   $("#journal").innerHTML = table([{ key: "step", label: "Étape" }, { key: "value", label: "Valeur" }], sm.journal);
 }
 
