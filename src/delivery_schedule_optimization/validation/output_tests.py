@@ -18,6 +18,7 @@ import pandas as pd
 
 from ..domain.calendar import first_working_day, is_working_day, plan_start
 from ..domain.config import COUPLE, DAY_NAMES, MissingDistance, PlannerConfig, PreparationConfig
+from ..io.schemas import profiles_by_code
 from ..pricing.tariff import Tariff
 
 logger = logging.getLogger(__name__)
@@ -66,7 +67,7 @@ def test_rg04_volume(allocations: pd.DataFrame, truck_m3: float) -> TestOutcome:
 
 def test_rg05_allowed_profiles(profiles: pd.DataFrame, allowed: tuple[int, ...]) -> TestOutcome:
     """RG05 - le profil de chaque couple fait partie des profils autorisés"""
-    wrong = ~profiles["profile"].isin(allowed)
+    wrong = ~profiles_by_code(profiles)["profile"].isin(allowed)
     return not bool(wrong.any()), f"{int(wrong.sum())} couple(s) hors des profils autorisés"
 
 
@@ -103,7 +104,7 @@ def test_same_days_profile(allocations: pd.DataFrame, profiles: pd.DataFrame) ->
     """Profil - chaque couple livre sur les jours de son profil, et son maximum de livraisons par semaine = son profil"""
     errors: list[str] = []
     by_couple = dict(tuple(allocations.groupby(COUPLE)))
-    for row in profiles.itertuples(index=False):
+    for row in profiles_by_code(profiles).itertuples(index=False):
         couple = by_couple.get((row.supplier_id, row.plant))
         if couple is None:
             errors.append(f"{row.supplier_id} × {row.plant} : aucune livraison")
@@ -149,19 +150,6 @@ def test_contents_match_allocations(contents: pd.DataFrame, allocations: pd.Data
     same = bool((got["need_lines"] == expected["need_lines"]).all()) and all(
         np.allclose(got[c], expected[c]) for c in ("quantity", "weight", "volume"))
     return same, f"{len(expected)} lignes de contenu comparées"
-
-
-def test_weekly_patterns_add_up(profiles: pd.DataFrame, saving: pd.DataFrame) -> TestOutcome:
-    """Sortie 1 - la somme du rythme hebdomadaire (avant et après) = le nombre de livraisons du couple (sortie 3)"""
-    merged = profiles.merge(saving[[*COUPLE, "deliveries_before", "deliveries_after"]], on=COUPLE, validate="1:1")
-
-    def total(pattern: pd.Series) -> pd.Series:
-        return pattern.astype(str).str.split().map(lambda weeks: sum(int(n) for n in weeks))
-
-    wrong = ((total(merged["weekly_pattern"]) != merged["deliveries_after"])
-             | (total(merged["current_weekly_pattern"]) != merged["deliveries_before"]))
-    examples = ", ".join(f"{r.supplier_id} × {r.plant}" for r in merged[wrong].head(3).itertuples(index=False))
-    return not bool(wrong.any()), f"{int(wrong.sum())} couple(s) dont le rythme ne compte pas toutes les livraisons {examples}".strip()
 
 
 # --------------------------------------------------------------------------- A3. missing-data assumptions
@@ -275,7 +263,6 @@ def output_tests(run: RunTables, holidays: set[date], tariff: Tariff, config: Pl
         ("A2 - contraintes", test_every_delivery_on_a_profile_day, (a, holidays)),
         ("A2 - contraintes", test_plan_start, (run.trucks, run.lines, holidays, config)),
         ("A2 - contraintes", test_contents_match_allocations, (run.contents, a)),
-        ("A2 - contraintes", test_weekly_patterns_add_up, (run.profiles, run.saving)),
         ("A3 - données manquantes", test_h05_imputed_line_alone, (a,)),
         ("A3 - données manquantes", test_h06_imputed_distance, (run.lines, run.trucks, run.distances, preparation.missing_distance)),
         ("A4 - exhaustivité", test_each_line_delivered_once, (a,)),

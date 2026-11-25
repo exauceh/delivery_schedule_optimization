@@ -1,6 +1,7 @@
 """Non-regression: on the real planning, the application gives exactly the outputs of the milestone 3 notebook.
 
-The expected files (`expected/`) are the outputs 1, 2 and 3 written by `milestone3/milestone3.ipynb`. Any change of
+The expected files (`expected/`) are the outputs 1, 2 and 3 written by `milestone3/milestone3.ipynb`; output 1 keeps only
+the columns of the project brief, renamed as in the brief (`io.schemas.PROFILE_COLUMNS`), with the notebook values. Any change of
 the engine that changes a result, even one cent or one line moved to another truck, makes this test fail. The run starts
 from the three raw input files, the carrier's rate sheet being read from its PDF.
 """

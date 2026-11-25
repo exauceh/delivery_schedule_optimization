@@ -1,7 +1,8 @@
 """Outputs 1, 2 and 3 in the layout of the project brief (`courses/consolidation_algorithme_pdf.pdf`, slides 10 to 12).
 
-French headers, the columns of the brief first and in its order, then the detail columns. Used by the Excel report;
-the CSV files keep the column names of the milestone 3 notebook (the regression test compares them byte for byte).
+French headers, the columns of the brief first and in its order, then the detail columns. Used by the Excel report.
+Output 1 has exactly the columns of the brief, in the CSV file as in the report; the other CSV files keep the column
+names of the milestone 3 notebook (the regression test compares them byte for byte).
 """
 
 from __future__ import annotations
@@ -11,7 +12,7 @@ from collections.abc import Mapping
 
 import pandas as pd
 
-from ..io.schemas import OutputName
+from ..io.schemas import PROFILE_COLUMNS, OutputName, profiles_by_code
 
 logger = logging.getLogger(__name__)
 
@@ -22,21 +23,19 @@ def _days(profile_days: str) -> str:
 
 
 def profiles_sheet(profiles: pd.DataFrame) -> pd.DataFrame:
-    """Output 1 (slide 10): the profile to apply for each couple."""
-    return pd.DataFrame({
-        "Fournisseur": profiles["supplier_id"],
-        "Usine": profiles["plant"],
-        "Distance (km)": profiles["distance"].round(1),
-        "Livraisons / sem. actuelles": profiles["current_profile"],
-        "Fréquence cible": profiles["profile"].map(lambda n: f"{n} / semaine"),
-        "Jour": profiles["profile_days"].map(_days),
-        "Camions / sem.": profiles["trucks_per_active_week"].round(1),
-        "Remplissage poids (%)": profiles["mean_fill_weight_pct"].round(1),
-        "Livraisons par semaine, actuelles": profiles["current_weekly_pattern"],
-        "Livraisons par semaine, après": profiles["weekly_pattern"],
-        "Avance moyenne (jours)": profiles["mean_advance_days"].round(1),
-        "Justification": profiles["reason"],
+    """Output 1 (slide 10): the profile to apply for each couple, with the columns of the CSV file (`PROFILE_COLUMNS`)."""
+    p = profiles_by_code(profiles)
+    sheet = pd.DataFrame({
+        "supplier_id": p["supplier_id"],
+        "plant": p["plant"],
+        "distance": p["distance"].round(1),
+        "current_profile": p["current_profile"],
+        "profile": p["profile"].map(lambda n: f"{n} / semaine"),
+        "profile_days": p["profile_days"].map(_days),
+        "trucks_per_active_week": p["trucks_per_active_week"].round(1),
+        "mean_fill_weight_pct": p["mean_fill_weight_pct"].round(1),
     })
+    return sheet.rename(columns=PROFILE_COLUMNS)
 
 
 def truck_contents_sheet(contents: pd.DataFrame) -> pd.DataFrame:

@@ -1,181 +1,181 @@
-supplier_id,plant,distance,current_profile,current_weekly_pattern,profile,profile_days,weekly_pattern,trucks_per_active_week,mean_fill_weight_pct,mean_advance_days,reason
-SUP_00003,PLT_001,83.0,2,0 2 0 2 2 0 1,1,mardi,0 1 0 1 1 0 1,1.0,0.726326530612245,1.8571428571428572,profil 1 : meilleur plan dont chaque départ tient dans un camion
-SUP_00005,PLT_001,46.0,1,0 0 1 1 1 1 1,1,mardi,0 0 1 1 1 1 0,1.5,54.25700680272108,3.857142857142857,profil 1 : meilleur plan dont chaque départ tient dans un camion ; lissage : mardi plutôt que lundi (+0 EUR)
-SUP_00010,PLT_001,56.0,2,0 1 0 2 1 0 0,1,jeudi,0 1 0 1 1 0 0,1.0,0.045823129251700685,0.5,profil 1 : meilleur plan dont chaque départ tient dans un camion
-SUP_00014,PLT_001,54.0,4,0 4 1 3 4 3 3,2,lundi + jeudi,0 1 1 0 2 0 1,1.25,1.6800653061224489,2.6315789473684212,"profil 2 : meilleur plan dont chaque départ tient dans un camion (profil 1 possible : +0 camion(s), +20 EUR)"
-SUP_00016,PLT_001,96.0,1,0 0 1 1 1 1 0,1,mercredi,0 0 1 0 1 0 0,1.0,0.31689795918367347,3.5,profil 1 : meilleur plan dont chaque départ tient dans un camion
-SUP_00019,PLT_001,77.0,1,0 0 1 1 0 0 0,1,jeudi,0 0 1 0 0 0 0,1.0,0.6840408163265306,4.0,profil 1 : meilleur plan dont chaque départ tient dans un camion ; lissage : jeudi plutôt que vendredi (+0 EUR)
-SUP_00024,PLT_001,64.0,4,0 3 4 2 3 4 2,3,lundi + mardi + vendredi,0 1 3 1 2 0 1,1.6,19.814785714285712,2.8636363636363638,"profil 3 : meilleur plan dont chaque départ tient dans un camion (profil 2 possible : -2 camion(s), +31 EUR)"
-SUP_00026,PLT_001,47.0,1,0 1 1 1 1 1 0,1,vendredi,0 1 0 1 0 1 0,1.0,7.171700680272109,2.8,profil 1 : meilleur plan dont chaque départ tient dans un camion
-SUP_00035,PLT_001,76.0,4,0 3 3 4 1 0 0,2,mardi + vendredi,0 1 2 0 1 0 0,1.3333333333333333,3.215,3.864864864864865,"profil 2 : meilleur plan dont chaque départ tient dans un camion (profil 1 possible : +0 camion(s), +11 EUR)"
-SUP_00037,PLT_001,69.0,3,0 1 1 1 3 1 0,1,vendredi,0 1 1 1 0 1 0,1.0,3.1505102040816326,4.0,profil 1 : meilleur plan dont chaque départ tient dans un camion
-SUP_00038,PLT_001,72.0,5,0 5 5 4 4 3 3,2,mardi + vendredi,1 1 1 0 2 1 0,1.2,0.6624217687074829,3.8771929824561404,"profil 2 : meilleur plan dont chaque départ tient dans un camion (profil 1 possible : +0 camion(s), +7 EUR) ; lissage : mardi + vendredi plutôt que lundi + vendredi (+0 EUR)"
-SUP_00045,PLT_001,95.0,5,0 4 5 4 4 3 3,3,lundi + mercredi + vendredi,0 1 1 1 1 3 0,1.4,8.798787172011663,3.074074074074074,"profil 3 : meilleur plan dont chaque départ tient dans un camion (profil 2 possible : -1 camion(s), +4 EUR)"
-SUP_00051,PLT_001,25.0,3,0 2 2 1 3 3 2,1,mardi,0 1 1 1 1 1 0,1.0,36.62693877551021,3.423076923076923,profil 1 : meilleur plan dont chaque départ tient dans un camion ; lissage : mardi plutôt que mercredi (+0 EUR)
-SUP_00052,PLT_001,126.0,5,0 5 4 4 2 3 2,2,lundi + jeudi,0 1 2 1 1 0 1,1.2,0.8877346938775509,2.24,"profil 2 : meilleur plan dont chaque départ tient dans un camion (profil 1 possible : +0 camion(s), +8 EUR)"
-SUP_00053,PLT_001,26.0,5,0 4 4 5 4 4 2,2,mardi + jeudi,0 2 1 1 1 1 0,1.2,3.9122312925170064,2.5,"profil 2 : meilleur plan dont chaque départ tient dans un camion (profil 1 possible : +0 camion(s), +30 EUR)"
-SUP_00055,PLT_001,68.0,4,0 3 4 4 2 2 4,2,lundi + jeudi,0 2 0 1 1 1 0,1.25,7.9324408163265305,3.5357142857142856,"profil 2 : meilleur plan dont chaque départ tient dans un camion (profil 1 possible : +1 camion(s), +61 EUR)"
-SUP_00057,PLT_001,108.0,3,0 1 2 2 3 1 3,2,mardi + jeudi,0 1 0 1 1 2 0,1.25,2.9976163265306117,3.5384615384615383,"profil 2 : meilleur plan dont chaque départ tient dans un camion (profil 1 possible : +1 camion(s), +32 EUR) ; lissage : mardi + jeudi plutôt que lundi + jeudi (+0 EUR)"
-SUP_00058,PLT_001,33.0,2,0 1 2 2 1 2 1,2,lundi + jeudi,0 1 0 1 0 2 0,1.3333333333333333,4.122877551020408,2.888888888888889,"profil 2 : meilleur plan dont chaque départ tient dans un camion (profil 1 possible : +0 camion(s), +15 EUR)"
-SUP_00060,PLT_001,69.0,5,0 3 5 5 5 5 4,1,lundi,0 1 1 1 1 1 1,1.0,5.5528571428571425,2.7333333333333334,profil 1 : meilleur plan dont chaque départ tient dans un camion
-SUP_00062,PLT_001,96.0,1,0 0 0 0 1 1 0,1,vendredi,0 0 0 1 1 0 0,1.0,18.33061224489796,5.5,profil 1 : meilleur plan dont chaque départ tient dans un camion ; lissage : vendredi plutôt que mercredi (+0 EUR)
-SUP_00066,PLT_001,22.0,3,0 1 0 3 2 0 0,1,mardi,0 1 0 1 1 0 0,1.0,1.5210204081632652,0.9,profil 1 : meilleur plan dont chaque départ tient dans un camion
-SUP_00073,PLT_001,48.0,4,0 2 1 2 4 3 2,2,lundi + mercredi,0 2 0 1 1 1 0,1.25,10.10204081632653,3.2666666666666666,"profil 2 : meilleur plan dont chaque départ tient dans un camion (profil 1 possible : +1 camion(s), +67 EUR)"
-SUP_00079,PLT_001,30.0,1,0 1 1 1 0 1 0,1,jeudi,0 1 0 1 0 1 0,1.0,1.046122448979592,1.5,profil 1 : meilleur plan dont chaque départ tient dans un camion
-SUP_00080,PLT_001,40.0,3,0 2 3 3 2 2 2,2,mardi + jeudi,0 1 1 1 0 2 0,1.25,2.3802448979591837,2.2142857142857144,"profil 2 : meilleur plan dont chaque départ tient dans un camion (profil 1 possible : +1 camion(s), +31 EUR)"
-SUP_00081,PLT_001,143.0,1,0 1 0 0 1 1 0,1,vendredi,0 1 0 0 1 0 0,1.0,1.5984285714285715,1.3333333333333333,profil 1 : meilleur plan dont chaque départ tient dans un camion
-SUP_00086,PLT_001,122.0,1,0 1 0 1 1 0 0,1,jeudi,1 0 1 1 0 0 0,1.0,0.167687074829932,5.25,profil 1 : meilleur plan dont chaque départ tient dans un camion ; lissage : jeudi plutôt que mardi (+0 EUR)
-SUP_00087,PLT_001,98.0,2,0 0 2 1 0 1 0,1,vendredi,0 1 1 0 1 0 0,1.0,0.5831972789115646,5.5,profil 1 : meilleur plan dont chaque départ tient dans un camion ; lissage : vendredi plutôt que mardi (+0 EUR)
-SUP_00090,PLT_001,33.0,1,0 0 0 0 1 0 0,1,vendredi,0 0 0 0 1 0 0,1.0,2.0016326530612245,0.0,profil 1 : meilleur plan dont chaque départ tient dans un camion
-SUP_00091,PLT_001,22.0,5,0 3 2 5 3 2 1,2,lundi + mercredi,0 2 0 1 1 0 1,1.5,21.568523809523807,2.963963963963964,"profil 2 : meilleur plan dont chaque départ tient dans un camion (profil 1 possible : +1 camion(s), +34 EUR)"
-SUP_00092,PLT_001,65.0,1,0 1 1 0 0 1 0,1,jeudi,1 1 0 0 0 1 0,1.0,0.04546938775510204,3.3333333333333335,profil 1 : meilleur plan dont chaque départ tient dans un camion ; lissage : jeudi plutôt que lundi (+0 EUR)
-SUP_00094,PLT_001,46.0,1,0 1 0 0 0 0 0,1,mardi,0 1 0 0 0 0 0,1.0,0.9685714285714285,0.0,profil 1 : meilleur plan dont chaque départ tient dans un camion
-SUP_00095,PLT_001,66.0,2,0 1 2 1 2 1 1,1,mardi,0 1 1 1 1 1 0,1.0,1.0096326530612245,3.0,profil 1 : meilleur plan dont chaque départ tient dans un camion ; lissage : mardi plutôt que mercredi (+0 EUR)
-SUP_00102,PLT_001,62.0,5,0 5 5 5 5 3 2,2,lundi + vendredi,0 1 2 0 1 1 1,1.2,1.5915782312925169,2.911764705882353,"profil 2 : meilleur plan dont chaque départ tient dans un camion (profil 1 possible : +0 camion(s), +2 EUR)"
-SUP_00107,PLT_001,9.0,5,0 5 5 5 5 5 4,1,jeudi,1 1 1 1 1 1 0,1.0,7.77757142857143,2.9526315789473685,profil 1 : meilleur plan dont chaque départ tient dans un camion
-SUP_00108,PLT_001,38.0,1,0 1 0 0 0 1 0,1,mardi,0 1 0 0 0 1 0,1.0,100.0,1.5,profil 1 : meilleur plan dont chaque départ tient dans un camion ; lissage : mardi plutôt que mercredi (+0 EUR)
-SUP_00113,PLT_001,37.0,2,0 2 2 2 2 2 1,2,lundi + jeudi,0 2 0 1 1 1 0,1.25,5.075020408163266,3.25,"profil 2 : meilleur plan dont chaque départ tient dans un camion (profil 1 possible : +0 camion(s), +26 EUR)"
-SUP_00117,PLT_001,23.0,1,0 0 0 0 0 1 0,1,lundi,0 0 0 0 0 1 0,1.0,0.9853061224489796,1.0,profil 1 : meilleur plan dont chaque départ tient dans un camion ; lissage : lundi plutôt que mardi (+0 EUR)
-SUP_00118,PLT_001,100.0,5,0 5 5 5 5 5 4,2,lundi + vendredi,0 1 1 2 0 2 0,1.5,13.061210884353745,2.7142857142857144,"profil 2 : meilleur plan dont chaque départ tient dans un camion (profil 1 possible : +0 camion(s), +46 EUR)"
-SUP_00124,PLT_001,55.0,1,0 0 0 0 1 0 0,1,lundi,0 0 0 0 1 0 0,1.0,1.489387755102041,0.0,profil 1 : meilleur plan dont chaque départ tient dans un camion
-SUP_00129,PLT_001,84.0,4,0 4 4 2 3 3 3,1,mercredi,1 1 1 1 1 1 0,3.5,82.23694849368319,3.5,profil 1 : meilleur plan dont chaque départ tient dans un camion
-SUP_00130,PLT_001,149.0,1,0 0 1 0 0 0 0,1,vendredi,0 1 0 0 0 0 0,1.0,0.2571428571428571,4.0,profil 1 : meilleur plan dont chaque départ tient dans un camion ; lissage : vendredi plutôt que mardi (+0 EUR)
-SUP_00136,PLT_001,59.0,5,0 3 2 5 4 1 0,2,mercredi + jeudi,0 1 1 1 2 0 0,1.25,9.527706122448977,3.4642857142857144,"profil 2 : meilleur plan dont chaque départ tient dans un camion (profil 1 possible : -1 camion(s), +11 EUR)"
-SUP_00143,PLT_001,21.0,1,0 1 1 1 1 1 0,1,mercredi,0 1 1 0 1 0 0,1.0,1.7970068027210884,3.2,profil 1 : meilleur plan dont chaque départ tient dans un camion
-SUP_00144,PLT_001,38.0,5,0 5 5 4 3 2 1,2,lundi + mercredi,0 1 1 2 1 1 0,1.4,54.76174927113702,1.626865671641791,"profil 2 : meilleur plan dont chaque départ tient dans un camion (profil 1 possible : +0 camion(s), +61 EUR)"
-SUP_00145,PLT_001,67.0,2,0 1 0 2 1 0 0,1,vendredi,1 0 1 1 0 0 0,1.0,0.15160544217687077,4.75,profil 1 : meilleur plan dont chaque départ tient dans un camion
-SUP_00146,PLT_001,122.0,2,0 1 0 2 1 0 0,1,jeudi,0 1 0 1 1 0 0,1.0,0.611034013605442,0.42857142857142855,profil 1 : meilleur plan dont chaque départ tient dans un camion
-SUP_00148,PLT_001,68.0,3,0 3 2 3 3 2 1,2,mardi + vendredi,1 1 0 2 0 1 0,1.25,7.596848979591837,3.4545454545454546,"profil 2 : meilleur plan dont chaque départ tient dans un camion (profil 1 possible : +1 camion(s), +52 EUR)"
-SUP_00149,PLT_001,13.0,1,0 1 0 0 1 1 0,1,mardi,1 0 0 0 1 0 0,1.0,1.5604081632653062,3.75,profil 1 : meilleur plan dont chaque départ tient dans un camion ; lissage : mardi plutôt que mercredi (+0 EUR)
-SUP_00151,PLT_001,82.0,3,0 1 2 3 1 0 1,1,jeudi,1 1 1 1 0 1 0,1.0,0.07005714285714285,4.25,profil 1 : meilleur plan dont chaque départ tient dans un camion ; lissage : jeudi plutôt que lundi (+0 EUR)
-SUP_00152,PLT_001,57.0,3,0 1 2 3 1 0 0,1,vendredi,1 1 1 0 1 0 0,1.0,1.7871836734693878,4.181818181818182,profil 1 : meilleur plan dont chaque départ tient dans un camion
-SUP_00154,PLT_001,127.0,1,0 1 1 1 1 0 0,1,jeudi,0 1 1 0 1 0 0,1.0,1.0441360544217686,3.0,profil 1 : meilleur plan dont chaque départ tient dans un camion
-SUP_00008,PLT_002,17.0,1,0 1 0 1 1 0 0,1,jeudi,0 1 0 1 1 0 0,1.0,2.717687074829932,0.25,profil 1 : meilleur plan dont chaque départ tient dans un camion
-SUP_00010,PLT_002,56.0,3,0 1 2 3 1 0 0,1,vendredi,1 1 1 1 0 0 0,1.0,1.1546326530612245,3.3636363636363638,profil 1 : meilleur plan dont chaque départ tient dans un camion
-SUP_00011,PLT_002,145.0,3,0 2 0 3 2 1 0,2,lundi + mardi,0 2 0 1 1 0 0,1.3333333333333333,1.103061224489796,2.0,"profil 2 : meilleur plan dont chaque départ tient dans un camion (profil 1 possible : +0 camion(s), +2 EUR)"
-SUP_00016,PLT_002,96.0,1,0 1 0 0 0 0 0,1,mercredi,1 0 0 0 0 0 0,1.0,0.386530612244898,6.0,profil 1 : meilleur plan dont chaque départ tient dans un camion ; lissage : mercredi plutôt que mardi (+0 EUR)
-SUP_00018,PLT_002,6.0,1,0 0 1 1 0 0 0,1,mardi,0 0 1 1 0 0 0,1.5,100.0,3.0,profil 1 : meilleur plan dont chaque départ tient dans un camion ; lissage : mardi plutôt que vendredi (+0 EUR)
-SUP_00019,PLT_002,77.0,2,0 1 2 2 1 1 0,2,mercredi + vendredi,0 1 2 0 1 0 0,1.6666666666666667,41.451746938775514,2.84375,"profil 2 : meilleur plan dont chaque départ tient dans un camion (profil 1 possible : +1 camion(s), +49 EUR)"
-SUP_00020,PLT_002,42.0,2,0 0 1 2 0 0 0,1,vendredi,0 0 1 0 0 0 0,1.0,1.0991836734693878,4.333333333333333,profil 1 : meilleur plan dont chaque départ tient dans un camion
-SUP_00024,PLT_002,64.0,3,0 0 1 3 1 0 0,1,vendredi,0 0 1 1 0 0 0,1.0,4.057571428571428,3.35,profil 1 : meilleur plan dont chaque départ tient dans un camion
-SUP_00028,PLT_002,54.0,2,0 0 1 2 0 0 0,1,vendredi,0 0 1 0 0 0 0,1.0,8.457142857142857,3.966666666666667,profil 1 : meilleur plan dont chaque départ tient dans un camion
-SUP_00032,PLT_002,12.0,3,0 0 1 3 1 0 0,1,mardi,0 0 1 1 0 0 0,2.5,88.77861224489796,3.1333333333333333,profil 1 : meilleur plan dont chaque départ tient dans un camion ; lissage : mardi plutôt que jeudi (+0 EUR)
-SUP_00033,PLT_002,41.0,2,0 0 1 2 0 0 0,1,vendredi,0 0 1 0 0 0 0,1.0,1.1220408163265305,4.333333333333333,profil 1 : meilleur plan dont chaque départ tient dans un camion
-SUP_00035,PLT_002,76.0,4,0 3 3 4 3 2 0,2,mardi + vendredi,1 1 1 0 2 0 0,1.25,2.525346938775509,3.703125,"profil 2 : meilleur plan dont chaque départ tient dans un camion (profil 1 possible : +0 camion(s), +25 EUR)"
-SUP_00037,PLT_002,69.0,4,0 3 2 4 0 1 0,1,mercredi,1 1 1 1 0 1 0,1.4,65.65481049562682,1.9285714285714286,"profil 1 : des départs dépassent un camion quel que soit le plan, on ajoute des camions"
-SUP_00038,PLT_002,72.0,3,0 3 3 3 3 2 0,2,lundi + vendredi,0 1 2 0 1 1 0,1.25,8.16301224489796,3.7679558011049723,"profil 2 : meilleur plan dont chaque départ tient dans un camion (profil 1 possible : +0 camion(s), +152 EUR)"
-SUP_00039,PLT_002,80.0,2,0 0 1 2 0 0 0,1,vendredi,0 0 1 0 0 0 0,1.0,0.2082857142857143,4.333333333333333,profil 1 : meilleur plan dont chaque départ tient dans un camion
-SUP_00045,PLT_002,95.0,2,0 1 1 2 2 1 0,2,lundi + vendredi,0 1 0 2 1 0 0,1.3333333333333333,2.8956326530612246,2.6315789473684212,"profil 2 : meilleur plan dont chaque départ tient dans un camion (profil 1 possible : +0 camion(s), +3 EUR)"
-SUP_00046,PLT_002,91.0,2,0 0 1 2 1 0 0,1,vendredi,0 0 1 0 1 0 0,4.0,75.63018367346939,4.105263157894737,profil 1 : meilleur plan dont chaque départ tient dans un camion
-SUP_00052,PLT_002,126.0,1,0 0 1 0 0 0 0,1,lundi,0 0 1 0 0 0 0,1.0,0.05293877551020408,4.0,profil 1 : meilleur plan dont chaque départ tient dans un camion ; lissage : lundi plutôt que vendredi (+0 EUR)
-SUP_00053,PLT_002,26.0,3,0 0 1 3 1 0 0,1,mercredi,0 0 1 1 0 0 0,1.0,0.087,3.0,profil 1 : meilleur plan dont chaque départ tient dans un camion ; lissage : mercredi plutôt que jeudi (+0 EUR)
-SUP_00054,PLT_002,31.0,1,0 0 1 1 0 0 0,1,mercredi,0 1 0 1 0 0 0,1.0,100.0,3.5,profil 1 : meilleur plan dont chaque départ tient dans un camion ; lissage : mercredi plutôt que mardi (+0 EUR)
-SUP_00058,PLT_002,33.0,3,0 1 1 3 1 0 0,1,lundi,0 1 1 1 1 0 0,1.0,1.4746326530612246,2.0,profil 1 : meilleur plan dont chaque départ tient dans un camion
-SUP_00060,PLT_002,69.0,3,0 0 2 3 1 0 0,2,lundi + vendredi,0 0 2 0 1 0 0,1.5,10.645469387755101,3.8205128205128207,"profil 2 : meilleur plan dont chaque départ tient dans un camion (profil 1 possible : -1 camion(s), +76 EUR)"
-SUP_00066,PLT_002,22.0,2,0 0 1 2 0 0 0,1,vendredi,0 0 1 0 0 0 0,1.0,1.420408163265306,4.333333333333333,profil 1 : meilleur plan dont chaque départ tient dans un camion
-SUP_00068,PLT_002,27.0,2,0 0 0 2 0 0 0,1,jeudi,0 0 0 1 0 0 0,1.0,1.396326530612245,0.5,profil 1 : meilleur plan dont chaque départ tient dans un camion
-SUP_00071,PLT_002,149.0,2,0 0 0 0 0 2 0,1,vendredi,0 0 0 0 1 0 0,1.0,6.084081632653061,3.5,profil 1 : meilleur plan dont chaque départ tient dans un camion ; lissage : vendredi plutôt que lundi (+0 EUR)
-SUP_00073,PLT_002,48.0,2,0 1 1 2 0 0 0,1,vendredi,1 0 1 0 0 0 0,1.0,17.666367346938774,4.75,profil 1 : meilleur plan dont chaque départ tient dans un camion
-SUP_00077,PLT_002,23.0,1,0 0 0 1 1 1 0,1,mardi,0 0 0 1 1 1 0,1.0,100.0,1.3333333333333333,profil 1 : meilleur plan dont chaque départ tient dans un camion
-SUP_00079,PLT_002,30.0,2,0 1 2 2 2 0 0,1,jeudi,0 1 1 1 1 0 0,1.0,1.2681632653061226,1.0,profil 1 : meilleur plan dont chaque départ tient dans un camion
-SUP_00080,PLT_002,40.0,5,0 5 4 5 4 2 0,3,lundi + mardi + vendredi,0 1 3 0 1 0 0,2.0,32.86762585034013,3.6372549019607843,"profil 3 : meilleur plan dont chaque départ tient dans un camion (profil 2 possible : +0 camion(s), +10 EUR)"
-SUP_00081,PLT_002,143.0,2,0 1 1 2 2 1 0,1,vendredi,0 1 1 1 1 0 0,1.0,1.2809591836734695,3.727272727272727,profil 1 : meilleur plan dont chaque départ tient dans un camion
-SUP_00083,PLT_002,27.0,3,0 1 2 3 2 1 0,1,lundi,0 1 1 1 1 0 0,1.0,19.0380306122449,2.857142857142857,profil 1 : meilleur plan dont chaque départ tient dans un camion
-SUP_00086,PLT_002,122.0,2,0 0 1 2 0 0 0,1,vendredi,0 0 1 0 0 0 0,1.0,2.8708163265306124,3.5454545454545454,profil 1 : meilleur plan dont chaque départ tient dans un camion
-SUP_00087,PLT_002,98.0,2,0 1 1 2 0 0 0,1,vendredi,1 0 1 0 0 0 0,2.5,60.56640000000001,5.0,profil 1 : meilleur plan dont chaque départ tient dans un camion
-SUP_00090,PLT_002,33.0,3,0 1 1 3 2 1 0,1,jeudi,1 0 1 1 1 0 0,1.0,2.571877551020408,3.727272727272727,profil 1 : meilleur plan dont chaque départ tient dans un camion
-SUP_00091,PLT_002,22.0,5,0 5 2 5 4 2 0,2,lundi + mardi,0 2 0 1 1 0 0,1.3333333333333333,4.342734693877551,2.643835616438356,"profil 2 : meilleur plan dont chaque départ tient dans un camion (profil 1 possible : +1 camion(s), +29 EUR)"
-SUP_00092,PLT_002,65.0,2,0 2 2 2 2 1 0,2,mercredi + vendredi,1 0 2 0 1 0 0,1.3333333333333333,1.2591326530612246,3.5714285714285716,"profil 2 : meilleur plan dont chaque départ tient dans un camion (profil 1 possible : +0 camion(s), +5 EUR)"
-SUP_00094,PLT_002,46.0,1,0 1 0 0 0 0 0,1,mercredi,1 0 0 0 0 0 0,1.0,0.6775510204081633,5.0,profil 1 : meilleur plan dont chaque départ tient dans un camion ; lissage : mercredi plutôt que lundi (+0 EUR)
-SUP_00096,PLT_002,30.0,2,0 1 0 2 1 1 0,1,jeudi,1 0 1 1 1 0 0,1.0,2.6481632653061222,3.8,profil 1 : meilleur plan dont chaque départ tient dans un camion ; lissage : jeudi plutôt que mercredi (+0 EUR)
-SUP_00097,PLT_002,72.0,4,0 1 1 4 2 0 0,1,mercredi,1 0 1 1 0 0 0,1.3333333333333333,42.77632653061225,2.0309278350515463,profil 1 : meilleur plan dont chaque départ tient dans un camion ; lissage : mercredi plutôt que jeudi (+0 EUR)
-SUP_00102,PLT_002,62.0,5,0 4 0 5 4 2 0,1,lundi,0 1 0 1 1 1 0,1.0,10.873775510204082,2.0869565217391304,profil 1 : meilleur plan dont chaque départ tient dans un camion
-SUP_00107,PLT_002,9.0,4,0 2 4 4 4 1 0,2,lundi + mercredi,0 2 1 1 1 0 0,2.25,55.957002267573706,2.5,"profil 2 : meilleur plan dont chaque départ tient dans un camion (profil 1 possible : +1 camion(s), +13 EUR)"
-SUP_00109,PLT_002,10.0,1,0 1 0 1 1 1 0,1,mercredi,1 0 0 1 1 0 0,1.3333333333333333,27.196642857142862,3.6666666666666665,profil 1 : meilleur plan dont chaque départ tient dans un camion
-SUP_00113,PLT_002,37.0,2,0 0 0 2 1 0 0,1,lundi,0 0 0 1 0 0 0,1.0,0.6996734693877551,3.6666666666666665,profil 1 : meilleur plan dont chaque départ tient dans un camion
-SUP_00116,PLT_002,26.0,2,0 0 0 2 1 0 0,1,lundi,0 0 0 1 0 0 0,1.0,0.12448979591836734,3.6666666666666665,profil 1 : meilleur plan dont chaque départ tient dans un camion
-SUP_00117,PLT_002,23.0,5,0 4 1 5 4 2 0,1,vendredi,1 0 1 1 1 0 0,3.75,82.94884625850341,3.619047619047619,profil 1 : meilleur plan dont chaque départ tient dans un camion
-SUP_00118,PLT_002,100.0,3,0 2 1 3 2 1 0,1,mardi,1 1 0 1 1 0 0,1.0,0.4077142857142858,3.111111111111111,profil 1 : meilleur plan dont chaque départ tient dans un camion
-SUP_00122,PLT_002,63.0,2,0 0 1 2 0 0 0,1,vendredi,0 0 1 0 0 0 0,1.0,0.040040816326530615,4.333333333333333,profil 1 : meilleur plan dont chaque départ tient dans un camion
-SUP_00124,PLT_002,55.0,2,0 2 0 2 2 1 0,1,jeudi,1 0 1 1 1 0 0,1.0,2.4542857142857146,3.7142857142857144,profil 1 : meilleur plan dont chaque départ tient dans un camion ; lissage : jeudi plutôt que lundi (+0 EUR)
-SUP_00127,PLT_002,18.0,1,0 1 0 0 1 0 0,1,jeudi,1 0 0 0 1 0 0,1.0,100.0,3.5,profil 1 : meilleur plan dont chaque départ tient dans un camion ; lissage : jeudi plutôt que mercredi (+0 EUR)
-SUP_00128,PLT_002,68.0,3,0 1 3 3 2 0 0,1,vendredi,1 1 1 1 0 0 0,1.0,1.0551020408163265,4.75,profil 1 : meilleur plan dont chaque départ tient dans un camion
-SUP_00130,PLT_002,149.0,2,0 0 1 2 0 0 0,1,vendredi,0 0 1 0 0 0 0,1.0,1.7497959183673473,4.333333333333333,profil 1 : meilleur plan dont chaque départ tient dans un camion
-SUP_00132,PLT_002,24.0,1,0 1 0 0 0 0 0,1,jeudi,0 1 0 0 0 0 0,1.0,0.3086530612244898,0.0,profil 1 : meilleur plan dont chaque départ tient dans un camion
-SUP_00133,PLT_002,64.0,1,0 1 0 0 1 1 0,1,jeudi,1 0 0 1 1 0 0,1.0,100.0,5.0,profil 1 : meilleur plan dont chaque départ tient dans un camion ; lissage : jeudi plutôt que lundi (+0 EUR)
-SUP_00136,PLT_002,59.0,5,0 4 1 5 5 2 0,2,lundi + mardi,0 2 0 1 1 0 0,1.3333333333333333,5.912540816326532,2.696969696969697,"profil 2 : meilleur plan dont chaque départ tient dans un camion (profil 1 possible : +1 camion(s), +65 EUR)"
-SUP_00143,PLT_002,21.0,2,0 0 1 2 0 0 0,1,vendredi,0 0 1 0 0 0 0,1.0,1.5502040816326528,4.333333333333333,profil 1 : meilleur plan dont chaque départ tient dans un camion
-SUP_00144,PLT_002,38.0,3,0 0 2 3 1 0 0,1,jeudi,0 1 1 0 1 0 0,1.0,0.9028571428571428,4.5,profil 1 : meilleur plan dont chaque départ tient dans un camion ; lissage : jeudi plutôt que lundi (+0 EUR)
-SUP_00145,PLT_002,67.0,5,0 4 3 5 5 2 0,2,jeudi + vendredi,1 1 1 1 2 0 0,2.0,55.290285714285716,4.0843373493975905,"profil 2 : meilleur plan dont chaque départ tient dans un camion (profil 1 possible : +0 camion(s), +37 EUR)"
-SUP_00146,PLT_002,122.0,5,0 5 3 5 5 2 0,2,lundi + mardi,0 1 1 1 2 0 0,1.25,42.713216326530606,2.4452054794520546,"profil 2 : meilleur plan dont chaque départ tient dans un camion (profil 1 possible : +0 camion(s), +277 EUR)"
-SUP_00148,PLT_002,68.0,2,0 0 1 2 1 0 0,1,vendredi,0 0 1 1 0 0 0,1.0,2.7140612244897957,4.75,profil 1 : meilleur plan dont chaque départ tient dans un camion
-SUP_00149,PLT_002,13.0,1,0 0 0 1 0 0 0,1,jeudi,0 0 0 1 0 0 0,1.0,0.6222448979591836,0.0,profil 1 : meilleur plan dont chaque départ tient dans un camion
-SUP_00150,PLT_002,118.0,1,0 0 1 1 0 0 0,1,vendredi,0 0 1 0 0 0 0,1.0,1.6408163265306122,3.5,profil 1 : meilleur plan dont chaque départ tient dans un camion
-SUP_00151,PLT_002,82.0,4,0 1 1 4 0 0 0,1,vendredi,1 0 1 0 0 0 0,1.0,0.6865102040816325,3.875,profil 1 : meilleur plan dont chaque départ tient dans un camion
-SUP_00152,PLT_002,57.0,4,0 2 4 3 3 1 0,2,lundi + mercredi,0 2 1 1 1 0 0,1.25,1.4820163265306125,2.238095238095238,"profil 2 : meilleur plan dont chaque départ tient dans un camion (profil 1 possible : +0 camion(s), +11 EUR)"
-SUP_00154,PLT_002,127.0,2,0 2 0 2 1 1 0,1,lundi,0 1 0 1 1 1 0,1.0,2.968265306122449,1.6666666666666667,profil 1 : meilleur plan dont chaque départ tient dans un camion
-SUP_00016,PLT_003,96.0,1,0 1 0 1 0 0 0,1,mercredi,0 1 0 1 0 0 0,1.0,0.9853061224489794,1.0,profil 1 : meilleur plan dont chaque départ tient dans un camion ; lissage : mercredi plutôt que jeudi (+0 EUR)
-SUP_00024,PLT_003,64.0,1,0 1 1 1 1 1 1,1,mardi,0 1 0 1 0 1 0,1.0,24.137414965986398,3.75,profil 1 : meilleur plan dont chaque départ tient dans un camion
-SUP_00038,PLT_003,72.0,1,0 1 1 1 1 1 1,1,mardi,0 1 0 1 0 1 0,1.0,4.037714285714285,3.1818181818181817,profil 1 : meilleur plan dont chaque départ tient dans un camion
-SUP_00055,PLT_003,68.0,1,0 1 0 1 0 1 0,1,jeudi,0 1 0 1 0 1 0,1.0,0.8679319727891157,0.0,profil 1 : meilleur plan dont chaque départ tient dans un camion
-SUP_00059,PLT_003,122.0,5,0 3 5 5 5 4 3,1,mercredi,0 1 1 1 1 1 0,1.0,18.966416326530613,3.56,profil 1 : meilleur plan dont chaque départ tient dans un camion
-SUP_00060,PLT_003,69.0,1,0 1 0 1 0 0 1,1,jeudi,0 1 0 1 0 1 0,1.0,0.7212244897959182,1.6666666666666667,profil 1 : meilleur plan dont chaque départ tient dans un camion ; lissage : jeudi plutôt que mardi (+0 EUR)
-SUP_00074,PLT_003,132.0,2,0 2 2 2 2 2 1,2,mardi + jeudi,0 1 1 1 0 2 0,1.5,52.58384353741496,3.0,"profil 2 : meilleur plan dont chaque départ tient dans un camion (profil 1 possible : +1 camion(s), +103 EUR)"
-SUP_00080,PLT_003,40.0,1,0 1 1 1 1 0 1,1,lundi,0 1 1 1 0 0 1,1.0,0.5780408163265306,3.2,profil 1 : meilleur plan dont chaque départ tient dans un camion ; lissage : lundi plutôt que mercredi (+0 EUR)
-SUP_00085,PLT_003,121.0,1,0 1 1 1 1 1 1,1,mardi,0 1 0 1 0 1 0,1.3333333333333333,27.38680612244898,4.117647058823529,profil 1 : meilleur plan dont chaque départ tient dans un camion
-SUP_00087,PLT_003,98.0,1,0 1 1 0 1 0 1,1,lundi,0 1 1 0 1 0 1,1.0,1.1305102040816328,1.5,profil 1 : meilleur plan dont chaque départ tient dans un camion
-SUP_00092,PLT_003,65.0,1,0 0 1 0 0 0 0,1,vendredi,0 1 0 0 0 0 0,1.0,0.8146938775510204,4.0,profil 1 : meilleur plan dont chaque départ tient dans un camion ; lissage : vendredi plutôt que mardi (+0 EUR)
-SUP_00094,PLT_003,46.0,1,0 1 1 1 1 1 0,1,jeudi,0 1 0 1 1 0 0,1.0,19.831972789115646,2.8,profil 1 : meilleur plan dont chaque départ tient dans un camion
-SUP_00099,PLT_003,43.0,1,0 0 1 0 0 0 0,1,mercredi,0 0 1 0 0 0 0,1.0,0.9410204081632653,1.0,profil 1 : meilleur plan dont chaque départ tient dans un camion ; lissage : mercredi plutôt que jeudi (+0 EUR)
-SUP_00102,PLT_003,62.0,4,0 2 4 2 2 2 1,2,lundi + mercredi,0 1 2 1 0 1 1,1.4,29.462915451895046,2.4285714285714284,"profil 2 : meilleur plan dont chaque départ tient dans un camion (profil 1 possible : +0 camion(s), +17 EUR)"
-SUP_00107,PLT_003,9.0,2,0 2 2 2 2 2 1,2,mardi + jeudi,0 1 1 1 0 2 0,1.25,10.158073469387755,3.2519083969465647,"profil 2 : meilleur plan dont chaque départ tient dans un camion (profil 1 possible : +0 camion(s), +58 EUR)"
-SUP_00118,PLT_003,100.0,1,0 0 0 0 1 0 0,1,jeudi,0 0 0 0 1 0 0,1.0,0.09093877551020409,0.0,profil 1 : meilleur plan dont chaque départ tient dans un camion
-SUP_00126,PLT_003,122.0,1,0 0 1 0 0 0 0,1,vendredi,0 1 0 0 0 0 0,1.0,1.7093877551020409,4.0,profil 1 : meilleur plan dont chaque départ tient dans un camion ; lissage : vendredi plutôt que mardi (+0 EUR)
-SUP_00128,PLT_003,68.0,1,0 1 0 0 0 0 0,1,mercredi,0 1 0 0 0 0 0,1.0,0.6575510204081633,1.0,profil 1 : meilleur plan dont chaque départ tient dans un camion ; lissage : mercredi plutôt que jeudi (+0 EUR)
-SUP_00129,PLT_003,84.0,5,0 5 5 5 4 5 3,3,lundi + mardi + mercredi,0 1 1 1 1 3 0,5.8,85.32812104152005,3.1159420289855073,"profil 3 : meilleur plan dont chaque départ tient dans un camion (profil 2 possible : +1 camion(s), +93 EUR)"
-SUP_00136,PLT_003,59.0,2,0 1 1 2 1 1 1,1,jeudi,0 1 1 1 0 1 0,1.0,2.2860204081632656,3.8333333333333335,profil 1 : meilleur plan dont chaque départ tient dans un camion
-SUP_00143,PLT_003,21.0,2,0 2 0 0 2 0 1,1,mardi,0 1 0 0 1 0 1,1.0,2.4203809523809525,1.3333333333333333,profil 1 : meilleur plan dont chaque départ tient dans un camion
-SUP_00148,PLT_003,68.0,2,0 2 2 2 2 2 1,2,mardi + jeudi,0 1 1 1 0 2 0,1.25,28.773126530612245,2.8421052631578947,"profil 2 : meilleur plan dont chaque départ tient dans un camion (profil 1 possible : +1 camion(s), +144 EUR)"
-SUP_00149,PLT_003,13.0,1,0 0 0 1 0 0 1,1,vendredi,0 0 1 0 0 1 0,1.0,0.7051020408163265,3.0,profil 1 : meilleur plan dont chaque départ tient dans un camion ; lissage : vendredi plutôt que lundi (+0 EUR)
-SUP_00150,PLT_003,118.0,1,0 0 0 0 0 0 1,1,mardi,0 0 0 0 0 0 1,1.0,0.1853877551020408,0.0,profil 1 : meilleur plan dont chaque départ tient dans un camion
-SUP_00154,PLT_003,127.0,1,0 1 1 1 1 1 0,1,jeudi,0 1 0 1 0 1 0,1.0,0.35819047619047617,2.6923076923076925,profil 1 : meilleur plan dont chaque départ tient dans un camion
-SUP_00156,PLT_003,78.0,1,0 1 0 1 1 1 0,1,jeudi,0 1 0 1 1 0 0,1.0,4.000775510204082,2.3333333333333335,profil 1 : meilleur plan dont chaque départ tient dans un camion
-SUP_00001,PLT_004,47.0,5,0 0 0 2 5 5 5,1,mardi,0 0 0 1 1 1 1,4.5,89.13931972789116,2.227272727272727,profil 1 : meilleur plan dont chaque départ tient dans un camion ; lissage : mardi plutôt que mercredi (+0 EUR)
-SUP_00009,PLT_004,15.0,1,0 0 1 0 0 0 0,1,mercredi,0 1 0 0 0 0 0,1.0,0.49612244897959185,6.0,profil 1 : meilleur plan dont chaque départ tient dans un camion ; lissage : mercredi plutôt que mardi (+0 EUR)
-SUP_00010,PLT_004,56.0,2,0 2 2 2 2 2 2,2,mercredi + vendredi,0 2 0 1 1 1 0,1.25,3.3044897959183674,3.0303030303030303,"profil 2 : meilleur plan dont chaque départ tient dans un camion (profil 1 possible : +1 camion(s), +49 EUR)"
-SUP_00011,PLT_004,145.0,5,0 5 5 5 5 5 5,2,lundi + vendredi,0 1 2 1 0 1 1,1.2,6.200414965986394,2.973684210526316,"profil 2 : meilleur plan dont chaque départ tient dans un camion (profil 1 possible : +0 camion(s), +7 EUR)"
-SUP_00014,PLT_004,54.0,3,0 2 2 2 2 3 1,1,lundi,0 1 1 1 1 1 0,1.0,4.258122448979593,2.8846153846153846,profil 1 : meilleur plan dont chaque départ tient dans un camion
-SUP_00015,PLT_004,95.0,1,0 0 0 1 0 0 1,1,jeudi,0 0 0 1 0 1 0,1.0,1.012857142857143,3.0,profil 1 : meilleur plan dont chaque départ tient dans un camion ; lissage : jeudi plutôt que mercredi (+0 EUR)
-SUP_00019,PLT_004,77.0,3,0 2 3 2 2 2 1,2,mercredi + vendredi,1 1 1 0 2 0 1,1.2,1.3412244897959185,3.25,"profil 2 : meilleur plan dont chaque départ tient dans un camion (profil 1 possible : +0 camion(s), +14 EUR)"
-SUP_00022,PLT_004,73.0,3,0 3 2 2 2 1 2,2,lundi + mercredi,0 2 0 1 1 0 1,1.25,4.523836734693877,2.3448275862068964,"profil 2 : meilleur plan dont chaque départ tient dans un camion (profil 1 possible : +0 camion(s), +1 EUR)"
-SUP_00024,PLT_004,64.0,5,0 5 4 3 4 5 5,2,mardi + vendredi,1 0 1 1 1 2 0,1.2,14.644285714285717,3.608695652173913,"profil 2 : meilleur plan dont chaque départ tient dans un camion (profil 1 possible : +0 camion(s), +73 EUR)"
-SUP_00032,PLT_004,12.0,3,0 1 3 1 2 2 2,2,mercredi + vendredi,0 2 0 1 1 1 0,1.25,3.6957551020408164,4.083333333333333,"profil 2 : meilleur plan dont chaque départ tient dans un camion (profil 1 possible : +1 camion(s), +35 EUR)"
-SUP_00033,PLT_004,41.0,3,0 3 2 2 2 2 3,2,lundi + vendredi,0 2 0 1 1 0 1,1.25,2.5664897959183675,3.625,"profil 2 : meilleur plan dont chaque départ tient dans un camion (profil 1 possible : +1 camion(s), +36 EUR)"
-SUP_00038,PLT_004,72.0,2,0 1 1 1 1 0 2,1,mercredi,0 1 1 0 1 1 0,1.0,0.7591836734693878,4.333333333333333,profil 1 : meilleur plan dont chaque départ tient dans un camion ; lissage : mercredi plutôt que mardi (+0 EUR)
-SUP_00041,PLT_004,48.0,5,0 3 5 5 3 5 4,2,mardi + vendredi,0 1 1 1 2 1 0,1.2,6.144217687074829,3.3333333333333335,"profil 2 : meilleur plan dont chaque départ tient dans un camion (profil 1 possible : +0 camion(s), +15 EUR)"
-SUP_00043,PLT_004,85.0,4,0 2 4 3 3 3 3,2,lundi + vendredi,0 1 1 2 0 2 0,1.5,3.659251700680272,3.263157894736842,"profil 2 : meilleur plan dont chaque départ tient dans un camion (profil 1 possible : +0 camion(s), +21 EUR)"
-SUP_00046,PLT_004,91.0,2,0 1 1 1 1 1 2,1,mercredi,0 1 1 1 0 1 1,1.6,83.56461224489797,1.5121951219512195,"profil 1 : des départs dépassent un camion quel que soit le plan, on ajoute des camions"
-SUP_00060,PLT_004,69.0,1,0 1 1 0 1 1 0,1,jeudi,0 1 1 1 1 0 0,1.0,0.7114285714285714,2.75,profil 1 : meilleur plan dont chaque départ tient dans un camion ; lissage : jeudi plutôt que mercredi (+0 EUR)
-SUP_00061,PLT_004,72.0,1,0 0 1 0 0 0 0,1,jeudi,0 1 0 0 0 0 0,1.0,3.257142857142857,4.0,profil 1 : meilleur plan dont chaque départ tient dans un camion ; lissage : jeudi plutôt que lundi (+0 EUR)
-SUP_00080,PLT_004,40.0,5,0 5 5 5 5 4 5,1,vendredi,1 1 1 1 1 1 0,1.0,18.835850340136055,4.298245614035087,profil 1 : meilleur plan dont chaque départ tient dans un camion
-SUP_00085,PLT_004,121.0,5,0 5 5 5 5 5 5,1,lundi,0 1 1 1 1 1 1,1.0,48.20938775510204,1.9902439024390244,profil 1 : meilleur plan dont chaque départ tient dans un camion
-SUP_00087,PLT_004,98.0,5,0 5 5 5 5 5 3,1,vendredi,1 1 1 1 1 1 0,1.0,11.221700680272109,4.3,profil 1 : meilleur plan dont chaque départ tient dans un camion
-SUP_00091,PLT_004,22.0,5,0 4 5 5 5 4 5,2,mardi + vendredi,0 1 1 1 2 1 0,1.2,4.190680272108843,2.983050847457627,"profil 2 : meilleur plan dont chaque départ tient dans un camion (profil 1 possible : +0 camion(s), +6 EUR)"
-SUP_00094,PLT_004,46.0,5,0 5 5 5 5 4 4,1,vendredi,1 1 1 1 1 1 0,1.0,6.643673469387755,3.8833333333333333,profil 1 : meilleur plan dont chaque départ tient dans un camion
-SUP_00096,PLT_004,30.0,2,0 2 0 1 1 2 0,1,jeudi,1 0 1 1 1 0 0,1.0,5.072755102040816,6.25,profil 1 : meilleur plan dont chaque départ tient dans un camion ; lissage : jeudi plutôt que lundi (+0 EUR)
-SUP_00100,PLT_004,58.0,1,0 1 0 1 0 0 0,1,mercredi,1 0 0 1 0 0 0,1.0,3.7246938775510205,3.0,profil 1 : meilleur plan dont chaque départ tient dans un camion ; lissage : mercredi plutôt que lundi (+0 EUR)
-SUP_00112,PLT_004,70.0,3,0 3 2 1 1 2 1,2,mardi + jeudi,1 0 1 1 0 2 0,1.5,28.363537414965986,3.1,"profil 2 : meilleur plan dont chaque départ tient dans un camion (profil 1 possible : +1 camion(s), +105 EUR) ; lissage : mardi + jeudi plutôt que lundi + mardi (+0 EUR)"
-SUP_00117,PLT_004,23.0,4,0 4 4 4 4 4 4,1,jeudi,1 1 1 1 1 1 0,1.5,90.73551383219954,3.2298850574712645,"profil 1 : des départs dépassent un camion quel que soit le plan, on ajoute des camions ; lissage : jeudi plutôt que lundi (+0 EUR)"
-SUP_00118,PLT_004,100.0,4,0 3 2 4 1 4 3,1,vendredi,1 1 1 0 1 1 0,1.0,6.299689795918368,4.6571428571428575,profil 1 : meilleur plan dont chaque départ tient dans un camion
-SUP_00121,PLT_004,55.0,2,0 2 1 2 2 1 2,1,mardi,0 1 1 1 1 1 1,1.0,0.8367346938775511,2.5,profil 1 : meilleur plan dont chaque départ tient dans un camion ; lissage : mardi plutôt que lundi (-0 EUR)
-SUP_00124,PLT_004,55.0,1,0 1 1 1 1 1 1,1,lundi,0 1 1 0 1 0 1,1.0,2.1036734693877555,2.8333333333333335,profil 1 : meilleur plan dont chaque départ tient dans un camion
-SUP_00126,PLT_004,122.0,2,0 0 0 0 0 1 2,1,jeudi,0 0 0 0 0 1 1,1.0,1.016122448979592,2.6666666666666665,profil 1 : meilleur plan dont chaque départ tient dans un camion
-SUP_00128,PLT_004,68.0,3,0 1 0 3 0 1 2,1,lundi,0 1 0 1 0 1 1,1.0,0.6935714285714286,2.4285714285714284,profil 1 : meilleur plan dont chaque départ tient dans un camion
-SUP_00135,PLT_004,52.0,1,0 0 1 1 1 1 1,1,lundi,0 0 1 0 1 1 0,1.6666666666666667,46.43265306122449,4.0,profil 1 : meilleur plan dont chaque départ tient dans un camion
-SUP_00136,PLT_004,59.0,2,0 2 1 1 1 1 2,1,mercredi,0 1 1 0 1 1 1,1.0,2.5608163265306123,1.6666666666666667,profil 1 : meilleur plan dont chaque départ tient dans un camion
-SUP_00144,PLT_004,38.0,4,0 4 3 3 3 3 2,2,mardi + vendredi,1 0 2 0 1 1 1,1.2,9.743469387755102,3.0555555555555554,"profil 2 : meilleur plan dont chaque départ tient dans un camion (profil 1 possible : +0 camion(s), +26 EUR)"
-SUP_00145,PLT_004,67.0,5,0 5 5 5 5 5 5,3,lundi + mardi + vendredi,0 3 0 1 2 0 1,1.75,13.651332944606416,3.0476190476190474,"profil 3 : meilleur plan dont chaque départ tient dans un camion (profil 1 possible : -1 camion(s), +38 EUR)"
-SUP_00149,PLT_004,13.0,5,0 5 5 5 5 5 5,2,lundi + vendredi,0 2 0 2 0 1 1,1.5,17.458537414965985,3.12,"profil 2 : meilleur plan dont chaque départ tient dans un camion (profil 1 possible : +0 camion(s), +16 EUR)"
-SUP_00152,PLT_004,57.0,1,0 1 1 0 1 1 1,1,mercredi,1 0 1 1 0 1 0,1.0,1.6783673469387759,4.2,profil 1 : meilleur plan dont chaque départ tient dans un camion ; lissage : mercredi plutôt que jeudi (+0 EUR)
-SUP_00153,PLT_004,79.0,2,0 2 2 0 0 0 0,1,jeudi,1 1 1 0 0 0 0,3.6666666666666665,100.0,3.1818181818181817,profil 1 : meilleur plan dont chaque départ tient dans un camion ; lissage : jeudi plutôt que mardi (+0 EUR)
-SUP_00154,PLT_004,127.0,1,0 1 1 1 1 1 0,1,vendredi,0 1 0 1 1 0 0,1.0,5.530612244897959,2.8,profil 1 : meilleur plan dont chaque départ tient dans un camion
+Fournisseur,Usine,Distance,Livraisons / sem. actuelles,Frequence cible,Jour,Camions / sem.,Remplissage poids
+SUP_00003,PLT_001,83.0,2,1,mardi,1.0,0.726326530612245
+SUP_00005,PLT_001,46.0,1,1,mardi,1.5,54.25700680272108
+SUP_00010,PLT_001,56.0,2,1,jeudi,1.0,0.045823129251700685
+SUP_00014,PLT_001,54.0,4,2,lundi + jeudi,1.25,1.6800653061224489
+SUP_00016,PLT_001,96.0,1,1,mercredi,1.0,0.31689795918367347
+SUP_00019,PLT_001,77.0,1,1,jeudi,1.0,0.6840408163265306
+SUP_00024,PLT_001,64.0,4,3,lundi + mardi + vendredi,1.6,19.814785714285712
+SUP_00026,PLT_001,47.0,1,1,vendredi,1.0,7.171700680272109
+SUP_00035,PLT_001,76.0,4,2,mardi + vendredi,1.3333333333333333,3.215
+SUP_00037,PLT_001,69.0,3,1,vendredi,1.0,3.1505102040816326
+SUP_00038,PLT_001,72.0,5,2,mardi + vendredi,1.2,0.6624217687074829
+SUP_00045,PLT_001,95.0,5,3,lundi + mercredi + vendredi,1.4,8.798787172011663
+SUP_00051,PLT_001,25.0,3,1,mardi,1.0,36.62693877551021
+SUP_00052,PLT_001,126.0,5,2,lundi + jeudi,1.2,0.8877346938775509
+SUP_00053,PLT_001,26.0,5,2,mardi + jeudi,1.2,3.9122312925170064
+SUP_00055,PLT_001,68.0,4,2,lundi + jeudi,1.25,7.9324408163265305
+SUP_00057,PLT_001,108.0,3,2,mardi + jeudi,1.25,2.9976163265306117
+SUP_00058,PLT_001,33.0,2,2,lundi + jeudi,1.3333333333333333,4.122877551020408
+SUP_00060,PLT_001,69.0,5,1,lundi,1.0,5.5528571428571425
+SUP_00062,PLT_001,96.0,1,1,vendredi,1.0,18.33061224489796
+SUP_00066,PLT_001,22.0,3,1,mardi,1.0,1.5210204081632652
+SUP_00073,PLT_001,48.0,4,2,lundi + mercredi,1.25,10.10204081632653
+SUP_00079,PLT_001,30.0,1,1,jeudi,1.0,1.046122448979592
+SUP_00080,PLT_001,40.0,3,2,mardi + jeudi,1.25,2.3802448979591837
+SUP_00081,PLT_001,143.0,1,1,vendredi,1.0,1.5984285714285715
+SUP_00086,PLT_001,122.0,1,1,jeudi,1.0,0.167687074829932
+SUP_00087,PLT_001,98.0,2,1,vendredi,1.0,0.5831972789115646
+SUP_00090,PLT_001,33.0,1,1,vendredi,1.0,2.0016326530612245
+SUP_00091,PLT_001,22.0,5,2,lundi + mercredi,1.5,21.568523809523807
+SUP_00092,PLT_001,65.0,1,1,jeudi,1.0,0.04546938775510204
+SUP_00094,PLT_001,46.0,1,1,mardi,1.0,0.9685714285714285
+SUP_00095,PLT_001,66.0,2,1,mardi,1.0,1.0096326530612245
+SUP_00102,PLT_001,62.0,5,2,lundi + vendredi,1.2,1.5915782312925169
+SUP_00107,PLT_001,9.0,5,1,jeudi,1.0,7.77757142857143
+SUP_00108,PLT_001,38.0,1,1,mardi,1.0,100.0
+SUP_00113,PLT_001,37.0,2,2,lundi + jeudi,1.25,5.075020408163266
+SUP_00117,PLT_001,23.0,1,1,lundi,1.0,0.9853061224489796
+SUP_00118,PLT_001,100.0,5,2,lundi + vendredi,1.5,13.061210884353745
+SUP_00124,PLT_001,55.0,1,1,lundi,1.0,1.489387755102041
+SUP_00129,PLT_001,84.0,4,1,mercredi,3.5,82.23694849368319
+SUP_00130,PLT_001,149.0,1,1,vendredi,1.0,0.2571428571428571
+SUP_00136,PLT_001,59.0,5,2,mercredi + jeudi,1.25,9.527706122448977
+SUP_00143,PLT_001,21.0,1,1,mercredi,1.0,1.7970068027210884
+SUP_00144,PLT_001,38.0,5,2,lundi + mercredi,1.4,54.76174927113702
+SUP_00145,PLT_001,67.0,2,1,vendredi,1.0,0.15160544217687077
+SUP_00146,PLT_001,122.0,2,1,jeudi,1.0,0.611034013605442
+SUP_00148,PLT_001,68.0,3,2,mardi + vendredi,1.25,7.596848979591837
+SUP_00149,PLT_001,13.0,1,1,mardi,1.0,1.5604081632653062
+SUP_00151,PLT_001,82.0,3,1,jeudi,1.0,0.07005714285714285
+SUP_00152,PLT_001,57.0,3,1,vendredi,1.0,1.7871836734693878
+SUP_00154,PLT_001,127.0,1,1,jeudi,1.0,1.0441360544217686
+SUP_00008,PLT_002,17.0,1,1,jeudi,1.0,2.717687074829932
+SUP_00010,PLT_002,56.0,3,1,vendredi,1.0,1.1546326530612245
+SUP_00011,PLT_002,145.0,3,2,lundi + mardi,1.3333333333333333,1.103061224489796
+SUP_00016,PLT_002,96.0,1,1,mercredi,1.0,0.386530612244898
+SUP_00018,PLT_002,6.0,1,1,mardi,1.5,100.0
+SUP_00019,PLT_002,77.0,2,2,mercredi + vendredi,1.6666666666666667,41.451746938775514
+SUP_00020,PLT_002,42.0,2,1,vendredi,1.0,1.0991836734693878
+SUP_00024,PLT_002,64.0,3,1,vendredi,1.0,4.057571428571428
+SUP_00028,PLT_002,54.0,2,1,vendredi,1.0,8.457142857142857
+SUP_00032,PLT_002,12.0,3,1,mardi,2.5,88.77861224489796
+SUP_00033,PLT_002,41.0,2,1,vendredi,1.0,1.1220408163265305
+SUP_00035,PLT_002,76.0,4,2,mardi + vendredi,1.25,2.525346938775509
+SUP_00037,PLT_002,69.0,4,1,mercredi,1.4,65.65481049562682
+SUP_00038,PLT_002,72.0,3,2,lundi + vendredi,1.25,8.16301224489796
+SUP_00039,PLT_002,80.0,2,1,vendredi,1.0,0.2082857142857143
+SUP_00045,PLT_002,95.0,2,2,lundi + vendredi,1.3333333333333333,2.8956326530612246
+SUP_00046,PLT_002,91.0,2,1,vendredi,4.0,75.63018367346939
+SUP_00052,PLT_002,126.0,1,1,lundi,1.0,0.05293877551020408
+SUP_00053,PLT_002,26.0,3,1,mercredi,1.0,0.087
+SUP_00054,PLT_002,31.0,1,1,mercredi,1.0,100.0
+SUP_00058,PLT_002,33.0,3,1,lundi,1.0,1.4746326530612246
+SUP_00060,PLT_002,69.0,3,2,lundi + vendredi,1.5,10.645469387755101
+SUP_00066,PLT_002,22.0,2,1,vendredi,1.0,1.420408163265306
+SUP_00068,PLT_002,27.0,2,1,jeudi,1.0,1.396326530612245
+SUP_00071,PLT_002,149.0,2,1,vendredi,1.0,6.084081632653061
+SUP_00073,PLT_002,48.0,2,1,vendredi,1.0,17.666367346938774
+SUP_00077,PLT_002,23.0,1,1,mardi,1.0,100.0
+SUP_00079,PLT_002,30.0,2,1,jeudi,1.0,1.2681632653061226
+SUP_00080,PLT_002,40.0,5,3,lundi + mardi + vendredi,2.0,32.86762585034013
+SUP_00081,PLT_002,143.0,2,1,vendredi,1.0,1.2809591836734695
+SUP_00083,PLT_002,27.0,3,1,lundi,1.0,19.0380306122449
+SUP_00086,PLT_002,122.0,2,1,vendredi,1.0,2.8708163265306124
+SUP_00087,PLT_002,98.0,2,1,vendredi,2.5,60.56640000000001
+SUP_00090,PLT_002,33.0,3,1,jeudi,1.0,2.571877551020408
+SUP_00091,PLT_002,22.0,5,2,lundi + mardi,1.3333333333333333,4.342734693877551
+SUP_00092,PLT_002,65.0,2,2,mercredi + vendredi,1.3333333333333333,1.2591326530612246
+SUP_00094,PLT_002,46.0,1,1,mercredi,1.0,0.6775510204081633
+SUP_00096,PLT_002,30.0,2,1,jeudi,1.0,2.6481632653061222
+SUP_00097,PLT_002,72.0,4,1,mercredi,1.3333333333333333,42.77632653061225
+SUP_00102,PLT_002,62.0,5,1,lundi,1.0,10.873775510204082
+SUP_00107,PLT_002,9.0,4,2,lundi + mercredi,2.25,55.957002267573706
+SUP_00109,PLT_002,10.0,1,1,mercredi,1.3333333333333333,27.196642857142862
+SUP_00113,PLT_002,37.0,2,1,lundi,1.0,0.6996734693877551
+SUP_00116,PLT_002,26.0,2,1,lundi,1.0,0.12448979591836734
+SUP_00117,PLT_002,23.0,5,1,vendredi,3.75,82.94884625850341
+SUP_00118,PLT_002,100.0,3,1,mardi,1.0,0.4077142857142858
+SUP_00122,PLT_002,63.0,2,1,vendredi,1.0,0.040040816326530615
+SUP_00124,PLT_002,55.0,2,1,jeudi,1.0,2.4542857142857146
+SUP_00127,PLT_002,18.0,1,1,jeudi,1.0,100.0
+SUP_00128,PLT_002,68.0,3,1,vendredi,1.0,1.0551020408163265
+SUP_00130,PLT_002,149.0,2,1,vendredi,1.0,1.7497959183673473
+SUP_00132,PLT_002,24.0,1,1,jeudi,1.0,0.3086530612244898
+SUP_00133,PLT_002,64.0,1,1,jeudi,1.0,100.0
+SUP_00136,PLT_002,59.0,5,2,lundi + mardi,1.3333333333333333,5.912540816326532
+SUP_00143,PLT_002,21.0,2,1,vendredi,1.0,1.5502040816326528
+SUP_00144,PLT_002,38.0,3,1,jeudi,1.0,0.9028571428571428
+SUP_00145,PLT_002,67.0,5,2,jeudi + vendredi,2.0,55.290285714285716
+SUP_00146,PLT_002,122.0,5,2,lundi + mardi,1.25,42.713216326530606
+SUP_00148,PLT_002,68.0,2,1,vendredi,1.0,2.7140612244897957
+SUP_00149,PLT_002,13.0,1,1,jeudi,1.0,0.6222448979591836
+SUP_00150,PLT_002,118.0,1,1,vendredi,1.0,1.6408163265306122
+SUP_00151,PLT_002,82.0,4,1,vendredi,1.0,0.6865102040816325
+SUP_00152,PLT_002,57.0,4,2,lundi + mercredi,1.25,1.4820163265306125
+SUP_00154,PLT_002,127.0,2,1,lundi,1.0,2.968265306122449
+SUP_00016,PLT_003,96.0,1,1,mercredi,1.0,0.9853061224489794
+SUP_00024,PLT_003,64.0,1,1,mardi,1.0,24.137414965986398
+SUP_00038,PLT_003,72.0,1,1,mardi,1.0,4.037714285714285
+SUP_00055,PLT_003,68.0,1,1,jeudi,1.0,0.8679319727891157
+SUP_00059,PLT_003,122.0,5,1,mercredi,1.0,18.966416326530613
+SUP_00060,PLT_003,69.0,1,1,jeudi,1.0,0.7212244897959182
+SUP_00074,PLT_003,132.0,2,2,mardi + jeudi,1.5,52.58384353741496
+SUP_00080,PLT_003,40.0,1,1,lundi,1.0,0.5780408163265306
+SUP_00085,PLT_003,121.0,1,1,mardi,1.3333333333333333,27.38680612244898
+SUP_00087,PLT_003,98.0,1,1,lundi,1.0,1.1305102040816328
+SUP_00092,PLT_003,65.0,1,1,vendredi,1.0,0.8146938775510204
+SUP_00094,PLT_003,46.0,1,1,jeudi,1.0,19.831972789115646
+SUP_00099,PLT_003,43.0,1,1,mercredi,1.0,0.9410204081632653
+SUP_00102,PLT_003,62.0,4,2,lundi + mercredi,1.4,29.462915451895046
+SUP_00107,PLT_003,9.0,2,2,mardi + jeudi,1.25,10.158073469387755
+SUP_00118,PLT_003,100.0,1,1,jeudi,1.0,0.09093877551020409
+SUP_00126,PLT_003,122.0,1,1,vendredi,1.0,1.7093877551020409
+SUP_00128,PLT_003,68.0,1,1,mercredi,1.0,0.6575510204081633
+SUP_00129,PLT_003,84.0,5,3,lundi + mardi + mercredi,5.8,85.32812104152005
+SUP_00136,PLT_003,59.0,2,1,jeudi,1.0,2.2860204081632656
+SUP_00143,PLT_003,21.0,2,1,mardi,1.0,2.4203809523809525
+SUP_00148,PLT_003,68.0,2,2,mardi + jeudi,1.25,28.773126530612245
+SUP_00149,PLT_003,13.0,1,1,vendredi,1.0,0.7051020408163265
+SUP_00150,PLT_003,118.0,1,1,mardi,1.0,0.1853877551020408
+SUP_00154,PLT_003,127.0,1,1,jeudi,1.0,0.35819047619047617
+SUP_00156,PLT_003,78.0,1,1,jeudi,1.0,4.000775510204082
+SUP_00001,PLT_004,47.0,5,1,mardi,4.5,89.13931972789116
+SUP_00009,PLT_004,15.0,1,1,mercredi,1.0,0.49612244897959185
+SUP_00010,PLT_004,56.0,2,2,mercredi + vendredi,1.25,3.3044897959183674
+SUP_00011,PLT_004,145.0,5,2,lundi + vendredi,1.2,6.200414965986394
+SUP_00014,PLT_004,54.0,3,1,lundi,1.0,4.258122448979593
+SUP_00015,PLT_004,95.0,1,1,jeudi,1.0,1.012857142857143
+SUP_00019,PLT_004,77.0,3,2,mercredi + vendredi,1.2,1.3412244897959185
+SUP_00022,PLT_004,73.0,3,2,lundi + mercredi,1.25,4.523836734693877
+SUP_00024,PLT_004,64.0,5,2,mardi + vendredi,1.2,14.644285714285717
+SUP_00032,PLT_004,12.0,3,2,mercredi + vendredi,1.25,3.6957551020408164
+SUP_00033,PLT_004,41.0,3,2,lundi + vendredi,1.25,2.5664897959183675
+SUP_00038,PLT_004,72.0,2,1,mercredi,1.0,0.7591836734693878
+SUP_00041,PLT_004,48.0,5,2,mardi + vendredi,1.2,6.144217687074829
+SUP_00043,PLT_004,85.0,4,2,lundi + vendredi,1.5,3.659251700680272
+SUP_00046,PLT_004,91.0,2,1,mercredi,1.6,83.56461224489797
+SUP_00060,PLT_004,69.0,1,1,jeudi,1.0,0.7114285714285714
+SUP_00061,PLT_004,72.0,1,1,jeudi,1.0,3.257142857142857
+SUP_00080,PLT_004,40.0,5,1,vendredi,1.0,18.835850340136055
+SUP_00085,PLT_004,121.0,5,1,lundi,1.0,48.20938775510204
+SUP_00087,PLT_004,98.0,5,1,vendredi,1.0,11.221700680272109
+SUP_00091,PLT_004,22.0,5,2,mardi + vendredi,1.2,4.190680272108843
+SUP_00094,PLT_004,46.0,5,1,vendredi,1.0,6.643673469387755
+SUP_00096,PLT_004,30.0,2,1,jeudi,1.0,5.072755102040816
+SUP_00100,PLT_004,58.0,1,1,mercredi,1.0,3.7246938775510205
+SUP_00112,PLT_004,70.0,3,2,mardi + jeudi,1.5,28.363537414965986
+SUP_00117,PLT_004,23.0,4,1,jeudi,1.5,90.73551383219954
+SUP_00118,PLT_004,100.0,4,1,vendredi,1.0,6.299689795918368
+SUP_00121,PLT_004,55.0,2,1,mardi,1.0,0.8367346938775511
+SUP_00124,PLT_004,55.0,1,1,lundi,1.0,2.1036734693877555
+SUP_00126,PLT_004,122.0,2,1,jeudi,1.0,1.016122448979592
+SUP_00128,PLT_004,68.0,3,1,lundi,1.0,0.6935714285714286
+SUP_00135,PLT_004,52.0,1,1,lundi,1.6666666666666667,46.43265306122449
+SUP_00136,PLT_004,59.0,2,1,mercredi,1.0,2.5608163265306123
+SUP_00144,PLT_004,38.0,4,2,mardi + vendredi,1.2,9.743469387755102
+SUP_00145,PLT_004,67.0,5,3,lundi + mardi + vendredi,1.75,13.651332944606416
+SUP_00149,PLT_004,13.0,5,2,lundi + vendredi,1.5,17.458537414965985
+SUP_00152,PLT_004,57.0,1,1,mercredi,1.0,1.6783673469387759
+SUP_00153,PLT_004,79.0,2,1,jeudi,3.6666666666666665,100.0
+SUP_00154,PLT_004,127.0,1,1,vendredi,1.0,5.530612244897959

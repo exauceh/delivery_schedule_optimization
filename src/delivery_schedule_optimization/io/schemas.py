@@ -61,6 +61,24 @@ NUMERIC_COLUMNS: dict[InputName, list[str]] = {
 
 WORKBOOK_NAME = "resultats_consolidation.xlsx"  # Excel report of a run, next to the CSV tables
 
+# Output 1, one row per couple, with the columns of the project brief (courses/consolidation_algorithme_pdf.pdf, page 9),
+# computed over the whole horizon: name in the code -> column of the file.
+PROFILE_COLUMNS: dict[str, str] = {
+    "supplier_id": "Fournisseur",
+    "plant": "Usine",
+    "distance": "Distance",  # km
+    "current_profile": "Livraisons / sem. actuelles",  # most deliveries made in one week today
+    "profile": "Frequence cible",  # deliveries per week
+    "profile_days": "Jour",  # delivery days of the profile, e.g. "lundi + jeudi"
+    "trucks_per_active_week": "Camions / sem.",  # mean over the weeks with a delivery
+    "mean_fill_weight_pct": "Remplissage poids",  # mean weight fill of the trucks, %
+}
+
+
+def profiles_by_code(profiles: pd.DataFrame) -> pd.DataFrame:
+    """Output 1 with the names used in the code (`supplier_id`, `profile`, ...) instead of those of the file."""
+    return profiles.rename(columns={label: code for code, label in PROFILE_COLUMNS.items()})
+
 
 class OutputName(StrEnum):
     """Files produced by a run (CSV), in the format of the project brief."""
