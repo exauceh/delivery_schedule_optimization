@@ -234,46 +234,35 @@ async function refreshQuality() {
   if (S.view === "accueil") renderLaunch();
 }
 
-const LOAD_CHOICES = { full_truck: "un camion plein", material_median: "la médiane du même matériel" };
-function chosenTreatment(check) {
-  if (check.rule === "DQ04" && F.missing_load) return "complété par " + LOAD_CHOICES[F.missing_load];
-  if (check.rule === "DQ07" && F.missing_distance && S.quality) {
-    const m = S.quality.missing;
-    return F.missing_distance === "max" ? `plus longue distance du planning (${km(m.distance_max)})` : `distance médiane du planning (${km(m.distance_median)})`;
-  }
-  return check.treatment;
-}
 const km = (v) => `${nf0.format(v)} km`;
+// short labels of the findings of the preparation, in the quality panel
+const SHORT = { "Quantité nulle": "Sans besoin (quantité 0)", "Quantité négative": "Quantité négative", "Quantité manquante": "Quantité manquante",
+  "Date de cumul en fin de planning": "Cumul de fin de planning", "Ligne plus grande qu'un camion": "Plus grandes qu'un camion",
+  "Besoin un week-end": "Besoins un week-end", "Besoin un jour férié": "Besoins un jour férié", "Fournisseur en double dans les distances": "Fournisseurs en double" };
 
 function renderQuality() {
   const box = $("#qualityPanel"), q = S.quality;
-  const head = `<div class="panel-head"><h3>Qualité des données</h3><span class="muted">${q ? `${num(q.rows_raw)} lignes importées` : ""}</span></div>`;
-  if (S.qualityState === "idle") {
-    box.innerHTML = head + `<p class="empty-note">Déposez le planning et les distances, ou essayez l'exemple : la qualité des données s'affiche ici avant le calcul.</p>`;
-    return;
-  }
-  if (S.qualityState === "loading") { box.innerHTML = head + `<p class="empty-note q-loading">Analyse des fichiers…</p>`; return; }
-  if (S.qualityState === "error") { box.innerHTML = head + `<p class="q-error">${esc(S.qualityError)}</p>`; return; }
-  const m = q.missing, need = missingKinds();
-  const tiles = [[num(q.lines), "besoins à planifier"], [`${fmtDate(q.first_date)} → ${fmtDate(q.last_date, true)}`, "période des besoins"],
-    [num(q.suppliers), "fournisseurs"], [num(q.plants), "usines"], [num(q.couples), "couples"], [num(q.materials), "matériels"]];
-  const missing = [];
-  if (m.weight.rows) missing.push(`<li><b>${num(m.weight.rows)} poids</b> manquants ou nuls</li>`);
-  if (m.volume.rows) missing.push(`<li><b>${num(m.volume.rows)} volumes</b> manquants ou nuls</li>`);
-  if (need.distance) missing.push(`<li><b>${m.suppliers_without_distance.length} fournisseur${m.suppliers_without_distance.length > 1 ? "s" : ""} sans distance</b> : ${m.suppliers_without_distance.map(esc).join(", ")}</li>`);
-  const done = choicesDone();
-  const found = q.checks.filter((c) => c.count), clean = q.checks.filter((c) => !c.count);
-  box.innerHTML = head + `<div class="q-tiles">${tiles.map(([v, l]) => `<div class="q-tile"><b>${v}</b><span>${l}</span></div>`).join("")}</div>
-    ${q.has_missing ? `<div class="q-missing ${done ? "done" : ""}"><p class="q-title">Données absentes</p><ul>${missing.join("")}</ul>
-      <p class="q-note">${done ? "✓ Méthode choisie dans les réglages : elles seront complétées ainsi." : "À compléter : choisissez la méthode dans les réglages détaillés avant de lancer."}</p></div>`
-      : `<div class="q-missing done"><p class="q-title">Aucune donnée absente</p><p class="q-note">Chaque ligne a un poids et un volume, chaque fournisseur une distance.</p></div>`}
-    <p class="q-sub">Contrôles appliqués</p>
-    <ul class="q-checks">${found.map((c) => {
-      const todo = (c.rule === "DQ04" && !F.missing_load) || (c.rule === "DQ07" && !F.missing_distance);
-      return `<li class="${todo ? "todo" : c.kind === "info" ? "info" : "fix"}"><span class="q-label">${esc(c.label)}</span><span class="q-count">${num(c.count)}</span>
-        <span class="q-treat">${esc(todo ? c.treatment : chosenTreatment(c))}</span></li>`;
-    }).join("")}</ul>
-    ${clean.length ? `<p class="q-clean">✓ Rien à signaler : ${[...new Set(clean.map((c) => c.label.toLowerCase()))].map(esc).join(", ")}.</p>` : ""}`;
+  const head = (badge = "") => `<div class="q-head"><h3>Qualité des données</h3>${badge}</div>`;
+  if (S.qualityState === "idle") { box.innerHTML = head() + `<p class="q-empty">S'affiche dès l'import des fichiers.</p>`; return; }
+  if (S.qualityState === "loading") { box.innerHTML = head() + `<p class="q-empty q-loading">Analyse des fichiers…</p>`; return; }
+  if (S.qualityState === "error") { box.innerHTML = head(`<span class="q-badge ko">Erreur</span>`) + `<p class="q-error">${esc(S.qualityError)}</p>`; return; }
+  const m = q.missing, need = missingKinds(), done = choicesDone();
+  const badge = !q.has_missing ? `<span class="q-badge">Complètes</span>` : done ? `<span class="q-badge">Prêtes</span>` : `<span class="q-badge todo">À compléter</span>`;
+  const row = (label, value, pill = "") => `<li><span class="q-l">${label}</span>${pill}<b>${value}</b></li>`;
+  const pill = (text, todo) => `<em class="q-pill ${todo ? "todo" : ""}">${text}</em>`;
+  const loadPill = F.missing_load ? pill(F.missing_load === "full_truck" ? "camion plein" : "médiane") : pill("à choisir", true);
+  const distPill = F.missing_distance ? pill(km(F.missing_distance === "max" ? m.distance_max : m.distance_median)) : pill("à choisir", true);
+  const absent = [m.weight.rows ? row("Poids", num(m.weight.rows), loadPill) : "", m.volume.rows ? row("Volumes", num(m.volume.rows), loadPill) : "",
+    need.distance ? row(`Distances <small>${m.suppliers_without_distance.map(esc).join(", ")}</small>`, num(m.suppliers_without_distance.length), distPill) : ""].filter(Boolean);
+  const list = (rules) => q.checks.filter((c) => c.count && rules.includes(c.rule)).map((c) => row(esc(SHORT[c.label] || c.label), num(c.count)));
+  const removed = list(["DQ01", "DQ03", "DQ05"]), flagged = list(["DQ02", "DQ06"]);
+  const group = (title, rows, todo = false) => rows.length ? `<div class="q-group ${todo ? "todo" : ""}"><p class="q-sub">${title}</p><ul class="q-list">${rows.join("")}</ul></div>` : "";
+  box.innerHTML = head(badge) + `
+    <div class="q-kpis"><div><b>${num(q.lines)}</b><span>besoins</span></div><div><b>${num(q.suppliers)}</b><span>fournisseurs</span></div>
+      <div><b>${num(q.plants)}</b><span>usines</span></div></div>
+    <p class="q-period">${fmtDate(q.first_date)} → ${fmtDate(q.last_date, true)} · ${num(q.couples)} couples · ${num(q.rows_raw)} lignes lues</p>
+    ${group("Données absentes", absent, !done)}${group("Lignes retirées", removed)}${group("Signalé", flagged)}
+    ${absent.length + removed.length + flagged.length ? "" : `<p class="q-empty">Aucune anomalie.</p>`}`;
 }
 
 function renderMissing() {
@@ -282,17 +271,16 @@ function renderMissing() {
   box.hidden = !visible;
   if (!visible) return;
   const m = q.missing, need = missingKinds();
-  const loadHint = { full_truck: "Prudent : chaque ligne incomplète voyage seule dans son camion, le coût est majoré.",
-    material_median: `Quantité × poids et volume médians par pièce du même matériel (${num(m.weight.material)} poids) ; à défaut, ligne médiane du fournisseur (${num(m.weight.supplier)}) ; sinon un camion plein (${num(m.weight.full_truck)}).` };
-  const distanceHint = { max: "Prudent : le transport de ce fournisseur est chiffré au plus cher.", median: "Une distance typique des fournisseurs du planning." };
+  const loadHint = { full_truck: "Prudent : la ligne voyage seule.", material_median: "Médiane par pièce du matériel, sinon du fournisseur." };
+  const distanceHint = { max: "Prudent : chiffré au plus cher.", median: "Distance typique du planning." };
   box.classList.toggle("off", !choicesDone());
-  box.innerHTML = `<p class="f-lab">Données absentes : comment les compléter ?</p>
-    ${need.load ? `<div class="m-row"><p class="m-q">Poids ou volume manquant (${num(m.weight.rows)} poids, ${num(m.volume.rows)} volumes)</p>
-      <div class="chips" data-choice="missing_load"><button type="button" data-v="full_truck">Camion plein</button><button type="button" data-v="material_median">Médiane du matériel</button></div>
-      <p class="m-hint">${F.missing_load ? loadHint[F.missing_load] : "Camion plein : prudent. Médiane : estimation à partir des autres lignes du même matériel."}</p></div>` : ""}
-    ${need.distance ? `<div class="m-row"><p class="m-q">Distance manquante (${m.suppliers_without_distance.map(esc).join(", ")})</p>
+  box.innerHTML = `<p class="f-lab">Compléter les données absentes</p>
+    ${need.load ? `<div class="m-row"><p class="m-q">Poids et volumes <span class="muted">${num(Math.max(m.weight.rows, m.volume.rows))} lignes</span></p>
+      <div class="chips" data-choice="missing_load"><button type="button" data-v="full_truck">Camion plein</button><button type="button" data-v="material_median">Médiane</button></div>
+      ${F.missing_load ? `<p class="m-hint">${loadHint[F.missing_load]}</p>` : ""}</div>` : ""}
+    ${need.distance ? `<div class="m-row"><p class="m-q">Distances <span class="muted">${m.suppliers_without_distance.map(esc).join(", ")}</span></p>
       <div class="chips" data-choice="missing_distance"><button type="button" data-v="max">La plus longue · ${km(m.distance_max)}</button><button type="button" data-v="median">Médiane · ${km(m.distance_median)}</button></div>
-      <p class="m-hint">${F.missing_distance ? distanceHint[F.missing_distance] : "La plus longue : prudent. Médiane : distance typique du planning."}</p></div>` : ""}`;
+      ${F.missing_distance ? `<p class="m-hint">${distanceHint[F.missing_distance]}</p>` : ""}</div>` : ""}`;
   $$("[data-choice] button", box).forEach((b) => {
     const field = b.parentElement.dataset.choice;
     b.classList.toggle("on", F[field] === b.dataset.v);
@@ -381,7 +369,8 @@ function renderForm() {
   const changed = Object.keys(DEFAULT_F).some((k) => F[k] !== DEFAULT_F[k]);
   $("#tuningSum").textContent = changed ? [`${F.anticipation} j d'avance`,
     F.smoothing ? `lissage ${pctTxt(F.smoothing)}` : "lissage gratuit"].join(" · ") : "par défaut : coût minimal";
-  if (F.missing_load === "material_median" || F.missing_distance === "median") $("#tuningSum").textContent += " · médiane si absent";
+  if (F.missing_load === "material_median" || F.missing_distance === "median")   // a choice of the user: no longer "by default"
+    $("#tuningSum").textContent = $("#tuningSum").textContent.replace("par défaut : ", "") + " · médiane si absent";
   const w = $("#tuningWarn"), warnings = [];
   if (F.anticipation !== DEFAULT_F.anticipation)
     warnings.push(`${F.anticipation} jours d'avance : en dehors de la règle des ${DEFAULT_F.anticipation} jours, à présenter comme un scénario.`);

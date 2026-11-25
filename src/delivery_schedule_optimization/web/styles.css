@@ -834,27 +834,29 @@ body:not([data-view="apercu"]) #scenarioSwitch { display: none !important; }
 @media (max-width: 1100px) { .running { min-height: 640px; align-items: end; } .running .running-text { grid-column: 1; } }
 
 /* qualité des données après l'import (panneau de droite de « Nouveau calcul ») */
-.quality .q-tiles { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .5rem; margin: .4rem 0 1rem; }
-.q-tile { background: var(--bg); border: 1px solid var(--line); border-radius: var(--r); padding: .6rem .7rem; }
-.q-tile b { display: block; font-family: var(--display); font-weight: 800; font-size: 1.05rem; line-height: 1.2; }
-.q-tile span { font-size: .76rem; color: var(--muted); }
-.q-missing { border-radius: 14px; padding: .8rem 1rem; background: var(--cream); border: 1px solid #F3C9A6; margin-bottom: 1rem; }
-.q-missing.done { background: var(--mint); border-color: transparent; }
-.q-missing .q-title { margin: 0 0 .3rem; font-weight: 800; color: var(--orange-dark); }
-.q-missing.done .q-title { color: var(--mint-ink); }
-.q-missing ul { margin: 0 0 .4rem; padding-left: 1.1rem; font-size: .88rem; }
-.q-missing .q-note { margin: 0; font-size: .84rem; font-weight: 600; color: var(--ink-2); }
-.q-sub { margin: 0 0 .4rem; font-size: .76rem; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
-.q-checks { list-style: none; margin: 0; padding: 0; display: grid; gap: .4rem; }
-.q-checks li { display: grid; grid-template-columns: 1fr auto; column-gap: .8rem; padding: .5rem .7rem; border-radius: 10px; background: var(--bg); border-left: 3px solid var(--emerald-3); }
-.q-checks li.info { border-left-color: var(--line-strong); }
-.q-checks li.todo { border-left-color: var(--orange); background: var(--cream); }
-.q-label { font-weight: 700; font-size: .88rem; }
-.q-count { font-family: var(--display); font-weight: 800; font-size: .9rem; }
-.q-treat { grid-column: 1 / -1; font-size: .8rem; color: var(--ink-2); }
-.q-checks li.todo .q-treat { color: var(--orange-dark); font-weight: 700; }
-.q-clean { margin: .7rem 0 0; font-size: .8rem; color: var(--muted); }
-.q-error { margin: 0; padding: .9rem 1rem; border-radius: var(--r); background: var(--red-tint); color: var(--red); font-weight: 600; font-size: .88rem; }
+.q-head { display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin-bottom: 1rem; }
+.q-head h3 { margin: 0; }
+.q-badge { padding: .2rem .7rem; border-radius: 999px; font-size: .76rem; font-weight: 800; background: var(--mint); color: var(--mint-ink); }
+.q-badge.todo { background: var(--orange-tint); color: var(--orange-dark); }
+.q-badge.ko { background: var(--red-tint); color: var(--red); }
+.q-kpis { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.q-kpis div + div { border-left: 1px solid var(--line); padding-left: 1rem; }
+.q-kpis b { display: block; font-family: var(--display); font-weight: 800; font-size: 1.6rem; line-height: 1.1; letter-spacing: -.02em; }
+.q-kpis span { font-size: .78rem; color: var(--muted); }
+.q-period { margin: .7rem 0 0; padding-bottom: .9rem; border-bottom: 1px solid var(--line); font-size: .8rem; color: var(--muted); }
+.q-group { margin-top: .9rem; }
+.q-sub { margin: 0 0 .3rem; font-size: .72rem; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+.q-group.todo .q-sub { color: var(--orange-dark); }
+.q-list { list-style: none; margin: 0; padding: 0; }
+.q-list li { display: flex; align-items: center; gap: .6rem; padding: .32rem 0; font-size: .88rem; }
+.q-list li + li { border-top: 1px dashed var(--line); }
+.q-l { flex: 1; min-width: 0; }
+.q-l small { color: var(--muted); font-size: .76rem; margin-left: .3rem; }
+.q-list b { font-family: var(--display); font-weight: 800; min-width: 2.6rem; text-align: right; font-variant-numeric: tabular-nums; }
+.q-pill { font-style: normal; font-size: .72rem; font-weight: 700; padding: .05rem .55rem; border-radius: 999px; background: var(--mint); color: var(--mint-ink); white-space: nowrap; }
+.q-pill.todo { background: var(--orange-tint); color: var(--orange-dark); }
+.q-empty { margin: 0; color: var(--muted); font-size: .86rem; }
+.q-error { margin: 0; padding: .8rem 1rem; border-radius: var(--r); background: var(--red-tint); color: var(--red); font-weight: 600; font-size: .86rem; }
 .q-loading { animation: pulse 1.2s ease-in-out infinite alternate; }
 @keyframes pulse { from { opacity: .55; } to { opacity: 1; } }
 
