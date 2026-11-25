@@ -173,9 +173,8 @@
       <div class="panel"><h3>Livraisons par semaine</h3><div id="dumbbell"></div></div>
       <div class="panel">
         <div class="filters">
-          <select id="pf-plant"><option value="">Toutes les usines</option></select>
-          <input id="pf-q" type="search" placeholder="Chercher un fournisseur">
-          <label class="check"><input type="checkbox" id="pf-changed"> profil changé au lissage</label>
+          <select id="pf-supplier" aria-label="Fournisseur"><option value="">Tous les fournisseurs</option></select>
+          <select id="pf-plant" aria-label="Usine"><option value="">Toutes les usines</option></select>
         </div>
         <div class="table-wrap" id="profilesTable"></div>
       </div>
@@ -227,6 +226,14 @@
 
 <div class="tooltip" id="tooltip" role="tooltip"></div>
 <div class="toast" id="toast" role="status"></div>
+<div class="modal" id="confirmModal" hidden>
+  <div class="modal-card" role="alertdialog" aria-modal="true" aria-labelledby="cmTitle" aria-describedby="cmText">
+    <span class="modal-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 4 2.8 19.5h18.4z"/><path d="M12 10v4.5M12 17.2v.1"/></svg></span>
+    <h3 id="cmTitle"></h3>
+    <p id="cmText"></p>
+    <div class="modal-actions"><button type="button" class="btn ghost" id="cmCancel"></button><button type="button" class="btn danger" id="cmOk"></button></div>
+  </div>
+</div>
 <div class="drawer" id="dayDrawer" hidden>
   <aside class="drawer-panel" role="dialog" aria-modal="true" aria-labelledby="ddTitle">
     <div class="dd-head">

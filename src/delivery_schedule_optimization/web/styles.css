@@ -1046,3 +1046,19 @@ body:not([data-view="apercu"]) #scenarioSwitch { display: none !important; }
 .back-plan { margin-bottom: .9rem; }
 .back-plan[hidden] { display: none; }
 @media (max-width: 760px) { .week-range { min-width: 0; } .drawer-panel { width: 100vw; } }
+
+/* confirmation (arrêter ou supprimer un calcul) */
+.btn.danger { background: var(--red); border-color: var(--red); color: #fff; }
+.btn.danger:hover { background: #A33024; border-color: #A33024; }
+.modal { position: fixed; inset: 0; z-index: 90; display: grid; place-items: center; padding: 1rem; background: rgba(20, 48, 42, .42);
+  backdrop-filter: blur(3px); opacity: 0; transition: opacity .18s ease; }
+.modal[hidden] { display: none; }
+.modal.on { opacity: 1; }
+.modal-card { width: min(420px, 100%); background: var(--surface); border-radius: var(--radius); padding: 1.5rem 1.5rem 1.25rem; box-shadow: var(--lift);
+  transform: translateY(8px) scale(.98); transition: transform .22s var(--ease); }
+.modal.on .modal-card { transform: none; }
+.modal-ico { width: 44px; height: 44px; border-radius: 12px; display: grid; place-items: center; background: var(--red-tint); color: var(--red); margin-bottom: .9rem; }
+.modal-ico svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.modal-card h3 { margin: 0 0 .4rem; font-family: var(--display); font-weight: 800; font-size: 1.2rem; }
+.modal-card p { margin: 0; color: var(--ink-2); font-size: .92rem; line-height: 1.45; }
+.modal-actions { display: flex; justify-content: flex-end; gap: .6rem; margin-top: 1.4rem; flex-wrap: wrap; }

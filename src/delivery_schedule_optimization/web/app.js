@@ -426,8 +426,33 @@ function renderHistory() {
   $$("#historyList [data-del-run]").forEach((b) => b.addEventListener("click", () => deleteRun(b.dataset.delRun)));
 }
 
+// confirmation in the style of the interface: resolves true (confirmed) or false (cancel, Échap, click outside)
+function confirmDialog({ title, text, ok, cancel = "Annuler" }) {
+  return new Promise((resolve) => {
+    const box = $("#confirmModal"), last = document.activeElement;
+    $("#cmTitle").textContent = title; $("#cmText").textContent = text;
+    $("#cmOk").textContent = ok; $("#cmCancel").textContent = cancel;
+    box.hidden = false; requestAnimationFrame(() => box.classList.add("on"));
+    $("#cmCancel").focus();   // the safe choice has the focus
+    const close = (value) => {
+      box.classList.remove("on"); box.hidden = true;
+      document.removeEventListener("keydown", onKey, true);
+      $("#cmOk").onclick = $("#cmCancel").onclick = box.onclick = null;
+      if (last && last.isConnected) last.focus();
+      resolve(value);
+    };
+    const onKey = (e) => { if (e.key === "Escape") { e.stopPropagation(); close(false); } };
+    document.addEventListener("keydown", onKey, true);
+    $("#cmOk").onclick = () => close(true);
+    $("#cmCancel").onclick = () => close(false);
+    box.onclick = (e) => { if (e.target === box) close(false); };
+  });
+}
+
 async function deleteRun(id) {
-  if (!confirm("Supprimer ce calcul, ses fichiers et ses résultats ?")) return;
+  const run = S.runs.find((r) => r.run_id === id);
+  if (!(await confirmDialog({ title: `Supprimer « ${run ? run.label : "ce calcul"} » ?`,
+    text: "Ses fichiers et ses résultats seront effacés. Cette action est définitive.", ok: "Supprimer" }))) return;
   try {
     await api("/runs/" + id, { method: "DELETE" });
     if (S.sourceRun === id) S.sourceRun = null;
@@ -726,7 +751,8 @@ function stopRunning() { clearInterval(S.polling); cancelAnimationFrame(gatherRa
 
 // stop button of the waiting screen: the server kills the run and its worker processes
 $("#stopRunBtn").addEventListener("click", async () => {
-  if (!S.runningId || !confirm("Arrêter le calcul en cours ? Il ne gardera aucun résultat.")) return;
+  if (!S.runningId || !(await confirmDialog({ title: "Arrêter le calcul ?", text: "Le calcul en cours sera interrompu et ne gardera aucun résultat.",
+    ok: "Arrêter le calcul", cancel: "Continuer" }))) return;
   const btn = $("#stopRunBtn"); btn.disabled = true; btn.classList.add("busy");
   try {
     await api(`/runs/${S.runningId}/cancel`, { method: "POST" });
@@ -770,6 +796,7 @@ function renderRunBar() {
 function fillFilters() {
   const f = S.summary.filters;
   const opts = (arr, label, fmt = (x) => x) => `<option value="">${label}</option>` + arr.map((x) => `<option value="${esc(x)}">${esc(fmt(x))}</option>`).join("");
+  $("#pf-supplier").innerHTML = opts(f.suppliers, "Tous les fournisseurs");
   $("#pf-plant").innerHTML = opts(f.plants, "Toutes les usines");
   $("#tf-plant").innerHTML = opts(f.plants, "Toutes les usines");
   $("#tf-supplier").innerHTML = opts(f.suppliers, "Tous les fournisseurs");
@@ -877,17 +904,22 @@ function calendarSvg(cal, { compact = false, big = false, width = 0 } = {}) {
   return svg(W, H, s);
 }
 
-function dumbbell(rows) {
-  const W = 520, rowH = 46, L = 92, R = 40, H = rows.length * rowH + 40, max = niceMax(Math.max(...rows.flatMap((r) => [r.before, r.after])));
-  const x = (v) => L + (W - L - R) * (v / max);
+// Couples per delivery class (deliveries per week), today and with Gilbert: two vertical bars per class, same style as plantBars
+function profileBars(rows, W = 430, H = 380) {
+  // a scale that stops just above the highest bar (steps of 2, 10, 25 or 50) so that the bars fill the panel
+  const top = Math.max(1, ...rows.flatMap((r) => [r.before, r.after])), step = top <= 10 ? 2 : top <= 50 ? 10 : top <= 150 ? 25 : 50;
+  const L = 34, B = 46, T = 24, max = Math.ceil((top * 1.08) / step) * step;
+  const gw = (W - L) / rows.length, bw = Math.min(40, gw * 0.38), y = (v) => T + (H - T - B) * (1 - v / max);
   let s = "";
-  for (let k = 0; k <= 4; k++) { const v = (max * k) / 4; s += `<g class="axis"><line x1="${x(v)}" x2="${x(v)}" y1="10" y2="${H - 26}"/></g><text x="${x(v)}" y="${H - 8}" text-anchor="middle">${num(v)}</text>`; }
+  for (let v = 0; v <= max; v += step) { s += `<g class="axis"><line x1="${L}" x2="${W}" y1="${y(v)}" y2="${y(v)}"/></g><text x="${L - 8}" y="${y(v) + 4}" text-anchor="end">${num(v)}</text>`; }
   rows.forEach((r, i) => {
-    const y = 24 + i * rowH;
-    s += `<text x="0" y="${y + 4}" style="font-weight:700;fill:${C.label};font-size:12.5px">${r.profile}</text>`;
-    s += `<line x1="${x(r.before)}" x2="${x(r.after)}" y1="${y}" y2="${y}" stroke="${C.line}" stroke-width="6" stroke-linecap="round"/>`;
-    s += `<circle class="pop" style="--d:${(0.08 * i).toFixed(2)}s" cx="${x(r.before)}" cy="${y}" r="9" fill="${C.before}" data-tip="${r.profile} · aujourd'hui<br><b>${r.before}</b> couples"/>`;
-    s += `<circle class="pop" style="--d:${(0.08 * i + 0.3).toFixed(2)}s" cx="${x(r.after)}" cy="${y}" r="9" fill="${C.after}" data-tip="${r.profile} · avec Gilbert<br><b>${r.after}</b> couples"/>`;
+    const cx = L + gw * i + gw / 2, [n, ...unit] = String(r.profile).split(" ");
+    const bar = (v, x, fill, who, d) => `<rect x="${x}" y="${y(v)}" width="${bw}" height="${Math.max(0, H - B - y(v))}" rx="6" class="bar" style="--d:${d}s" fill="${fill}" data-tip="${esc(r.profile)} · ${who}<br><b>${num(v)}</b> couple${v > 1 ? "s" : ""}"/>
+      <text x="${x + bw / 2}" y="${y(v) - 6}" text-anchor="middle" class="val fade" style="font-size:12px;--d:${(+d + 0.5).toFixed(2)}s">${num(v)}</text>`;
+    s += bar(r.before, cx - bw - 2, C.before, "aujourd'hui", (0.08 * i).toFixed(2));
+    s += bar(r.after, cx + 2, C.after, "avec Gilbert", (0.08 * i + 0.2).toFixed(2));
+    s += `<text x="${cx}" y="${H - B + 18}" text-anchor="middle" style="font-weight:700;fill:${C.label};font-size:14px">${esc(n)}</text>`;
+    s += `<text x="${cx}" y="${H - B + 33}" text-anchor="middle" style="font-size:11.5px">${esc(unit.join(" "))}</text>`;
   });
   return svg(W, H, s) + `<div class="legend" style="margin-top:.6rem"><span class="l-before">aujourd'hui</span><span class="l-after">avec Gilbert</span><span>nombre de couples fournisseur × usine</span></div>`;
 }
@@ -1257,22 +1289,27 @@ function table(cols, rows, { onRow, selected } = {}) {
 }
 
 async function renderProfiles() {
-  $("#dumbbell").innerHTML = dumbbell(S.summary.profiles);
+  // whole scenario, whatever the filters of the table: couples per weekly class (1 to 5 deliveries a week)
+  if (S.profilesChart !== S.current) {   // drawn once per scenario: changing a filter does not redraw it
+    $("#dumbbell").innerHTML = profileBars(S.summary.profiles.filter((r) => / semaine$/.test(r.profile)));
+    S.profilesChart = S.current;
+  }
   const p = new URLSearchParams();
   if ($("#pf-plant").value) p.set("plant", $("#pf-plant").value);
-  if ($("#pf-q").value) p.set("q", $("#pf-q").value);
+  const supplier = $("#pf-supplier").value;
+  if (supplier) p.set("q", supplier);
   let rows = await api(`/runs/${S.current}/views/profiles?${p}`);
-  if ($("#pf-changed").checked) rows = rows.filter((r) => r.frequency_changed || r.days !== r.days_before_smoothing);
+  if (supplier) rows = rows.filter((r) => r.supplier === supplier);   // exact supplier (the API search matches a part of the id)
   $("#profilesTable").innerHTML = table([
     { key: "supplier", label: "Fournisseur" }, { key: "plant", label: "Usine" }, { key: "km", label: "km", num: true, fmt: num },
     { key: "before", label: "Aujourd'hui" }, { key: "after", label: "Avec Gilbert", fmt: (v, r) => {
       const moved = r.days !== r.days_before_smoothing;
-      return `<span class="tag ${moved ? "rose" : ""}" ${moved ? `data-tip="Avant lissage : ${esc(r.days_before_smoothing)}"` : ""}>${v}</span>`; } },
+      return `<span class="tag" ${moved ? `data-tip="Avant lissage : ${esc(r.days_before_smoothing)}"` : ""}>${v}</span>`; } },
     { key: "days", label: "Jours" }, { key: "deliveries_before", label: "Livr. avant", num: true }, { key: "deliveries_after", label: "Livr. après", num: true },
     { key: "trucks", label: "Camions", num: true }, { key: "fill", label: "Remplissage", num: true, fmt: (v) => nf1.format(v) + " %" },
   ], rows);
 }
-["#pf-plant", "#pf-q", "#pf-changed"].forEach((id) => $(id).addEventListener("input", () => S.summary && renderProfiles()));
+["#pf-supplier", "#pf-plant"].forEach((id) => $(id).addEventListener("input", () => S.summary && renderProfiles()));
 
 async function renderTrucks() {
   const p = new URLSearchParams({ limit: 60, offset: S.trucksPage * 60 });
