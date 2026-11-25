@@ -20,7 +20,7 @@ const dayLabel = (iso) => { const d = new Date(iso + "T12:00:00"); return `${JOU
 const short = (iso) => iso.slice(8, 10) + "/" + iso.slice(5, 7);
 
 const S = { runs: [], sourceRun: null, current: null, summary: null, view: "accueil", files: {}, polling: null, trucksPage: 0, selectedTruck: null, suppliers: [], sort: {} };
-const DONE = "succeeded", FAILED = "failed";
+const DONE = "succeeded", FAILED = "failed", CANCELLED = "cancelled", FINISHED = [DONE, FAILED, CANCELLED];
 // parameters of the planner used by a run (defaults filled in by the API)
 const planner = (run) => (run && run.parameters && run.parameters.planner) || {};
 const runtime = (run) => Object.values((run && run.timings) || {}).reduce((a, b) => a + b, 0);
@@ -174,7 +174,7 @@ function renderLaunch() {
   $("#composeBtn").disabled = !canLaunch();
 }
 
-const STATUS = { queued: "En attente", running: "En cours", succeeded: "Terminé", failed: "Échec" };
+const STATUS = { queued: "En attente", running: "En cours", succeeded: "Terminé", failed: "Échec", cancelled: "Annulé" };
 function renderHistory() {
   const list = S.runs || [];
   $("#historyCount").textContent = list.length ? `${list.length} calcul${list.length > 1 ? "s" : ""}` : "";
@@ -187,7 +187,7 @@ function renderHistory() {
       <div class="imp-actions">
         ${ok ? `<button class="btn ghost small" data-open-run="${r.run_id}">Voir les résultats</button>` : ""}
         <button class="btn ghost small" data-reuse="${r.run_id}" title="Relancer sur les mêmes fichiers, avec d'autres réglages">Relancer</button>
-        ${[DONE, FAILED].includes(r.status) ? `<button class="c-del" data-del-run="${r.run_id}" title="Supprimer ce calcul">×</button>` : ""}</div>
+        ${FINISHED.includes(r.status) ? `<button class="c-del" data-del-run="${r.run_id}" title="Supprimer ce calcul">×</button>` : ""}</div>
     </div>`;
   }).join("") : `<p class="empty-note">Aucun calcul pour l'instant.</p>`;
   $$("[data-open-run]").forEach((b) => b.addEventListener("click", () => openRun(b.dataset.openRun, "apercu")));
@@ -486,10 +486,23 @@ function startRunning(run) {
       const st = await api("/runs/" + run.run_id);
       if (st.status === DONE) { stopRunning(); await refreshRuns(); $("#f-label").value = `Scénario ${S.runs.length + 1}`; await openRun(st.run_id, "apercu"); }
       else if (st.status === FAILED) { stopRunning(); toast("Le calcul n'a pas abouti : " + (st.error || st.status)); await refreshRuns(); show("accueil"); }
+      else if (st.status === CANCELLED) { stopRunning(); toast("Calcul arrêté."); await refreshRuns(); show("accueil"); }
     } catch (_) { /* server busy: try again */ }
   }, 500);
 }
 function stopRunning() { clearInterval(S.polling); cancelAnimationFrame(gatherRaf); gatherRaf = null; }
+
+// stop button of the waiting screen: the server kills the run and its worker processes
+$("#stopRunBtn").addEventListener("click", async () => {
+  if (!S.runningId || !confirm("Arrêter le calcul en cours ? Il ne gardera aucun résultat.")) return;
+  const btn = $("#stopRunBtn"); btn.disabled = true; btn.classList.add("busy");
+  try {
+    await api(`/runs/${S.runningId}/cancel`, { method: "POST" });
+    stopRunning(); toast("Calcul arrêté.");
+    await refreshRuns(); show("accueil");
+  } catch (err) { toast(err.message); }   // e.g. the run ended meanwhile: the polling opens its results
+  finally { btn.disabled = false; btn.classList.remove("busy"); }
+});
 
 // ----------------------------------------------------------------------------- runs
 async function refreshRuns() {
@@ -887,7 +900,7 @@ function renderScenarios() {
   $("#scenarioCards").innerHTML = S.runs.map((r) => {
     const ok = r.status === DONE;
     return `<div class="card ${r.run_id === S.current ? "current" : ""} ${ok ? "" : "failed"}" data-run="${r.run_id}" data-ok="${ok}">
-      ${[DONE, FAILED].includes(r.status) ? `<button class="c-del" data-del="${r.run_id}" title="Supprimer">×</button>` : ""}
+      ${FINISHED.includes(r.status) ? `<button class="c-del" data-del="${r.run_id}" title="Supprimer">×</button>` : ""}
       <div class="c-name">${esc(r.label)}</div><div class="c-date">${fmtStamp(r.created_at)}</div>
       <div class="c-chips">${settingsChips(r)}</div>
       ${ok ? `<div class="c-saving">${eur(r.kpis.saving)}</div><div class="c-meta">${num(r.kpis.trucks_after)} camions · pics ${Object.values(r.plant_peaks || {}).join(" / ")} · ${Math.round(runtime(r))} s</div>`

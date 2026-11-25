@@ -1,4 +1,4 @@
-"""Runs: import a planning and launch the optimisation, relaunch it with other parameters, follow it, delete it."""
+"""Runs: import a planning and launch the optimisation, relaunch it with other parameters, follow it, cancel it, delete it."""
 
 from __future__ import annotations
 
@@ -130,9 +130,22 @@ def get_run(run_id: str, repository: Annotated[RunRepository, Depends(get_reposi
     return repository.get(run_id)
 
 
+@router.post("/{run_id}/cancel")
+def cancel_run(
+    run_id: str,
+    repository: Annotated[RunRepository, Depends(get_repository)],
+    runner: Annotated[JobRunner, Depends(get_runner)],
+) -> RunManifest:
+    """Stop a waiting or running run: it ends as cancelled and keeps no results."""
+    manifest = repository.get(run_id)
+    if manifest.status not in (RunStatus.QUEUED, RunStatus.RUNNING) or not runner.cancel(run_id):
+        raise HTTPException(status.HTTP_409_CONFLICT, f"run {run_id} is {repository.get(run_id).status}: nothing to cancel")
+    return repository.get(run_id)
+
+
 @router.delete("/{run_id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_run(run_id: str, repository: Annotated[RunRepository, Depends(get_repository)]) -> Response:
-    """Delete a finished run (succeeded or failed) and its files."""
+    """Delete a finished run (succeeded, failed or cancelled) and its files."""
     manifest = repository.get(run_id)
     if manifest.status in (RunStatus.QUEUED, RunStatus.RUNNING):
         raise HTTPException(status.HTTP_409_CONFLICT, f"run {run_id} is {manifest.status}: wait for its end before deleting it")

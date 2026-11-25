@@ -100,7 +100,7 @@ rien : tous ses chiffres viennent des tables de sortie d'une exécution, par les
 - **Nouveau calcul** : on dépose les trois fichiers d'un coup (reconnus automatiquement), on nomme le scénario et on
   ajuste les réglages détaillés (avance maximale, surcoût accepté pour lisser), puis on
   lance. « Essayer avec un exemple » utilise les fichiers du projet. Les calculs précédents se rouvrent, se relancent sur
-  les mêmes fichiers avec d'autres réglages, ou se suppriment.
+  les mêmes fichiers avec d'autres réglages, ou se suppriment. Pendant le calcul, « Arrêter le calcul » l'annule.
 - **Synthèse** : économie, coût, camions, livraisons et remplissage avant / après, charge quotidienne des usines,
   conformité, puis en détail le coût par usine, le lissage, la situation actuelle sur la grille tarifaire, les règles
   appliquées aux données, le registre des anomalies, les contrôles, les tests de sortie et le journal du calcul.
@@ -125,7 +125,8 @@ Toutes les routes sont sous `/api`.
 | `POST` | `/api/runs/example` | Même chose avec les fichiers du projet (`DSO_EXAMPLE_*`) |
 | `POST` | `/api/runs/{run_id}/rerun` | Nouvelle exécution sur les fichiers de `run_id`, avec d'autres paramètres (`source_run_id` dans le manifeste) |
 | `GET` | `/api/runs`, `/api/runs/{run_id}` | Liste des exécutions, statut et résultats d'une exécution |
-| `DELETE` | `/api/runs/{run_id}` | Supprimer une exécution terminée et ses fichiers |
+| `POST` | `/api/runs/{run_id}/cancel` | Arrêter une exécution en attente ou en cours (son processus et ceux du calcul parallèle) : elle finit `cancelled`, sans résultats |
+| `DELETE` | `/api/runs/{run_id}` | Supprimer une exécution terminée (réussie, en échec ou annulée) et ses fichiers |
 | `GET` | `/api/runs/{run_id}/log` | Journal de l'exécution |
 | `GET` | `/api/runs/{run_id}/tables`, `/api/runs/{run_id}/tables/{name}` | Tables de sortie en JSON, paginées |
 | `GET` | `/api/runs/{run_id}/files/{name}`, `/api/runs/{run_id}/download` | Une table en CSV, ou toutes les sorties dans un zip |

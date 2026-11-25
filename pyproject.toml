@@ -14,6 +14,7 @@ dependencies = [
     "openpyxl>=3.1.5",
     "pandas>=2.2,<3",
     "pdfplumber>=0.11.11",
+    "psutil>=7.2.2",
     "pydantic-settings>=2.16.3",
     "python-multipart>=0.0.34",
     "scipy>=1.16.3",
@@ -36,6 +37,7 @@ dev = [
     "ruff>=0.17.6",
     "scipy-stubs>=1.18.1.1",
     "types-openpyxl>=3.1.5.20261122",
+    "types-psutil>=7.2.2.20261122",
 ]
 # Milestone notebooks and their PDF generators only: never installed in the application image
 notebooks = [

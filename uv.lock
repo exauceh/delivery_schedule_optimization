@@ -474,6 +474,7 @@ dependencies = [
     { name = "openpyxl" },
     { name = "pandas" },
     { name = "pdfplumber" },
+    { name = "psutil" },
     { name = "pydantic-settings" },
     { name = "python-multipart" },
     { name = "scipy" },
@@ -489,6 +490,7 @@ dev = [
     { name = "ruff" },
     { name = "scipy-stubs" },
     { name = "types-openpyxl" },
+    { name = "types-psutil" },
 ]
 notebooks = [
     { name = "ipykernel" },
@@ -506,6 +508,7 @@ requires-dist = [
     { name = "openpyxl", specifier = ">=3.1.5" },
     { name = "pandas", specifier = ">=2.2,<3" },
     { name = "pdfplumber", specifier = ">=0.11.11" },
+    { name = "psutil", specifier = ">=7.2.2" },
     { name = "pydantic-settings", specifier = ">=2.16.3" },
     { name = "python-multipart", specifier = ">=0.0.34" },
     { name = "scipy", specifier = ">=1.16.3" },
@@ -521,6 +524,7 @@ dev = [
     { name = "ruff", specifier = ">=0.17.6" },
     { name = "scipy-stubs", specifier = ">=1.18.1.1" },
     { name = "types-openpyxl", specifier = ">=3.1.5.20261122" },
+    { name = "types-psutil", specifier = ">=7.2.2.20261122" },
 ]
 notebooks = [
     { name = "ipykernel", specifier = ">=7.4.0" },
@@ -2067,6 +2071,15 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/e9/5a/30192a8e53334e9457073589a843408198cfab2d9f2c76698819d70bb87d/types_openpyxl-3.1.5.20261122.tar.gz", hash = "sha256:10b4b572021af793fabd87446594e621fc9a222e6e664b6b1f40fd51f638dee3", size = 102103, upload-time = "2026-11-22T08:59:53.69Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/81/12/bf353e0a7c780b4cbc22bf8a32ee9c521e7a87055e1ecf5c99bd35762039/types_openpyxl-3.1.5.20261122-py3-none-any.whl", hash = "sha256:cc6d93aab042fa27f69e9b89f3b7b671d5630e632199326ee3d18c2e22977839", size = 165892, upload-time = "2026-11-22T08:59:52.262Z" },
+]
+
+[[package]]
+name = "types-psutil"
+version = "7.2.2.20261122"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/af/c3/f2b13b3a78628887c407bee49eed3e8bfb5e23e2e8407c31146269226215/types_psutil-7.2.2.20261122.tar.gz", hash = "sha256:30879c88d871c99f4a632cb17826ce8ec55de2c4884ed84e4f8f293b91c6439e", size = 27671, upload-time = "2026-11-22T09:00:03.397Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/78/da/cc4e00f377450ebc69075f10eea90dce14a534e789426367347e1a1a64b2/types_psutil-7.2.2.20261122-py3-none-any.whl", hash = "sha256:ee60d47cddb6ecace68aeb5326bce47fef706a00f728df7ec27dae31d4ed8472", size = 33505, upload-time = "2026-11-22T09:00:02.507Z" },
 ]
 
 [[package]]

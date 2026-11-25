@@ -22,6 +22,7 @@ class RunStatus(StrEnum):
     RUNNING = "running"
     SUCCEEDED = "succeeded"
     FAILED = "failed"
+    CANCELLED = "cancelled"  # stopped by the user before its end
 
 
 class RunManifest(BaseModel):
