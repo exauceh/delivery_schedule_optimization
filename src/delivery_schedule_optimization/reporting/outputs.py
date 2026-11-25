@@ -14,6 +14,7 @@ from ..domain.config import COUPLE, DAY_NAMES, PlannerConfig
 from ..domain.models import Candidates, Plans
 from ..engine.selection import selection_key
 from ..engine.smoothing import smoothing_indicator
+from ..io.schemas import PROFILE_COLUMNS
 from ..pricing.tariff import Tariff
 
 
@@ -157,8 +158,6 @@ def smoothing_tables(plans: Plans, unsmoothed: Plans) -> tuple[pd.DataFrame, pd.
     return pd.DataFrame(plants), pd.DataFrame(couples)
 
 
-PROFILE_COLUMNS = ["supplier_id", "plant", "distance", "current_profile", "current_weekly_pattern", "profile", "profile_days",
-                   "weekly_pattern", "trucks_per_active_week", "mean_fill_weight_pct", "mean_advance_days", "reason"]
 SAVING_COLUMNS = ["supplier_id", "plant", "distance", "deliveries_before", "deliveries_after", "trucks_before", "trucks_after",
                   "imputed_full_truck_lines", "cost_before", "cost_after", "saving", "saving_pct"]
 
@@ -182,7 +181,7 @@ def build_outputs(lines: pd.DataFrame, deliveries_before: pd.DataFrame, plans: P
     """Outputs 1, 2 and 3 of the retained plan, with the columns of the milestone 3 notebook."""
     trucks, allocations = export(lines, plans, "B", tariff, config)
     summary = couple_summary(lines, deliveries_before, plans, candidates, unsmoothed, config)
-    profiles = summary[PROFILE_COLUMNS].sort_values(["plant", "supplier_id"]).reset_index(drop=True)
+    profiles = summary[list(PROFILE_COLUMNS)].sort_values(["plant", "supplier_id"]).reset_index(drop=True).rename(columns=PROFILE_COLUMNS)
     saving = summary[SAVING_COLUMNS]
     if not np.isclose(saving["saving"].sum(), deliveries_before["cost"].sum() - trucks["cost"].sum()):
         raise ValueError("output 3: the savings per couple do not add up to the total saving")

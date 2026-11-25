@@ -35,8 +35,11 @@ def test_saving_adds_up_and_is_not_negative(result: PipelineResult) -> None:
 
 def test_one_profile_per_couple(result: PipelineResult) -> None:
     profiles = result.tables[OutputName.PROFILES]
-    assert len(profiles) == result.kpis["couples"] == profiles[["supplier_id", "plant"]].drop_duplicates().shape[0]
-    assert profiles["profile"].between(1, 5).all()
+    assert len(profiles) == result.kpis["couples"] == profiles[["Fournisseur", "Usine"]].drop_duplicates().shape[0]
+    assert profiles["Frequence cible"].between(1, 5).all()
+    # output 1 has exactly the columns of the project brief (consolidation_algorithme_pdf.pdf, page 9), nothing more
+    assert list(profiles.columns) == ["Fournisseur", "Usine", "Distance", "Livraisons / sem. actuelles", "Frequence cible", "Jour",
+                                      "Camions / sem.", "Remplissage poids"]
 
 
 def test_timings_cover_every_stage(result: PipelineResult) -> None:

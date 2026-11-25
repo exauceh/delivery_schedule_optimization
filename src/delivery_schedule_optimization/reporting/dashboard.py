@@ -15,7 +15,7 @@ import numpy as np
 import pandas as pd
 from pydantic import BaseModel
 
-from ..io.schemas import OutputName
+from ..io.schemas import OutputName, profiles_by_code
 from ..pricing.tariff import Tariff
 from ..storage.base import RunManifest
 
@@ -211,7 +211,7 @@ def journal(manifest: RunManifest, couples: int, lines: int) -> list[JournalRow]
 def summary(output_dir: Path, manifest: RunManifest) -> Summary:
     """Everything the synthesis, planning and profiles screens need."""
     trucks, alloc = table(output_dir, OutputName.TRUCKS), table(output_dir, OutputName.ALLOCATIONS)
-    saving, profiles = table(output_dir, OutputName.SAVING), table(output_dir, OutputName.PROFILES)
+    saving, profiles = table(output_dir, OutputName.SAVING), profiles_by_code(table(output_dir, OutputName.PROFILES))
     smoothing, couples = table(output_dir, OutputName.SMOOTHING_PLANTS), table(output_dir, OutputName.SMOOTHING_COUPLES)
     checks, tests = table(output_dir, OutputName.CHECKS), table(output_dir, OutputName.OUTPUT_TESTS)
 
@@ -512,7 +512,7 @@ class ProfileRow(BaseModel):
 
 
 def profile_rows(output_dir: Path, plant: str | None, query: str | None) -> list[ProfileRow]:
-    profiles = table(output_dir, OutputName.PROFILES)
+    profiles = profiles_by_code(table(output_dir, OutputName.PROFILES))
     merged = (profiles.merge(table(output_dir, OutputName.SAVING)[["supplier_id", "plant", "deliveries_before", "deliveries_after", "trucks_after"]],
                              on=["supplier_id", "plant"])
               .merge(table(output_dir, OutputName.SMOOTHING_COUPLES)[["supplier_id", "plant", "profile_before_smoothing",

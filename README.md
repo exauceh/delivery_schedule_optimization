@@ -78,7 +78,7 @@ Chaque exécution écrit dans `runs/<run_id>/output/` :
 
 | Fichier | Contenu |
 | :--- | :--- |
-| `sortie1_profils.csv` | **Sortie 1** : profil de chaque couple (jours, rythme hebdomadaire avant / après) et la raison du choix |
+| `sortie1_profils.csv` | **Sortie 1** : profil de chaque couple, avec les colonnes du PDF de l'algorithme (page 9) : Fournisseur, Usine, Distance, Livraisons / sem. actuelles, Frequence cible, Jour, Camions / sem., Remplissage poids. Calculée sur tout l'horizon : « Livraisons / sem. actuelles » est le maximum sur une semaine, « Camions / sem. » et « Remplissage poids » des moyennes |
 | `sortie2_contenu_camions.csv` | **Sortie 2** : matériels regroupés dans chaque camion, par quai, avec les jours de besoin couverts |
 | `sortie2_camions.csv`, `sortie2_affectations.csv` | Sortie 2 en détail : une ligne par camion, une ligne par besoin (camion, jour de livraison, avance, règle appliquée) |
 | `sortie3_saving.csv` | **Sortie 3** : livraisons, camions et coût avant / après, saving par couple |

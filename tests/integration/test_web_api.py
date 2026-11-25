@@ -118,10 +118,10 @@ def test_excel_report(client: TestClient, run_id: str) -> None:
     sheets = pd.read_excel(io.BytesIO(response.content), sheet_name=None)
     assert {"Synthese", "Sortie1_Profils", "Sortie2_Camions", "Sortie3_Saving", "Controles", "Tests_sorties"} <= set(sheets)
     assert len(sheets["Sortie2_Camions"]) == client.get(f"/api/runs/{run_id}").json()["kpis"]["trucks_after"]
-    # outputs 1, 2 and 3 start with the columns of the project brief (slides 10 to 12), in its order
-    assert list(sheets["Sortie1_Profils"].columns[:8]) == ["Fournisseur", "Usine", "Distance (km)", "Livraisons / sem. actuelles",
-                                                           "Fréquence cible", "Jour", "Camions / sem.", "Remplissage poids (%)"]
-    assert sheets["Sortie1_Profils"]["Fréquence cible"].str.fullmatch(r"[1-5] / semaine").all()
+    # outputs 1, 2 and 3 start with the columns of the project brief (slides 10 to 12), in its order; output 1 has only them
+    assert list(sheets["Sortie1_Profils"].columns) == ["Fournisseur", "Usine", "Distance", "Livraisons / sem. actuelles",
+                                                       "Frequence cible", "Jour", "Camions / sem.", "Remplissage poids"]
+    assert sheets["Sortie1_Profils"]["Frequence cible"].str.fullmatch(r"[1-5] / semaine").all()
     contents, trucks = sheets["Sortie2_Contenu_camions"], sheets["Sortie2_Camions"]
     assert {"Material", "Quai", "Besoins regroupés (jours)", "Quantité", "Poids (kg)"} <= set(contents.columns)
     assert (contents.groupby("Camion")["Material"].nunique().reindex(trucks["Camion"]).to_numpy() == trucks["Materials"].to_numpy()).all()
