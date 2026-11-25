@@ -2,7 +2,7 @@
 <!-- Test navigateur du planning (GILBERT-UI-02). Copier ce fichier dans src/delivery_schedule_optimization/web/, lancer l application, ouvrir /planning_check.html : les parcours A a D s affichent a gauche. Supprimer la copie ensuite. -->
 <body style="margin:0;font:13px monospace">
 <pre id="out" style="position:fixed;left:0;top:0;width:640px;max-height:100vh;overflow:auto;background:#fff;z-index:9;margin:0;padding:8px;border:1px solid #ccc"></pre>
-<iframe id="f" src="/#calendrier" style="position:absolute;left:660px;top:0;width:1440px;height:900px;border:0"></iframe>
+<iframe id="f" src="/" style="position:absolute;left:660px;top:0;width:1440px;height:900px;border:0"></iframe>
 <script>
 // temporary test page (GILBERT-UI-02): drives the real application in the iframe; ?mode=shotN leaves a given state for a screenshot
 const mode = new URLSearchParams(location.search).get("mode") || "test";
@@ -17,6 +17,9 @@ async function until(fn, ms = 6000) { const t = Date.now(); while (Date.now() - 
 f.onload = async () => {
   const w = f.contentWindow, d = f.contentDocument, $ = (s) => d.querySelector(s), $$ = (s) => [...d.querySelectorAll(s)];
   const S = () => w.eval("S");
+  // the results live in the page of a scenario: open the latest succeeded run on its Planning tab
+  await until(() => S().runs && S().runs.some((r) => r.status === "succeeded"));
+  w.eval('openRun(S.runs.find((r) => r.status === "succeeded").run_id, "calendrier")');
   await until(() => S().summary && $("#calendarBig svg"));
   const cal = () => S().summary.calendar;
   const count = (p, day) => w.eval(`dayCount(${JSON.stringify(p)}, ${JSON.stringify(day)})`);
@@ -140,17 +143,16 @@ f.onload = async () => {
     check("clic à l'extérieur ferme le panneau", await until(() => !drawerOpen()));
     w.eval(`openDayDrawer("${cal().plants[0]}", "2099-01-05")`);
     await wait(150); check("date hors horizon : pas de panneau", !drawerOpen());
-    $('.sidenav button[data-view="camions"]').click();
-    check("page Camions depuis le menu : pas de bouton retour, filtres remis à zéro", await until(() => S().view === "camions") && $("#backToPlanning").hidden && $("#tf-plant").value === "" && $("#tf-day").value === "");
+    $('.runbar-tabs button[data-view="camions"]').click();
+    check("page Camions depuis son onglet : pas de bouton retour, filtres remis à zéro", await until(() => S().view === "camions") && $("#backToPlanning").hidden && $("#tf-plant").value === "" && $("#tf-day").value === "");
     // scenario change
     const other = S().runs.find((r) => r.status === "succeeded" && r.run_id !== S().current);
     if (other) {
-      $('.sidenav button[data-view="calendrier"]').click(); await until(() => S().view === "calendrier");
+      $('.runbar-tabs button[data-view="calendrier"]').click(); await until(() => S().view === "calendrier");
       $(`#plantTabs button[data-plant="${cal().plants[1]}"]`).click(); await until(() => S().plan.plant !== "");
       const before = S().current;
-      $("#scenarioSelect").value = other.run_id; $("#scenarioSelect").dispatchEvent(new w.Event("change"));
+      w.eval(`openRun("${other.run_id}", "calendrier")`);   // another scenario, opened from the history
       await until(() => S().current === other.run_id);
-      w.eval('show("calendrier")');
       check(`changement de scénario (${other.label}) : planning remis sur « Toutes les usines », cache vidé`, await until(() => S().plan.plant === "") && S().dayCache.size === 0 && before !== S().current);
       const c2 = S().summary.calendar; let b2 = null; c2.plants.forEach((p, r) => c2.days.forEach((day, c) => { if (!b2 || c2.trucks[r][c] > b2.v) b2 = { p, day, v: c2.trucks[r][c] }; }));
       clickCell(b2.p, b2.day); await until(() => $$("#ddList .dd-row").length === b2.v);

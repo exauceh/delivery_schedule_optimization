@@ -12,7 +12,7 @@ from delivery_schedule_optimization.domain.config import PlannerConfig, Preparat
 from delivery_schedule_optimization.io.readers import read_distances, read_schedule
 from delivery_schedule_optimization.io.schemas import InputName
 from delivery_schedule_optimization.preparation.cleaning import tail_date
-from delivery_schedule_optimization.preparation.imputation import impute_full_truck, supplier_distances
+from delivery_schedule_optimization.preparation.imputation import impute_couple_median, impute_full_truck, supplier_distances
 from delivery_schedule_optimization.preparation.pipeline import prepare
 from delivery_schedule_optimization.preparation.quality import AnomalyRegister
 
@@ -50,6 +50,33 @@ def test_missing_distance_gets_the_longest_planning_distance() -> None:
     distances = pd.DataFrame({"supplier_id": ["A", "B", "Z"], "distance": [30.0, 80.0, 500.0]})  # Z is not in the planning
     result = supplier_distances(schedule, distances, AnomalyRegister()).set_index("supplier_id")
     assert result.loc["C", "distance"] == 80.0 and bool(result.loc["C", "distance_imputed"])
+
+
+def test_missing_load_from_the_median_of_the_couple() -> None:
+    """Median of the known lines of the same supplier x plant couple (whatever the material and the quantity), else a
+    full truck; never more than one truck."""
+    schedule = pd.DataFrame({
+        "supplier_id": ["S", "S", "S", "S", "S", "S", "T", "U"],
+        "plant": ["P", "P", "P", "P", "Q", "Q", "P", "P"],
+        "material": ["A", "B", "C", "A", "A", "B", "D", "E"],
+        "schedule_quantity": [10.0, 30.0, 5.0, 4.0, 1.0, 2.0, 7.0, 3.0],
+        "weight": [20.0, 30.0, 100.0, np.nan, 50_000.0, 0.0, np.nan, 12.0],
+    })
+    register = AnomalyRegister()
+    result = impute_couple_median(schedule, "weight", 24_500.0, register)
+    # S x P: median of 20, 30, 100; S x Q: its only known line, capped at one truck; T x P: no known line, a full truck
+    assert result["weight"].tolist() == [20.0, 30.0, 100.0, 30.0, 50_000.0, 24_500.0, 24_500.0, 12.0]
+    assert result["weight_imputed"].tolist() == [False, False, False, True, False, True, True, False]
+    assert register.missing_loads["weight"] == {"couple": 2, "full_truck": 1}
+
+
+def test_missing_distance_can_get_the_median_distance() -> None:
+    schedule = pd.DataFrame({"supplier_id": ["A", "B", "C", "D"]})
+    distances = pd.DataFrame({"supplier_id": ["A", "B", "C"], "distance": [30.0, 80.0, 40.0]})
+    register = AnomalyRegister()
+    result = supplier_distances(schedule, distances, register, method="median").set_index("supplier_id")
+    assert result.loc["D", "distance"] == 40.0 and bool(result.loc["D", "distance_imputed"])
+    assert register.missing_distances == ["D"] and register.distance_fallbacks == {"max": 80.0, "median": 40.0}
 
 
 def test_line_larger_than_a_truck_is_dropped() -> None:

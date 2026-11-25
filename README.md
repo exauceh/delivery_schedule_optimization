@@ -18,7 +18,12 @@ uv run main.py run --schedule docs/released_schedule.csv --distances docs/distan
 
 # L'application : interface web sur http://127.0.0.1:8000, API sous /api (documentation interactive sur /docs)
 uv run main.py serve
+
+# En développement : le serveur redémarre à chaque modification d'un fichier Python (HTML, CSS, JS : rafraîchir la page)
+uv run uvicorn delivery_schedule_optimization.api.app:create_app --factory --reload --reload-dir src
 ```
+
+Un redémarrage pendant un calcul le marque « interrompu » : en mode reload, éviter de modifier le code pendant un calcul.
 
 Avec Docker (interface et API sur le port 8000, exécutions conservées dans un volume) :
 
@@ -97,17 +102,28 @@ graphiques SVG faits main, logo et polices hébergés avec l'application) est se
 rien : tous ses chiffres viennent des tables de sortie d'une exécution, par les routes `/api/runs/{run_id}/views/...`
 (`reporting/dashboard.py`).
 
-- **Nouveau calcul** : on dépose les trois fichiers d'un coup (reconnus automatiquement), on nomme le scénario et on
-  ajuste les réglages détaillés (avance maximale, surcoût accepté pour lisser), puis on
-  lance. « Essayer avec un exemple » utilise les fichiers du projet. Les calculs précédents se rouvrent, se relancent sur
-  les mêmes fichiers avec d'autres réglages, ou se suppriment. Pendant le calcul, « Arrêter le calcul » l'annule.
-- **Synthèse** : économie, coût, camions, livraisons et remplissage avant / après, charge quotidienne des usines,
-  conformité, puis en détail le coût par usine, le lissage, la situation actuelle sur la grille tarifaire, les règles
-  appliquées aux données, le registre des anomalies, les contrôles, les tests de sortie et le journal du calcul.
-  « Exporter le rapport » donne le rapport Excel, les sorties en CSV ou le zip de toutes les tables.
-- **Planning, Profils, Camions, Fournisseurs** : le détail des sorties 1 à 3, avec filtres et le bon de livraison de
-  chaque camion.
-- **Scénarios** : tous les calculs côte à côte (économie, camions, pics par usine, réglages, durée).
+Le menu a deux entrées, **Nouveau calcul** et **Historique** ; les résultats s'ouvrent dans la page d'un scénario.
+
+- **Nouveau calcul** : on dépose les trois fichiers d'un coup (reconnus automatiquement), ou l'on choisit « Essayer avec
+  un exemple » (les fichiers du projet). La **qualité des données** s'affiche aussitôt à droite, avant tout calcul :
+  besoins, fournisseurs, usines, données absentes, lignes retirées. S'il manque des poids, des volumes ou des distances,
+  les réglages détaillés demandent comment les compléter (camion plein ou médiane ; plus longue distance ou distance
+  médiane) et le calcul ne se lance qu'une fois ce choix fait. On nomme le scénario, on ajuste l'avance maximale et le
+  surcoût accepté pour lisser, puis on lance ; « Arrêter le calcul » l'annule.
+- **Historique** : tous les calculs, avec leurs données d'entrée (fichiers, besoins), leurs paramètres et leur résultat
+  (économie, camions) ou leur statut. Une ligne ouvre ses résultats ; ⟳ remplit le formulaire avec les mêmes fichiers
+  et les mêmes paramètres, pour en changer un et relancer ; × supprime le calcul.
+- **Page d'un scénario** : on n'y entre qu'en ouvrant un calcul (à la fin du calcul, ou depuis l'historique), si bien
+  que les résultats affichés sont toujours ceux d'un scénario identifié. Le fil d'Ariane (« Historique / Médianes /
+  Planning ») et l'en-tête rappellent le scénario (nom, date, paramètres), avec le retour à l'historique et l'export
+  (rapport Excel, sorties en CSV, zip de toutes les tables). Les résultats sont des onglets ; l'adresse de la page
+  (`#/runs/<run_id>/planning`) désigne le scénario et l'onglet, si bien que « précédent », le rafraîchissement et les
+  favoris y ramènent.
+  - **Synthèse** : économie, coût, camions, livraisons et remplissage avant / après, charge quotidienne des usines,
+    conformité, puis en détail le coût par usine, le lissage, la situation actuelle sur la grille tarifaire, les règles
+    appliquées aux données, le registre des anomalies, les contrôles, les tests de sortie et le journal du calcul.
+  - **Planning, Profils, Camions, Fournisseurs** : le détail des sorties 1 à 3, avec filtres et le bon de livraison de
+    chaque camion.
 
 Un lissage avec surcoût est plus long que le lissage gratuit : environ 50 secondes pour 0,5 % sur le planning du projet,
 contre une dizaine de secondes (les usines sont lissées en parallèle, l'usine la plus lente fixe la durée). L'interface
@@ -121,6 +137,8 @@ Toutes les routes sont sous `/api`.
 | :--- | :--- | :--- |
 | `GET` | `/api/health` | État du service |
 | `GET` | `/api/config/defaults` | Tous les paramètres d'une exécution avec leur valeur par défaut |
+| `POST` | `/api/quality` | Qualité des données du planning et des distances déposés, sans rien enregistrer : contrôles et données absentes |
+| `GET` | `/api/quality/example`, `/api/runs/{run_id}/quality` | La même chose pour les fichiers de l'exemple, ou ceux d'une exécution |
 | `POST` | `/api/runs` | Importer les trois fichiers (+ `label` et un JSON `parameters` facultatifs) et lancer l'exécution en arrière-plan → `202` avec le `run_id` |
 | `POST` | `/api/runs/example` | Même chose avec les fichiers du projet (`DSO_EXAMPLE_*`) |
 | `POST` | `/api/runs/{run_id}/rerun` | Nouvelle exécution sur les fichiers de `run_id`, avec d'autres paramètres (`source_run_id` dans le manifeste) |
@@ -152,8 +170,10 @@ uv run main.py run ... --parameters parameters.json
 ```
 
 Les principaux : `max_advance_days` (RG03), `allowed_frequencies` (RG05), `smoothing` et `smoothing_budget` (RG09),
-`overflow_first` (ajouter des jours plutôt que des camions), `strict_coverage` (RG06), `holiday_country` (RG10) et `tail_date` (dernière date
-du planning qui cumule les besoins, détectée automatiquement). La marge et la surcharge diesel (RG11) n'en font pas
+`overflow_first` (ajouter des jours plutôt que des camions), `strict_coverage` (RG06), `holiday_country` (RG10), `tail_date` (dernière date
+du planning qui cumule les besoins, détectée automatiquement), `missing_load` (poids ou volume absent : `full_truck`, un camion
+plein, par défaut, ou `couple_median`, médiane des lignes du même couple fournisseur × usine) et `missing_distance` (distance absente :
+`max`, la plus longue du planning, par défaut, ou `median`). La marge et la surcharge diesel (RG11) n'en font pas
 partie : elles sont lues dans la grille du transporteur. Le plan commence toujours `max_advance_days` avant
 le premier besoin (réponse client) : les premiers besoins peuvent partir en avance comme les autres. Les réglages techniques (dossier des exécutions,
 niveau de log, nombre de processus, hôte et port) viennent de l'environnement avec le préfixe `DSO_` (voir
@@ -166,7 +186,7 @@ main.py                          point d'entrée : run | serve | parameters
 src/delivery_schedule_optimization/
 ├── domain/        objets métier, sans I/O : paramètres (config.py), calendrier (RG10), plan d'un couple (models.py)
 ├── io/            contrats des fichiers d'entrée et de sortie, lecture (avec contrôles, PDF de la grille) et écriture
-├── preparation/   nettoyage du Milestone 1 : DQ01–DQ07, imputation camion plein, dataset consolidé, lignes du moteur
+├── preparation/   nettoyage du Milestone 1 : DQ01–DQ07, imputation (camion plein ou médiane), dataset consolidé, lignes du moteur
 ├── pricing/       grille tarifaire et prix d'un camion (RG11)
 ├── baseline/      situation actuelle (référence A) : une livraison par couple et par jour de besoin, chargée comme le plan
 ├── engine/        optimisation (Milestone 3)

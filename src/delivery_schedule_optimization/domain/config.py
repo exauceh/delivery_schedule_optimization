@@ -3,11 +3,16 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from typing import Literal
 
 DAY_NAMES = ("lundi", "mardi", "mercredi", "jeudi", "vendredi")
 
 
 COUPLE = ["supplier_id", "plant"]
+
+# How missing data are completed (DQ04, DQ07). The first value of each is the prudent choice of Milestone 1 (H05, H06).
+MissingLoad = Literal["full_truck", "couple_median"]  # a full truck / median line of the same supplier x plant couple
+MissingDistance = Literal["max", "median"]  # longest / median distance of the planning suppliers
 
 
 @dataclass(frozen=True)
@@ -43,9 +48,18 @@ class PlannerConfig:
 class PreparationConfig:
     """Parameters of the data preparation (Milestone 1 cleaning, DQ01 to DQ07).
 
-    Missing weights, volumes and distances are always completed the prudent way: a full truck and the longest
-    distance of the planning suppliers (H05, H06).
+    By default, missing weights, volumes and distances are completed the prudent way: a full truck and the longest
+    distance of the planning suppliers (H05, H06). The interface asks the user to choose when data are missing.
     """
+
+    # DQ04: missing or non-positive weight / volume of a line. "full_truck" = the capacity of one truck (the line travels
+    # alone); "couple_median" = the median weight (volume) of the known lines of the same supplier x plant couple, else a
+    # full truck. (The weight of a line is not proportional to its quantity, and most materials with a missing weight
+    # have no known weight at all: the couple is the reference.)
+    missing_load: MissingLoad = "full_truck"
+    # DQ07: supplier of the planning without a distance. "max" = the longest, "median" = the median distance of the
+    # planning suppliers that have one.
+    missing_distance: MissingDistance = "max"
 
     # DQ03: the planning ends with one date that accumulates every need after the daily horizon (01/01/2027 in the
     # November 2026 planning). None = detected automatically: the last date of the file when it comes more than

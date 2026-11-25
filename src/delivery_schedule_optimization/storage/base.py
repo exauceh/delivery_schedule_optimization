@@ -38,6 +38,7 @@ class RunManifest(BaseModel):
     app_version: str
     parameters: dict[str, JsonValue] = Field(default_factory=dict)
     inputs: dict[str, str] = Field(default_factory=dict, description="input name -> SHA-256 of the uploaded file")
+    input_files: dict[str, str] = Field(default_factory=dict, description="input name -> name of the file given by the user")
     timings: dict[str, float] = Field(default_factory=dict, description="stage -> seconds")
     kpis: dict[str, float] = Field(default_factory=dict)
     accuracy: dict[str, float] = Field(default_factory=dict)

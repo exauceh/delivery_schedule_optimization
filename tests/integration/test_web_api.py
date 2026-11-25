@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import io
 import json
+import re
 from collections.abc import Iterator
 from pathlib import Path
 
@@ -43,8 +44,10 @@ def run_id(client: TestClient) -> str:
 
 def test_the_interface_is_served(client: TestClient) -> None:
     page = client.get("/")
-    assert page.status_code == 200 and "Gilbert" in page.text and 'src="app.js"' in page.text
+    assert page.status_code == 200 and "Gilbert" in page.text
+    assert re.search(r'src="app\.js\?v=[0-9a-f]{12}"', page.text) and re.search(r'href="styles\.css\?v=[0-9a-f]{12}"', page.text)
     assert client.get("/app.js").status_code == 200 and client.get("/brand/gilbert-logo.svg").status_code == 200
+    assert client.get("/styles.css").headers["cache-control"] == "no-cache"  # a new version is never mixed with an old stylesheet
 
 
 def test_summary_adds_up(client: TestClient, run_id: str) -> None:
@@ -129,6 +132,7 @@ def test_rerun_keeps_the_files_and_changes_the_parameters(client: TestClient, ru
     rerun = response.json()
     source = client.get(f"/api/runs/{run_id}").json()
     assert rerun["source_run_id"] == run_id and rerun["inputs"] == source["inputs"] and rerun["label"] == "Sans lissage"
+    assert rerun["input_files"] == source["input_files"] and set(source["input_files"]) == {"released_schedule", "distances", "rate_sheet"}
     assert rerun["parameters"]["planner"]["smoothing"] is False and rerun["status"] == "succeeded"
     assert client.post(f"/api/runs/{run_id}/rerun", data={"parameters": '{"planner": {"speed": 1}}'}).status_code == 422
 
@@ -139,6 +143,37 @@ def test_delete_a_run(client: TestClient, run_id: str) -> None:
     assert client.get(f"/api/runs/{other}").status_code == 404
     assert other not in [r["run_id"] for r in client.get("/api/runs").json()]
     assert client.delete(f"/api/runs/{other}").status_code == 404
+
+
+def test_data_quality_before_the_launch(client: TestClient, run_id: str, small_inputs: dict[InputName, bytes]) -> None:
+    files = {"released_schedule": ("released_schedule.csv", small_inputs[InputName.SCHEDULE], "text/csv"),
+             "distances": ("distances.csv", small_inputs[InputName.DISTANCES], "text/csv")}
+    response = client.post("/api/quality", files=files)
+    assert response.status_code == 200, response.text
+    quality = response.json()
+    assert quality == client.get("/api/quality/example").json() == client.get(f"/api/runs/{run_id}/quality").json()  # same files
+    run = client.get(f"/api/runs/{run_id}").json()
+    assert quality["lines"] == run["kpis"]["lines"] and quality["rows_raw"] > quality["lines"]
+    assert quality["rows_valid"] + quality["rows_to_impute"] + quality["rows_rejected"] == quality["rows_raw"]
+    assert quality["rows_to_impute"] >= 1 and 0 <= quality["score"] <= 100  # SUP_00130 has no distance
+    missing = quality["missing"]
+    assert missing["suppliers_without_distance"] == ["SUP_00130"] and quality["has_missing"]
+    assert missing["distance_median"] <= missing["distance_max"]
+    dq07 = next(c for c in quality["checks"] if c["rule"] == "DQ07")
+    assert dq07["count"] == 1 and dq07["treatment"].startswith("à compléter")
+    broken = {**files, "distances": ("distances.csv", b"supplier;km\nA;3\n", "text/csv")}
+    assert client.post("/api/quality", files=broken).status_code == 422
+
+
+def test_run_with_the_median_imputation(client: TestClient, run_id: str) -> None:
+    response = client.post(f"/api/runs/{run_id}/rerun", data={
+        "label": "Médianes", "parameters": json.dumps({"preparation": {"missing_load": "couple_median", "missing_distance": "median"}})})
+    rerun = response.json()
+    assert rerun["status"] == "succeeded" and rerun["checks_passed"], rerun.get("error")  # H06 checks the median distance
+    assert rerun["parameters"]["preparation"]["missing_distance"] == "median"
+    situation = client.get(f"/api/runs/{rerun['run_id']}/views/situation").json()
+    assert any(a["rule"] == "DQ07" and "médiane" in a["treatment"] for a in situation["anomalies"])
+    assert client.post(f"/api/runs/{run_id}/rerun", data={"parameters": '{"preparation": {"missing_load": "mean"}}'}).status_code == 422
 
 
 def test_views_of_an_unknown_run(client: TestClient) -> None:

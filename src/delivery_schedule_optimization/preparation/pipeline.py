@@ -9,7 +9,7 @@ import pandas as pd
 
 from ..domain.config import PlannerConfig, PreparationConfig
 from .cleaning import KEY_COLUMNS, check_unique_needs, clean_distances, drop_larger_than_truck, drop_tail, drop_without_need, flag_non_working_days
-from .imputation import impute_full_truck, supplier_distances
+from .imputation import impute_couple_median, impute_full_truck, supplier_distances
 from .quality import AnomalyRegister, accuracy
 
 logger = logging.getLogger(__name__)
@@ -22,13 +22,15 @@ class PreparedData:
     consolidated: pd.DataFrame
     anomalies: pd.DataFrame
     accuracy: dict[str, float]
+    register: AnomalyRegister  # the same findings, with the details of the missing data
 
 
 def prepare(schedule_raw: pd.DataFrame, distances_raw: pd.DataFrame, planner: PlannerConfig, config: PreparationConfig) -> PreparedData:
     """Clean the raw planning, complete the missing values and join the distances.
 
-    Steps (Milestone 1): DQ01 needs only, DQ03 cumulative tail, DQ02 flags, DQ04 imputation (full truck),
-    DQ05 lines larger than a truck, DQ06 / DQ07 distances. The consolidated dataset keeps the line identity,
+    Steps (Milestone 1): DQ01 needs only, DQ03 cumulative tail, DQ02 flags, DQ04 imputation (full truck or couple
+    median, `config.missing_load`), DQ05 lines larger than a truck, DQ06 / DQ07 distances (`config.missing_distance`).
+    The consolidated dataset keeps the line identity,
     the quantity, the load and the distance.
     """
     register = AnomalyRegister()
@@ -36,11 +38,12 @@ def prepare(schedule_raw: pd.DataFrame, distances_raw: pd.DataFrame, planner: Pl
     schedule = drop_without_need(schedule, register)
     schedule = drop_tail(schedule, config, register)
     flag_non_working_days(schedule, planner, register)  # after DQ03: the cumulative date is not a delivery day
-    schedule = impute_full_truck(schedule, "weight", planner.truck_kg, register)
-    schedule = impute_full_truck(schedule, "volume", planner.truck_m3, register)
+    impute = impute_full_truck if config.missing_load == "full_truck" else impute_couple_median
+    schedule = impute(schedule, "weight", planner.truck_kg, register)
+    schedule = impute(schedule, "volume", planner.truck_m3, register)
     schedule = drop_larger_than_truck(schedule, planner, register)
     check_unique_needs(schedule)
-    distances = supplier_distances(schedule, clean_distances(distances_raw, register), register)
+    distances = supplier_distances(schedule, clean_distances(distances_raw, register), register, config.missing_distance)
     schedule = schedule.merge(distances, on="supplier_id", how="left", validate="m:1")
 
     quality = accuracy(schedule)
@@ -50,4 +53,4 @@ def prepare(schedule_raw: pd.DataFrame, distances_raw: pd.DataFrame, planner: Pl
         raise ValueError("released schedule: no line left after the preparation")
     logger.info("Raw: %d rows -> consolidated: %d rows (accuracy: rows %.1f %%, weight %.1f %%)", len(schedule_raw), len(consolidated),
                 100 * quality["rows_accuracy"], 100 * quality["weight_accuracy"])
-    return PreparedData(consolidated=consolidated, anomalies=register.to_frame(), accuracy=quality)
+    return PreparedData(consolidated=consolidated, anomalies=register.to_frame(), accuracy=quality, register=register)
