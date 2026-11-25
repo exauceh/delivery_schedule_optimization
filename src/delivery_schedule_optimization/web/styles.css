@@ -492,6 +492,10 @@ table.anomalies td.det { color: var(--muted); font-size: .82rem; }
 .ticket li .a { font-weight: 700; }
 .ticket li .d { color: var(--muted); font-size: .8rem; grid-column: 1 / -1; }
 .ticket .replaces { margin-top: .9rem; font-size: .9rem; background: var(--mint); color: var(--ink); border-radius: 12px; padding: .6rem .85rem; }
+/* Largest savings: bars against the current cost, 2 to 10 couples */
+.top-pick { display: inline-flex; align-items: center; gap: .45rem; font-size: .88rem; color: var(--muted); white-space: nowrap; }
+.top-pick select { height: 34px; border: 1px solid var(--line); background: var(--bg); border-radius: 999px; padding: 0 .8rem; font-weight: 700; color: var(--ink); }
+.top-pick select:focus { outline: none; border-color: var(--emerald-3); box-shadow: 0 0 0 3px var(--mint); }
 
 /* ================================================================== scenarios */
 .cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(270px, 1fr)); gap: 1.1rem; margin-top: 1.2rem; }

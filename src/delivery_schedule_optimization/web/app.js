@@ -892,16 +892,24 @@ function dumbbell(rows) {
   return svg(W, H, s) + `<div class="legend" style="margin-top:.6rem"><span class="l-before">aujourd'hui</span><span class="l-after">avec Gilbert</span><span>nombre de couples fournisseur × usine</span></div>`;
 }
 
-function lollipop(rows) {
-  const W = 560, rowH = 30, L = 170, R = 70, H = rows.length * rowH + 10, max = Math.max(...rows.map((r) => r.saving));
-  const x = (v) => L + (W - L - R) * (v / max);
-  return svg(W, H, rows.map((r, i) => {
-    const y = 14 + i * rowH;
-    return `<text x="0" y="${y + 4}" style="font-size:11.5px;fill:${C.ink}">${r.supplier} · ${r.plant}</text>
-      <line class="hbar" style="--d:${(0.04 * i).toFixed(2)}s" x1="${L}" x2="${x(r.saving)}" y1="${y}" y2="${y}" stroke="${C.afterPale}" stroke-width="3" stroke-linecap="round"/>
-      <circle class="pop" style="--d:${(0.04 * i + 0.5).toFixed(2)}s" cx="${x(r.saving)}" cy="${y}" r="7" fill="${C.after}" data-tip="${r.supplier} → ${r.plant}<br>${eur(r.before)} → ${eur(r.after)}<br><b>−${nf0.format(r.pct)} %</b>"/>
-      <text x="${x(r.saving) + 12}" y="${y + 4}" class="val fade" style="--d:${(0.04 * i + 0.6).toFixed(2)}s">${eur(r.saving)}</text>`;
-  }).join(""));
+// Largest savings, as in the output of the brief: per couple, the current cost (reference) against the cost with Gilbert
+function topSavingBars(rows, W = 760) {
+  const L = 150, R = 70, B = 26, rowH = 52, bh = 17, H = rows.length * rowH + B + 6;
+  const max = niceMax(Math.max(...rows.map((r) => r.before))), x = (v) => L + (W - L - R) * (v / max);
+  let s = "";
+  for (let k = 0; k <= 4; k++) {
+    const v = (max * k) / 4;
+    s += `<g class="axis"><line x1="${x(v)}" x2="${x(v)}" y1="0" y2="${H - B}"/></g><text x="${x(v)}" y="${H - 8}" text-anchor="middle">${num(v)}</text>`;
+  }
+  rows.forEach((r, i) => {
+    const y = 6 + i * rowH, tip = `${r.supplier} → ${r.plant}<br>${eur(r.before)} → ${eur(r.after)}<br><b>−${nf0.format(r.pct)} %</b>`;
+    s += `<text x="${L - 10}" y="${y + bh + 5}" text-anchor="end" style="font-size:12px;font-weight:700;fill:${C.ink}">${r.supplier} → ${r.plant}</text>`;
+    s += `<rect class="hbar" style="--d:${(0.06 * i).toFixed(2)}s" x="${L}" y="${y}" width="${x(r.before) - L}" height="${bh}" rx="4" fill="${C.before}" data-tip="${tip}"/>`;
+    s += `<text x="${x(r.before) + 6}" y="${y + bh - 4}" class="val fade" style="--d:${(0.06 * i + 0.5).toFixed(2)}s">${eur(r.before)}</text>`;
+    s += `<rect class="hbar" style="--d:${(0.06 * i + 0.2).toFixed(2)}s" x="${L}" y="${y + bh + 3}" width="${Math.max(2, x(r.after) - L)}" height="${bh}" rx="4" fill="${C.after}" data-tip="${tip}"/>`;
+    s += `<text x="${x(r.after) + 6}" y="${y + 2 * bh - 1}" class="val fade" style="fill:${C.afterDark};--d:${(0.06 * i + 0.7).toFixed(2)}s">${eur(r.after)}</text>`;
+  });
+  return svg(W, H, s);
 }
 
 // ----------------------------------------------------------------------------- views
@@ -1309,7 +1317,9 @@ async function openTruck(id) {
 }
 
 async function renderSuppliers() {
-  $("#lollipop").innerHTML = lollipop(S.summary.top_savings);
+  const top = S.summary.top_savings.slice(0, +$("#sf-top").value), k = S.summary.kpi;
+  $("#topTitle").textContent = `Les ${top.length} plus grosses économies · coût de transport du ${dayLabel(k.first_need)} au ${dayLabel(k.last_need)}`;
+  $("#topChart").innerHTML = top.length ? topSavingBars(top, 1240) : "";
   if (!S.suppliers.length) S.suppliers = await api(`/runs/${S.current}/views/suppliers`);
   const q = $("#sf-q").value.trim().toLowerCase();
   const rows = S.suppliers.filter((r) => !q || (r.supplier + " " + r.plant).toLowerCase().includes(q)).sort((a, b) => b.saving - a.saving);
@@ -1321,6 +1331,7 @@ async function renderSuppliers() {
   ], rows);
 }
 $("#sf-q").addEventListener("input", () => S.summary && renderSuppliers());
+$("#sf-top").addEventListener("change", () => S.summary && renderSuppliers());
 
 function renderControls() {
   const sm = S.summary;
