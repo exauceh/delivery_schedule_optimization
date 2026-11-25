@@ -16,7 +16,7 @@ class Settings(BaseSettings):
 
     runs_dir: Path = Path("runs")  # one folder per run: inputs, outputs, manifest, log
     log_level: str = "INFO"
-    workers: int | None = None  # processes for the candidate plans (None = every CPU core)
+    workers: int | None = None  # processes for the candidate plans and the smoothing of the plants (None = every CPU core)
     host: str = "127.0.0.1"
     port: int = 8000
     max_upload_mb: int = 50  # size limit of each uploaded file

@@ -29,8 +29,8 @@ def write_tables(tables: Mapping[OutputName, pd.DataFrame], directory: Path) -> 
 # Sheets of the Excel report, in this order (sheet names are limited to 31 characters)
 WORKBOOK_SHEETS: list[tuple[OutputName, str]] = [
     (OutputName.PROFILES, "Sortie1_Profils"),
-    (OutputName.TRUCKS, "Sortie2_Camions"),
     (OutputName.TRUCK_CONTENTS, "Sortie2_Contenu_camions"),
+    (OutputName.TRUCKS, "Sortie2_Camions"),
     (OutputName.ALLOCATIONS, "Sortie2_Affectations"),
     (OutputName.SAVING, "Sortie3_Saving"),
     (OutputName.SMOOTHING_PLANTS, "Lissage_usines"),

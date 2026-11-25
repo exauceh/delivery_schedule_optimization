@@ -83,7 +83,7 @@ Chaque exécution écrit dans `runs/<run_id>/output/` :
 | `tests_sorties.csv` | Les suites de tests du Milestone 4 rejouées sur les sorties : contraintes recalculées depuis les lignes, données manquantes (H05, H06), exhaustivité, absence de rupture, cohérence du saving |
 | `situation_actuelle_camions.csv` | Situation actuelle camion par camion (poids, remplissage, prix) : la grille tarifaire de l'interface |
 | `lissage_usines.csv`, `lissage_couples.csv` | Effet du lissage : pic et coût de chaque usine, profil de chaque couple, avant et après lissage |
-| `resultats_consolidation.xlsx` | Rapport Excel : une feuille de synthèse, puis les sorties, le lissage, les anomalies, les contrôles et les tests |
+| `resultats_consolidation.xlsx` | Rapport Excel : une feuille de synthèse, puis les sorties 1, 2 et 3 au format du sujet (colonnes et en-têtes des diapos 10 à 12 de `courses/consolidation_algorithme_pdf.pdf`, puis le détail), le lissage, les anomalies, les contrôles et les tests |
 
 `runs/<run_id>/manifest.json` enregistre l'empreinte SHA-256 des entrées, tous les paramètres utilisés (valeurs par
 défaut comprises), la durée de chaque étape, les principaux indicateurs et le résultat des contrôles et des tests de
@@ -98,7 +98,7 @@ rien : tous ses chiffres viennent des tables de sortie d'une exécution, par les
 (`reporting/dashboard.py`).
 
 - **Nouveau calcul** : on dépose les trois fichiers d'un coup (reconnus automatiquement), on nomme le scénario et on
-  ajuste les réglages détaillés (avance maximale, surcoût accepté pour lisser, livraisons par semaine au plus), puis on
+  ajuste les réglages détaillés (avance maximale, surcoût accepté pour lisser), puis on
   lance. « Essayer avec un exemple » utilise les fichiers du projet. Les calculs précédents se rouvrent, se relancent sur
   les mêmes fichiers avec d'autres réglages, ou se suppriment.
 - **Synthèse** : économie, coût, camions, livraisons et remplissage avant / après, charge quotidienne des usines,
@@ -175,7 +175,7 @@ src/delivery_schedule_optimization/
 │   ├── candidates.py   un plan par ensemble de jours de la semaine (31) et par couple, en parallèle
 │   ├── selection.py    choix du profil (RG07)
 │   └── smoothing.py    répartition des livraisons par usine (RG09, programme linéaire en nombres entiers, HiGHS)
-├── reporting/     sorties 1, 2, 3, lissage, indicateurs, synthèse Excel et données des écrans (dashboard.py)
+├── reporting/     sorties 1, 2, 3 (au format du sujet pour l'Excel : brief.py), lissage, indicateurs, synthèse Excel et données des écrans (dashboard.py)
 ├── validation/    contrôles des règles métier (checks.py), tests du Milestone 4 sur les sorties d'une exécution
 │                  (output_tests.py) et cas unitaires du moteur (engine_cases.py)
 ├── pipeline.py    flux principal : préparation → situation actuelle → plans → sorties → contrôles (ni fichier, ni API)

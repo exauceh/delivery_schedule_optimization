@@ -243,12 +243,11 @@ $("#exampleBtn").addEventListener("click", () => launch(true));
 
 // settings of the form -> parameters of the planner (POST /api/runs, field "parameters")
 function runParameters() {
-  return { planner: { max_advance_days: F.anticipation, smoothing_budget: F.smoothing,
-                      allowed_frequencies: Array.from({ length: F.frequency }, (_, i) => i + 1) } };
+  return { planner: { max_advance_days: F.anticipation, smoothing_budget: F.smoothing } };
 }
 
 // ----------------------------------------------------------------------------- settings (folded menus)
-let DEFAULT_F = { anticipation: 7, smoothing: 0, frequency: 5 };
+let DEFAULT_F = { anticipation: 7, smoothing: 0 };
 const F = { ...DEFAULT_F };
 function pctTxt(x) { return x === 0 ? "aucun" : `${(x * 100).toLocaleString("fr-FR", { maximumFractionDigits: 1 })} %`; }
 function placePill(seg) {
@@ -266,7 +265,7 @@ function renderForm() {
   $('.fiche[data-field="anticipation"]').classList.toggle("off", F.anticipation !== DEFAULT_F.anticipation);
   const changed = Object.keys(DEFAULT_F).some((k) => F[k] !== DEFAULT_F[k]);
   $("#tuningSum").textContent = changed ? [`${F.anticipation} j d'avance`,
-    F.smoothing ? `lissage ${pctTxt(F.smoothing)}` : "lissage gratuit", `≤ ${F.frequency} / sem.`].join(" · ") : "par défaut : coût minimal";
+    F.smoothing ? `lissage ${pctTxt(F.smoothing)}` : "lissage gratuit"].join(" · ") : "par défaut : coût minimal";
   const w = $("#tuningWarn"), warnings = [];
   if (F.anticipation !== DEFAULT_F.anticipation)
     warnings.push(`${F.anticipation} jours d'avance : en dehors de la règle des ${DEFAULT_F.anticipation} jours, à présenter comme un scénario.`);
@@ -678,7 +677,7 @@ function stamp(label, value, target, ok, r) {
 function settingsChips(run) {
   const p = planner(run), freq = p.allowed_frequencies ? Math.max(...p.allowed_frequencies) : 5;
   return [`${p.max_advance_days ?? 7} j d'avance`, p.smoothing_budget ? `lissage ${nf1.format(p.smoothing_budget * 100)} %` : "lissage gratuit",
-    `≤ ${freq} / semaine`, run && run.source_run_id ? "relance" : null].filter(Boolean)
+    freq < 5 ? `≤ ${freq} / semaine` : null, run && run.source_run_id ? "relance" : null].filter(Boolean)
     .map((c) => `<span class="tag">${esc(c)}</span>`).join(" ");
 }
 
@@ -906,8 +905,7 @@ function renderScenarios() {
 (async function init() {
   try {   // default parameters of the planner, as the API applies them
     const d = (await api("/config/defaults")).planner || {};
-    DEFAULT_F = { anticipation: d.max_advance_days ?? 7, smoothing: d.smoothing_budget ?? 0,
-                  frequency: d.allowed_frequencies ? Math.max(...d.allowed_frequencies) : 5 };
+    DEFAULT_F = { anticipation: d.max_advance_days ?? 7, smoothing: d.smoothing_budget ?? 0 };
     Object.assign(F, DEFAULT_F);
   } catch (_) { /* offline: keep the built-in defaults */ }
   setNav(readNav());

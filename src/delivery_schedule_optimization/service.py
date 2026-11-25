@@ -17,6 +17,7 @@ from .io.schemas import InputName
 from .io.writers import write_tables, write_workbook
 from .logging_config import run_log_file, setup_logging
 from .pipeline import RawInputs, RunConfig, run_pipeline
+from .reporting.brief import brief_tables
 from .reporting.kpis import summary_table
 from .storage.base import RunManifest, RunRepository, RunStatus
 from .storage.filesystem import FileRunRepository
@@ -49,7 +50,8 @@ def execute_run(repository: RunRepository, run_id: str, workers: int | None = No
             )
             result = run_pipeline(inputs, RunConfig(planner=planner, preparation=preparation))
             write_tables(result.tables, repository.output_dir(run_id))
-            write_workbook(result.tables, summary_table(result.kpis, result.rate_sheet, result.checks_passed,
+            # outputs 1, 2 and 3 in the layout of the project brief in the Excel report, as in the notebook in the CSV
+            write_workbook({**result.tables, **brief_tables(result.tables)}, summary_table(result.kpis, result.rate_sheet, result.checks_passed,
                                                         sum(result.timings.values())), repository.output_dir(run_id))
         except Exception as exc:  # the run fails, the service keeps running: the error is recorded in the manifest
             logger.exception("Run %s failed", run_id)
