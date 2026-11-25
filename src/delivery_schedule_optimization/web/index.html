@@ -42,7 +42,7 @@
     </div>
     <nav class="runbar-tabs" aria-label="Résultats du scénario">
       <button data-view="apercu">Synthèse</button><button data-view="calendrier">Planning</button><button data-view="profils">Profils</button>
-      <button data-view="camions">Camions</button><button data-view="fournisseurs">Fournisseurs</button>
+      <button data-view="camions">Camions</button><button data-view="fournisseurs">Fournisseurs</button><button data-view="qualite">Tests &amp; qualité</button>
     </nav>
   </div>
   <!-- ======================================================== NEW CALCULATION -->
@@ -82,7 +82,6 @@
           </div>
         </div>
       </div>
-      <div class="panel quality" id="qualityPanel" aria-live="polite"></div>
     </div>
   </section>
 
@@ -134,11 +133,6 @@
       <div class="ed-legend" id="loadLegend"></div>
     </div>
 
-    <div class="ed-row ed-split">
-      <div class="ed-card" id="plantCard"></div>
-      <div class="ed-card" id="complianceCard"></div>
-    </div>
-
     <h3 class="ed-section">Analyses détaillées</h3>
     <details class="fold panel"><summary><span>Coût de transport par usine</span><span class="t-sum" id="plantsSum"></span></summary><div id="plantsBody"></div></details>
     <details class="fold panel"><summary><span>Lissage des réceptions</span><span class="t-sum" id="smoothSum"></span></summary><div id="smoothBody"></div></details>
@@ -147,11 +141,33 @@
         <p class="meta small" id="sitCaption"></p>
         <div id="sitBody"></div>
       </details>
-      <details class="fold panel"><summary><span>Règles appliquées aux données</span><span class="t-sum" id="foldRulesSum"></span></summary><ol id="rulesList" class="rules-list"></ol></details>
-      <details class="fold panel"><summary><span>Registre des anomalies</span><span class="t-sum" id="anomalyCount"></span></summary><div class="table-wrap" id="anomalyTable"></div></details>
     </div>
-    <details class="fold panel"><summary><span>Contrôles du plan et journal du calcul</span><span class="t-sum" id="controlsSum"></span></summary>
-      <div class="split"><div><div id="controlsList"></div></div><div><h3>Préparation et calcul</h3><div class="table-wrap" id="journal"></div></div></div></details>
+  </section>
+
+  <!-- ======================================================== TESTS & QUALITY -->
+  <section class="view ed" id="view-qualite">
+    <div class="ed-head">
+      <div>
+        <p class="ed-eyebrow">Tests &amp; qualité</p>
+        <h1 class="ed-title">Fiabilité des données et du plan</h1>
+        <p class="ed-sub" id="qa-sub"></p>
+      </div>
+    </div>
+
+    <h3 class="ed-section">Données importées</h3>
+    <div class="ed-row qa-top">
+      <div class="ed-card quality" id="qaQuality" aria-live="polite"></div>
+      <div class="ed-card" id="qaAnomalies"></div>
+    </div>
+    <div class="ed-card" id="qaRules"></div>
+
+    <h3 class="ed-section">Tests sur le plan</h3>
+    <div class="qa-sum" id="qaTestsSum"></div>
+    <div class="ed-row qa-tests">
+      <div class="qa-col"><div class="ed-card" id="qaControls"></div>
+        <div class="ed-card"><div class="ed-card-head"><h2>Journal du calcul</h2><span class="ed-chip">préparation et calcul</span></div><div class="table-wrap" id="journal"></div></div></div>
+      <div class="ed-card" id="qaOutputTests"></div>
+    </div>
   </section>
 
   <!-- ======================================================== CALENDAR -->
