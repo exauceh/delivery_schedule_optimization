@@ -664,20 +664,6 @@ function topSavingBars(rows, W = 760) {
   return svg(W, H, s);
 }
 
-function topSavingCards(rows, terms) {
-  const before = rows.reduce((a, r) => a + r.before, 0), after = rows.reduce((a, r) => a + r.after, 0), n = rows.length;
-  const share = 100 * (before - after) / S.summary.kpi.saving, best = rows[0];
-  const s = (k) => (k > 1 ? "s" : "");
-  let formula = `${best.supplier} → ${best.plant} : ${num(best.trucks_before)} camion${s(best.trucks_before)} aujourd'hui → ${num(best.trucks_after)} avec Gilbert`;
-  if (terms) {
-    const factor = (1 + terms.margin) * terms.diesel_surcharge, f = (v) => new Intl.NumberFormat("fr-FR", { maximumFractionDigits: 4 }).format(v);
-    formula = `${best.supplier} → ${best.plant} : ${num(best.trucks_before)} camion${s(best.trucks_before)} (${eur(best.before / factor, 2)} de base) → ` +
-      `${num(best.trucks_after)} camion${s(best.trucks_after)} (${eur(best.after / factor, 2)} de base) × ${f(1 + terms.margin)} × ${f(terms.diesel_surcharge)}`;
-  }
-  return `<div class="top-card hot"><b>−${nf0.format(100 * (before - after) / before)} %</b><span>coût des ${n} couples : ${eur(before)} → ${eur(after)}</span></div>
-    <div class="top-card"><b>${eur(before - after)}</b><span>économisés pour ${n} couples, soit ${nf0.format(share)} % de l'économie totale (${eur(S.summary.kpi.saving)})</span></div>
-    <div class="top-card"><b>${eur(best.saving)}</b><span>${formula}</span></div>`;
-}
 
 function scenarioBars(runs) {
   const W = 900, rowH = 50, L = 200, R = 250, H = runs.length * rowH + 10, max = Math.max(1, ...runs.map((r) => r.kpis.saving));
@@ -884,9 +870,7 @@ async function openTruck(id) {
 async function renderSuppliers() {
   const top = S.summary.top_savings.slice(0, +$("#sf-top").value), k = S.summary.kpi;
   $("#topTitle").textContent = `Les ${top.length} plus grosses économies · coût de transport du ${dayLabel(k.first_need)} au ${dayLabel(k.last_need)}`;
-  $("#topChart").innerHTML = top.length ? topSavingBars(top) : "";
-  $("#topCards").innerHTML = top.length ? topSavingCards(top, S.summary.price_terms) : "";
-  if (!S.suppliers.length) S.suppliers = await api(`/runs/${S.current}/views/suppliers`);
+  $("#topChart").innerHTML = top.length ? topSavingBars(top, 1240) : "";  if (!S.suppliers.length) S.suppliers = await api(`/runs/${S.current}/views/suppliers`);
   const q = $("#sf-q").value.trim().toLowerCase();
   const rows = S.suppliers.filter((r) => !q || (r.supplier + " " + r.plant).toLowerCase().includes(q)).sort((a, b) => b.saving - a.saving);
   $("#suppliersTable").innerHTML = table([

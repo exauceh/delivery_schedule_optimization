@@ -157,22 +157,6 @@ class TopSaving(BaseModel):
     pct: float
     before: float
     after: float
-    trucks_before: int
-    trucks_after: int
-
-
-class PriceTerms(BaseModel):
-    """Contract terms of the rate sheet (RG11): price of a truck = grid price x (1 + margin) x diesel surcharge."""
-
-    margin: float
-    diesel_surcharge: float
-
-
-def price_terms(manifest: RunManifest) -> PriceTerms | None:
-    margin, diesel = manifest.rate_sheet.get("margin"), manifest.rate_sheet.get("diesel_surcharge")
-    if margin is None or diesel is None:
-        return None
-    return PriceTerms(margin=float(margin), diesel_surcharge=float(diesel))
 
 
 class AdvanceCount(BaseModel):
@@ -201,8 +185,7 @@ class Summary(BaseModel):
     calendar: Calendar
     advance: list[AdvanceCount]
     profiles: list[ProfileCount]
-    top_savings: list[TopSaving]  # the 15 largest savings, largest first
-    price_terms: PriceTerms | None
+    top_savings: list[TopSaving]
     filters: Filters
 
 
@@ -272,11 +255,9 @@ def summary(output_dir: Path, manifest: RunManifest) -> Summary:
         advance=[AdvanceCount(days=d, lines=n) for d, n in zip(ints(advance, "advance_days"), ints(advance, "lines"))],
         profiles=[ProfileCount(profile=per_week(int(n)), before=int(before_counts.get(n, 0)), after=int(after_counts.get(n, 0)))
                   for n in labels],
-        top_savings=[TopSaving(supplier=s, plant=p, saving=v, pct=pc, before=b, after=a, trucks_before=tb, trucks_after=ta)
-                     for s, p, v, pc, b, a, tb, ta in zip(strs(top, "supplier_id"), strs(top, "plant"), floats(top, "saving"),
-                                                          floats(top, "saving_pct"), floats(top, "cost_before"), floats(top, "cost_after"),
-                                                          ints(top, "trucks_before"), ints(top, "trucks_after"))],
-        price_terms=price_terms(manifest),
+        top_savings=[TopSaving(supplier=s, plant=p, saving=v, pct=pc, before=b, after=a)
+                     for s, p, v, pc, b, a in zip(strs(top, "supplier_id"), strs(top, "plant"), floats(top, "saving"),
+                                                  floats(top, "saving_pct"), floats(top, "cost_before"), floats(top, "cost_after"))],
         filters=Filters(plants=cal.plants, suppliers=sorted(trucks["supplier_id"].unique()), days=cal.days),
     )
 
